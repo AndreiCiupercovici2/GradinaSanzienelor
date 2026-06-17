@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panou Administrare - Diana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; }
+        h1, h2 { color: #333; }
+        .tabel-container { 
+            overflow-x: auto; 
+            margin-bottom: 40px; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #2c3e50; color: white; font-size: 15px; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        /* O mică stilizare pentru textul de status (opțional, js-ul face grosul) */
+        .status-text { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        .data-mica { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <h1>Panou Administrare Rezervări</h1>
+    <p>Aici poți aproba sau respinge cererile de rezervare primite de la clienți.</p>
+
+    <h2>1. Rezervări Mâncare</h2>
+    <div class="tabel-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data efectuării cererii</th>
+                    <th>Nume / Contact</th>
+                    <th>Data mesei / Ora</th>
+                    <th>Număr Persoane</th>
+                    <th>Acțiuni / Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabelMancare">
+                </tbody>
+        </table>
+    </div>
+
+    <h2>2. Rezervări Cabană</h2>
+    <div class="tabel-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data efectuării cererii</th>
+                    <th>Nume / Contact</th>
+                    <th>Perioada (Check-in - Check-out)</th>
+                    <th>Persoane / Meniu</th>
+                    <th>Acțiuni / Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabelCabana">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punct Gastronomic</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/flatpickr/flatpickr.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="lang-selector">
+        <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
+        <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+    </div>
+
+    <h1 data-i18n="titlu_principal" style="text-align: center;">Rezervări Punct Gastronomic</h1>
+
+    <div class="menu-selector">
+        <button onclick="arataSectiune('mancare')" id="btnMancare" data-i18n="nav_mancare">Rezervă Masă</button>
+        <button onclick="arataSectiune('cabana')" id="btnCabana" data-i18n="nav_cabana">Cazare</button>
+    </div>
+
+    <div id="sectiuneMancare" class="form-container" style="display: none;">
+        <p style="text-align: center; color: #555; margin-bottom: 20px;">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
+        
+        <div class="calendar-wrapper">
+            <input type="text" id="calendarMancare">
+        </div>
+
+        <div id="formMancareContainer" class="hidden-form">
+            <form id="formMancare">
+                <div class="form-group">
+                    <label data-i18n="label_data_mesei">Data Mesei:</label>
+                    <input type="text" id="dataM" readonly required> 
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_nume">Nume Complet:</label>
+                    <input type="text" id="numeM" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_email">Email:</label>
+                    <input type="email" id="emailM" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_telefon">Telefon (Opțional):</label>
+                    <input type="tel" id="telefonM">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_ora_sosire">Ora Sosirii:</label>
+                    <input type="time" id="oraM" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_numar_persoane">Număr Persoane:</label>
+                    <input type="number" id="persoaneM" min="1" value="1" required>
+                </div>
+                <div class="pret-estimat" id="pretMancareAfisaj">Preț estimat: 0 RON</div>
+                <br>
+                <button type="submit" data-i18n="btn_trimite">Trimite Cererea de Masă</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="sectiuneCabana" class="form-container" style="display: none;">
+        <p style="text-align: center; color: #555; margin-bottom: 20px;">Selectează perioada în care dorești să te cazezi în cabană.</p>
+
+        <div class="calendar-wrapper">
+            <input type="text" id="calendarCabana">
+        </div>
+
+        <div id="formCabanaContainer" class="hidden-form">
+            <form id="formCabana">
+                <div id="warningCabana"></div>
+
+                <div class="form-group">
+                    <label data-i18n="label_data_check_in">Data Check-in (Început):</label>
+                    <input type="text" id="dataInceputC" readonly required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_data_check_out">Data Check-out (Sfârșit):</label>
+                    <input type="text" id="dataSfarsitC" readonly required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_nume">Nume Complet:</label>
+                    <input type="text" id="numeC" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_email">Email:</label>
+                    <input type="email" id="emailC" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_telefon">Telefon (Opțional):</label>
+                    <input type="tel" id="telefonC">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_numar_persoane">Număr Persoane (Max 8):</label>
+                    <input type="number" id="persoaneC" min="1" max="8" value="1" required>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="meniuC">
+                    <label style="display:inline;" for="meniuC">Doresc și meniu gastronomic</label>
+                </div>
+                <div class="pret-estimat" id="pretCabanaAfisaj">Preț estimat: 0 RON</div>
+                <br>
+                <button type="submit" data-i18n="btn_trimite">Trimite Rezervarea Cabană</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script src="/flatpickr/flatpickr.min.js"></script>
+    <script src="/flatpickr/l10n/ro.js"></script>
+</body>
+</html>

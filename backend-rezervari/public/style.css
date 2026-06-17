@@ -1,0 +1,173 @@
+/* --- Setări Generale și Tipografie --- */
+body { 
+    font-family: Arial, sans-serif; 
+    max-width: 600px; 
+    margin: 40px auto; 
+    padding: 20px; 
+    background-color: #f9f9f9; 
+}
+
+h2 { 
+    color: #333; 
+    border-bottom: 2px solid #ddd; 
+    padding-bottom: 10px; 
+    text-align: center; 
+}
+
+/* --- Selectorul de Limbă --- */
+.lang-selector { 
+    text-align: right; 
+    margin-bottom: 20px; 
+}
+
+.lang-selector button { 
+    width: auto; 
+    padding: 5px 10px; 
+    margin-left: 5px; 
+    cursor: pointer;
+}
+
+/* --- Selector Secțiuni (Meniu Principal Minimal) --- */
+.menu-selector {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.menu-selector button {
+    background-color: #6c757d; /* Gri neutru pentru butonul neactiv */
+    color: white;
+    flex: 1;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: background-color 0.2s, transform 0.1s;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.menu-selector button:hover {
+    background-color: #5a6268;
+}
+
+/* Stil pentru butonul selectat activ */
+.menu-selector button.active {
+    background-color: #007bff; /* Albastru pentru evidențiere */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+}
+
+.menu-selector button.active:hover {
+    background-color: #0069d9;
+}
+
+/* --- Containere și Formulare --- */
+.form-container { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    margin-bottom: 30px; 
+}
+
+.form-group { 
+    margin-bottom: 15px; 
+}
+
+label { 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    font-size: 14px; 
+}
+
+/* --- Câmpuri de Input --- */
+input[type="text"], 
+input[type="email"], 
+input[type="date"], 
+input[type="time"], 
+input[type="number"], 
+input[type="tel"] { 
+    width: 100%; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    background-color: #fff; 
+}
+
+input[readonly] { 
+    background-color: #e9ecef; 
+    cursor: not-allowed; 
+}
+
+/* --- Butoane de Trimitere (Submit) --- */
+button[type="submit"] { 
+    background-color: #28a745; 
+    color: white; 
+    border: none; 
+    padding: 12px 15px; 
+    font-size: 16px; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    width: 100%; 
+}
+
+button[type="submit"]:hover { 
+    background-color: #218838; 
+}
+
+/* --- Mesaje de Alertă și Preț --- */
+.pret-estimat { 
+    font-size: 18px; 
+    font-weight: bold; 
+    color: #d9534f; 
+    margin-top: 15px; 
+    background: #fdf7f7; 
+    padding: 10px; 
+    border-radius: 4px; 
+    border-left: 5px solid #d9534f; 
+}
+
+#warningCabana {
+    display: none; 
+    background-color: #fff3cd; 
+    color: #856404; 
+    padding: 12px; 
+    border-radius: 4px; 
+    margin-bottom: 15px; 
+    border-left: 5px solid #ffeeba; 
+    font-size: 14px;
+}
+
+.hidden-form { 
+    display: none; 
+    margin-top: 20px; 
+    border-top: 1px dashed #ccc; 
+    padding-top: 20px; 
+}
+
+/* --- Configurări Flatpickr --- */
+.flatpickr-calendar { 
+    z-index: 99 !important; 
+}
+
+.calendar-wrapper { 
+    display: flex; 
+    justify-content: center; 
+    margin-bottom: 20px; 
+    margin-top: 20px;
+}
+
+.flatpickr-calendar.inline { 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    border: 1px solid #ddd; 
+    position: static !important; 
+}
+
+/* Ascunde input-urile originale ale calendarelor */
+input#calendarMancare, 
+input#calendarCabana {
+    display: none !important;
+}
