@@ -15,9 +15,28 @@ function schimbaLimba(nouaLimba) {
     limbaCurenta = nouaLimba;
     localStorage.setItem('limba_preferata', nouaLimba);
     aplicaTraducerile();
-    
-    if (typeof flatpickr !== 'undefined' && flatpickr.l10ns[nouaLimba]) {
-        flatpickr.localize(flatpickr.l10ns[nouaLimba]);
+
+    // Recreate visible calendars with new locale
+    const mancareContainer = document.getElementById('sectiuneMancare');
+    const cabanaContainer = document.getElementById('sectiuneCabana');
+
+    if (mancareContainer.style.display !== 'none' && calendarMancareInstanta) {
+        calendarMancareInstanta.destroy();
+        calendarMancareInstanta = null;
+        arataSectiune('mancare');
+    }
+    if (cabanaContainer.style.display !== 'none' && calendarCabanaInstanta) {
+        calendarCabanaInstanta.destroy();
+        calendarCabanaInstanta = null;
+        arataSectiune('cabana');
+    }
+
+    // Refresh price displays with new language
+    if (document.getElementById('pretCabanaAfisaj').innerText.includes('RON')) {
+        calculeazaPretCabana();
+    }
+    if (document.getElementById('pretMancareAfisaj').innerText.includes('RON')) {
+        calculeazaPretMancare();
     }
 }
 aplicaTraducerile();
@@ -27,10 +46,17 @@ const PRET_NOAPTE_PERSOANA = 100;
 const PRET_MENIU_PERSOANA = 70;
 const backendUrl = '/api'; 
 
-let ocupareZilnica = {}; 
+let ocupareZilnica = {};
 let zileCompletOcupate = [];
 let calendarMancareInstanta = null;
 let calendarCabanaInstanta = null;
+
+function getLocaleConfig() {
+    if (limbaCurenta === 'ro' && typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ro) {
+        return { locale: flatpickr.l10ns.ro };
+    }
+    return { locale: 'en' };
+}
 
 // Deschide secțiunea selectată și inițializează calendarul aferent ei
 function arataSectiune(tip) {
@@ -45,13 +71,14 @@ function arataSectiune(tip) {
     const setariComune = {
         dateFormat: "Y-m-d",
         inline: true,
-        disableMobile: "true"
+        disableMobile: "true",
+        locale: limbaCurenta === 'ro' ? flatpickr.l10ns.ro : 'en'
     };
 
     // Inițializare Calendar Mâncare la cerere
     if (tip === 'mancare' && !calendarMancareInstanta) {
-        calendarMancareInstanta = flatpickr("#calendarMancare", { 
-            ...setariComune, 
+        calendarMancareInstanta = flatpickr("#calendarMancare", {
+            ...setariComune,
             minDate: "today",
             onChange: function(selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
@@ -64,13 +91,13 @@ function arataSectiune(tip) {
             }
         });
     }
-    
+
     // Inițializare Calendar Cabană la cerere
     if (tip === 'cabana' && !calendarCabanaInstanta) {
-        calendarCabanaInstanta = flatpickr("#calendarCabana", { 
+        calendarCabanaInstanta = flatpickr("#calendarCabana", {
             ...setariComune,
-            minDate: "today", 
-            mode: "range", 
+            minDate: "today",
+            mode: "range",
             disable: zileCompletOcupate,
             onChange: function(selectedDates, dateStr, instance) {
                 const formContainer = document.getElementById('formCabanaContainer');
@@ -150,7 +177,7 @@ async function incarcatDateOcupare() {
 document.addEventListener("DOMContentLoaded", async function() {
     await incarcatDateOcupare();
     // Pagina de mâncare rămâne prima deschisă automat la încărcare
-    arataSectiune('mancare');
+    //arataSectiune('mancare');
 });
 
 // --- 4. CALCUL PREȚ ---
@@ -165,16 +192,18 @@ function calculeazaPretCabana() {
     const persoane = parseInt(document.getElementById('persoaneC').value) || 0;
     const nopti = calculeazaNopti(document.getElementById('dataInceputC').value, document.getElementById('dataSfarsitC').value);
     const vreaMeniu = document.getElementById('meniuC').checked;
-    
+
     let pretTotal = (nopti > 0) ? (persoane * nopti * PRET_NOAPTE_PERSOANA) : 0;
     if (nopti > 0 && vreaMeniu) pretTotal += (persoane * nopti * PRET_MENIU_PERSOANA);
-    
-    document.getElementById('pretCabanaAfisaj').innerText = `Preț estimat: ${pretTotal} RON`;
+
+    const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
+    document.getElementById('pretCabanaAfisaj').innerText = `${pretEstimatiText} ${pretTotal} RON`;
 }
 
 function calculeazaPretMancare() {
     const persoane = parseInt(document.getElementById('persoaneM').value) || 0;
-    document.getElementById('pretMancareAfisaj').innerText = `Preț estimat: ${persoane * PRET_MENIU_PERSOANA} RON`;
+    const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
+    document.getElementById('pretMancareAfisaj').innerText = `${pretEstimatiText} ${persoane * PRET_MENIU_PERSOANA} RON`;
 }
 
 document.getElementById('persoaneC').addEventListener('input', calculeazaPretCabana);

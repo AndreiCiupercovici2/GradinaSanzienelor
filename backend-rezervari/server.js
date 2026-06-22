@@ -28,9 +28,6 @@ const MIN_NR_CABANA = 1;
 const sendConfirmationEmail = (detaliiRezervare, tipRezervare) => {
     const TelefonText = detaliiRezervare.telefon ? detaliiRezervare.telefon : 'Nu a lasat numar de telefon';
     let continutEmail = `Ai o rezervare noua pentru: ${tipRezervare}\n\n`;
-    continutEmail += `Nume: ${detaliiRezervare.nume}\n`;
-    continutEmail += `Email: ${detaliiRezervare.email}\n`;
-    continutEmail += `Telefon: ${TelefonText}\n`;
     continutEmail += `Data rezervare: ${detaliiRezervare.data_rezervare}\n`;
     continutEmail += `Numar persoane: ${detaliiRezervare.numar_persoane}\n`;
     if (tipRezervare === 'cabana') {
@@ -38,6 +35,8 @@ const sendConfirmationEmail = (detaliiRezervare, tipRezervare) => {
         continutEmail += `Data sfarsit: ${detaliiRezervare.data_sfarsit}\n`;
         continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
     }
+    // Link la admin panel
+    continutEmail += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: http://localhost:${port}/admin.html`;
 
     const mailOptions = {
         from: process.env.EMAIL_USER,

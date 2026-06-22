@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punct Gastronomic</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="/flatpickr/flatpickr.min.css">
+    <link rel="stylesheet" href="flatpickr.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,7 +23,7 @@
     </div>
 
     <div id="sectiuneMancare" class="form-container" style="display: none;">
-        <p style="text-align: center; color: #555; margin-bottom: 20px;">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
+        <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
         
         <div class="calendar-wrapper">
             <input type="text" id="calendarMancare">
@@ -55,7 +55,7 @@
                     <label data-i18n="label_numar_persoane">Număr Persoane:</label>
                     <input type="number" id="persoaneM" min="1" value="1" required>
                 </div>
-                <div class="pret-estimat" id="pretMancareAfisaj">Preț estimat: 0 RON</div>
+                <div class="pret-estimat" id="pretMancareAfisaj" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON</div>
                 <br>
                 <button type="submit" data-i18n="btn_trimite">Trimite Cererea de Masă</button>
             </form>
@@ -63,7 +63,7 @@
     </div>
 
     <div id="sectiuneCabana" class="form-container" style="display: none;">
-        <p style="text-align: center; color: #555; margin-bottom: 20px;">Selectează perioada în care dorești să te cazezi în cabană.</p>
+        <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
 
         <div class="calendar-wrapper">
             <input type="text" id="calendarCabana">
@@ -99,18 +99,18 @@
                 </div>
                 <div class="form-group">
                     <input type="checkbox" id="meniuC">
-                    <label style="display:inline;" for="meniuC">Doresc și meniu gastronomic</label>
+                    <label style="display:inline;" for="meniuC" data-i18n="label_meniu">Doresc și meniu gastronomic</label>
                 </div>
-                <div class="pret-estimat" id="pretCabanaAfisaj">Preț estimat: 0 RON</div>
+                <div class="pret-estimat" id="pretCabanaAfisaj" data-i18n="pretCabanaAfisaj">Preț estimat: 0 RON</div>
                 <br>
                 <button type="submit" data-i18n="btn_trimite">Trimite Rezervarea Cabană</button>
             </form>
         </div>
     </div>
 
+    <script src="flatpickr.min.js"></script>
+    <script src="ro.js"></script>
     <script src="translations.js"></script>
     <script src="script.js"></script>
-    <script src="/flatpickr/flatpickr.min.js"></script>
-    <script src="/flatpickr/l10n/ro.js"></script>
 </body>
 </html>
