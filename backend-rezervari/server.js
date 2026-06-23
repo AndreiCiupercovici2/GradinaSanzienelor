@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${port}`;
 
 // Middleware
 app.use(cors());
@@ -25,33 +26,106 @@ const transporter = nodemailer.createTransport({
 const CAPACITATE_MAX_CABANA = 8;
 const MIN_NR_CABANA = 1;
 
-const sendConfirmationEmail = (detaliiRezervare, tipRezervare) => {
-    const TelefonText = detaliiRezervare.telefon ? detaliiRezervare.telefon : 'Nu a lasat numar de telefon';
-    let continutEmail = `Ai o rezervare noua pentru: ${tipRezervare}\n\n`;
-    continutEmail += `Data rezervare: ${detaliiRezervare.data_rezervare}\n`;
-    continutEmail += `Numar persoane: ${detaliiRezervare.numar_persoane}\n`;
-    if (tipRezervare === 'cabana') {
-        continutEmail += `Data inceput: ${detaliiRezervare.data_inceput}\n`;
-        continutEmail += `Data sfarsit: ${detaliiRezervare.data_sfarsit}\n`;
-        continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
+const messages = {
+    ro: {
+        num_persoane_invalid: `Numărul de persoane trebuie să fie între ${MIN_NR_CABANA} și ${CAPACITATE_MAX_CABANA}.`,
+        availability_error: 'Eroare la verificarea disponibilității.',
+        fully_booked: 'Cabana nu mai are locuri disponibile în perioada selectată.',
+        save_error: 'Eroare la salvarea rezervării.',
+        commit_error: 'Eroare la confirmare.',
+        cabin_success: 'Cererea de rezervare a fost trimisă pentru aprobare.',
+        food_success: 'Cererea de masă trimisă pentru aprobare.',
+        invalid_type: 'Tip rezervare invalid.',
+        invalid_decision: 'Decizie invalidă.',
+        invalid_id: 'ID invalid.',
+        update_error: 'Eroare la actualizare.',
+        not_found: 'Rezervare nu a fost găsită.',
+        data_error: 'Eroare la preluarea datelor.',
+        update_success: (decizie) => `Rezervare ${decizie} cu succes.`
+    },
+    en: {
+        num_persoane_invalid: `Number of people must be between ${MIN_NR_CABANA} and ${CAPACITATE_MAX_CABANA}.`,
+        availability_error: 'Error checking availability.',
+        fully_booked: 'Cabin has no available spots for this period.',
+        save_error: 'Error saving reservation.',
+        commit_error: 'Error confirming reservation.',
+        cabin_success: 'Reservation request submitted for approval.',
+        food_success: 'Meal request submitted for approval.',
+        invalid_type: 'Invalid reservation type.',
+        invalid_decision: 'Invalid decision.',
+        invalid_id: 'Invalid ID.',
+        update_error: 'Error updating reservation.',
+        not_found: 'Reservation not found.',
+        data_error: 'Error retrieving data.',
+        update_success: (decizie) => `Reservation ${decizie} successfully.`
     }
-    // Link la admin panel
-    continutEmail += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: http://localhost:${port}/admin.html`;
+};
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
-        subject: `Confirmare rezervare pentru ${tipRezervare}`,
-        text: continutEmail
-    };
+const getLanguage = (req) => {
+    const lang = req.query.lang || req.headers['accept-language']?.split(',')[0]?.slice(0, 2) || 'ro';
+    return ['ro', 'en'].includes(lang) ? lang : 'ro';
+};
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error(error);
+const t = (key, lang, ...args) => {
+    const msg = messages[lang]?.[key] || messages.ro[key];
+    return typeof msg === 'function' ? msg(...args) : msg;
+};
+
+// Input validation helpers
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const isValidDate = (date) => !isNaN(Date.parse(date));
+const isValidPhoneNumber = (phone) => !phone || /^[0-9\s\-\+()]{6,}$/.test(phone);
+const sanitizeText = (text) => text?.trim().slice(0, 255) || '';
+
+const validateReservationInput = (data, isFood = false) => {
+    const errors = [];
+
+    if (!data.nume || !sanitizeText(data.nume)) errors.push('Nume invalid');
+    if (!isValidEmail(data.email)) errors.push('Email invalid');
+    if (!isValidPhoneNumber(data.telefon)) errors.push('Telefon invalid');
+    if (!data.numar_persoane || data.numar_persoane < 1) errors.push('Număr persoane invalid');
+
+    if (isFood) {
+        if (!isValidDate(data.data_rezervare)) errors.push('Data rezervare invalidă');
+        if (!data.ora) errors.push('Ora invalidă');
+    } else {
+        if (!isValidDate(data.data_inceput)) errors.push('Data început invalidă');
+        if (!isValidDate(data.data_sfarsit)) errors.push('Data sfârșit invalidă');
+        if (new Date(data.data_inceput) >= new Date(data.data_sfarsit)) errors.push('Data sfârșit trebuie după data început');
+    }
+
+    return errors.length > 0 ? errors : null;
+};
+
+const sendConfirmationEmail = async (detaliiRezervare, tipRezervare) => {
+    try {
+        const telefonText = detaliiRezervare.telefon || 'Nu a lăsat număr de telefon';
+        let continutEmail = `Ai o rezervare nouă pentru: ${tipRezervare}\n\n`;
+        continutEmail += `Nume: ${sanitizeText(detaliiRezervare.nume)}\n`;
+        continutEmail += `Email: ${detaliiRezervare.email}\n`;
+        continutEmail += `Telefon: ${telefonText}\n`;
+        continutEmail += `Număr persoane: ${detaliiRezervare.numar_persoane}\n`;
+
+        if (tipRezervare === 'cabana') {
+            continutEmail += `Data început: ${detaliiRezervare.data_inceput}\n`;
+            continutEmail += `Data sfârșit: ${detaliiRezervare.data_sfarsit}\n`;
+            continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
         } else {
-            console.log('Email sent: ' + info.response);
+            continutEmail += `Data: ${detaliiRezervare.data_rezervare}\n`;
+            continutEmail += `Ora: ${detaliiRezervare.ora}\n`;
         }
-    });
+
+        continutEmail += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/admin.html`;
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
+            subject: `Nouă rezervare - ${tipRezervare}`,
+            text: continutEmail
+        });
+    } catch (error) {
+        console.error('Email sending failed:', error);
+    }
 };
 
 // Connect to SQLite database
@@ -92,86 +166,149 @@ db.serialize(() => {
     )`);
 });
 
-app.post('/api/rezervari_cabana', (req, res) => {
+app.post('/api/rezervari_cabana', async (req, res) => {
+    const lang = getLanguage(req);
     const { nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu } = req.body;
 
-    if (numar_persoane < MIN_NR_CABANA ) {
-        return res.status(400).json({ error: `Numarul minim de persoane pentru cabana este ${MIN_NR_CABANA}.` });
+    const validationErrors = validateReservationInput(req.body, false);
+    if (validationErrors) {
+        return res.status(400).json({ error: validationErrors.join(', ') });
     }
 
-    db.serialize(() => {
-        db.run("BEGIN TRANSACTION");
+    if (numar_persoane < MIN_NR_CABANA || numar_persoane > CAPACITATE_MAX_CABANA) {
+        return res.status(400).json({ error: t('num_persoane_invalid', lang) });
+    }
 
-        const sqlVerificare = `
-            SELECT SUM(numar_persoane) AS total_oaspeti
-            FROM rezervari_cabana
-            WHERE status = 'confirmat'
-            AND NOT (data_sfarsit <= ? OR data_inceput >= ?)`;
+    return new Promise((resolve) => {
+        db.serialize(() => {
+            db.run("BEGIN TRANSACTION");
 
-        db.get(sqlVerificare, [data_inceput, data_sfarsit], (err, row) => {
-            if (err) {
-                db.run("ROLLBACK");
-                return res.status(500).json({ error: 'Eroare la verificarea disponibilității.' });
-            }
-            const oaspetiExistenti = row.total_oaspeti || 0;
+            const sqlVerificare = `
+                SELECT SUM(numar_persoane) AS total_oaspeti
+                FROM rezervari_cabana
+                WHERE status = 'confirmat'
+                AND NOT (data_sfarsit <= ? OR data_inceput >= ?)`;
 
-            if (oaspetiExistenti + numar_persoane > CAPACITATE_MAX_CABANA) {
-                db.run("ROLLBACK");
-                return res.status(400).json({ error: 'Ne pare rău, cabana este complet ocupată sau nu mai are destule locuri în această perioadă.' });
-            }
-
-            const sqlInsert = `INSERT INTO rezervari_cabana (nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-            db.run(sqlInsert, [nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu], function(err) {
+            db.get(sqlVerificare, [data_inceput, data_sfarsit], (err, row) => {
                 if (err) {
                     db.run("ROLLBACK");
-                    return res.status(500).json({ error: 'Eroare la salvarea rezervării.' });
+                    resolve(res.status(500).json({ error: t('availability_error', lang) }));
+                    return;
                 }
-                db.run("COMMIT");
 
-                sendConfirmationEmail(req.body, 'cabana');
+                const oaspetiExistenti = row.total_oaspeti || 0;
+                if (oaspetiExistenti + numar_persoane > CAPACITATE_MAX_CABANA) {
+                    db.run("ROLLBACK");
+                    resolve(res.status(400).json({ error: t('fully_booked', lang) }));
+                    return;
+                }
 
-                return res.status(201).json({ message: 'Cererea de rezervare a fost trimisă pentru aprobare.', id: this.lastID });
+                const sqlInsert = `INSERT INTO rezervari_cabana (nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+                db.run(sqlInsert, [sanitizeText(nume), email, sanitizeText(telefon), data_inceput, data_sfarsit, numar_persoane, vrea_meniu ? 1 : 0], function(err) {
+                    if (err) {
+                        db.run("ROLLBACK");
+                        resolve(res.status(500).json({ error: t('save_error', lang) }));
+                        return;
+                    }
+
+                    db.run("COMMIT", async (err) => {
+                        if (err) {
+                            resolve(res.status(500).json({ error: t('commit_error', lang) }));
+                            return;
+                        }
+
+                        await sendConfirmationEmail(req.body, 'cabana');
+                        resolve(res.status(201).json({ message: t('cabin_success', lang), id: this.lastID }));
+                    });
+                });
             });
         });
     });
 });
 
-app.post('/api/rezervari_mancare', (req, res) => {
+app.post('/api/rezervari_mancare', async (req, res) => {
+    const lang = getLanguage(req);
     const { nume, email, telefon, data_rezervare, ora, numar_persoane } = req.body;
+
+    const validationErrors = validateReservationInput(req.body, true);
+    if (validationErrors) {
+        return res.status(400).json({ error: validationErrors.join(', ') });
+    }
+
     const sql = `INSERT INTO rezervari_mancare (nume, email, telefon, data_rezervare, ora, numar_persoane) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.run(sql, [nume, email, telefon, data_rezervare, ora, numar_persoane], function(err) {
+
+    db.run(sql, [sanitizeText(nume), email, sanitizeText(telefon), data_rezervare, ora, numar_persoane], async function(err) {
         if (err) {
-            return res.status(500).json({ error: 'Eroare la salvarea rezervării.' });
+            console.error('Database error:', err);
+            return res.status(500).json({ error: t('save_error', lang) });
         }
-        sendConfirmationEmail(req.body, 'mancare');
-        return res.status(201).json({ message: 'Cererea de masă trimisă pentru aprobare.', id: this.lastID });
+
+        await sendConfirmationEmail(req.body, 'mancare');
+        return res.status(201).json({ message: t('food_success', lang), id: this.lastID });
     });
-})
+});
 
 app.post('/api/admin/decizie', (req, res) => {
-    const { id, tipRezervare, decizie } = req.body; //tipRezervare: 'cabana' sau 'mancare', decizie: 'confirmat' sau 'anulat'
+    const lang = getLanguage(req);
+    const { id, tipRezervare, decizie } = req.body;
+
+    if (!['cabana', 'mancare'].includes(tipRezervare)) {
+        return res.status(400).json({ error: t('invalid_type', lang) });
+    }
+    if (!['confirmat', 'anulat'].includes(decizie)) {
+        return res.status(400).json({ error: t('invalid_decision', lang) });
+    }
+    if (!id || isNaN(id)) {
+        return res.status(400).json({ error: t('invalid_id', lang) });
+    }
+
     const tabel = tipRezervare === 'cabana' ? 'rezervari_cabana' : 'rezervari_mancare';
     const sql = `UPDATE ${tabel} SET status = ? WHERE id = ?`;
+
     db.run(sql, [decizie, id], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        if (this.changes === 0) return res.status(404).json({ error: 'Rezervare nu a fost găsită.' });
-        return res.json({ message: `Rezervare ${decizie}ă cu succes.` });
-    })
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: t('update_error', lang) });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: t('not_found', lang) });
+        }
+        return res.json({ message: t('update_success', lang, decizie) });
+    });
 });
 
 app.get('/api/zile_ocupate', (req, res) => {
+    const lang = getLanguage(req);
     const sql = `SELECT data_inceput, data_sfarsit, numar_persoane FROM rezervari_cabana WHERE status = 'confirmat'`;
     db.all(sql, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        return res.json(rows);
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: t('data_error', lang) });
+        }
+        return res.json(rows || []);
     });
 });
 
 app.get('/api/admin/cabana', (req, res) => {
-    db.all(`SELECT * FROM rezervari_cabana ORDER BY data_rezervare DESC`, [], (err, rows) => res.json(rows));
+    const lang = getLanguage(req);
+    db.all(`SELECT * FROM rezervari_cabana ORDER BY data_rezervare DESC`, [], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: t('data_error', lang) });
+        }
+        return res.json(rows || []);
+    });
 });
+
 app.get('/api/admin/mancare', (req, res) => {
-    db.all(`SELECT * FROM rezervari_mancare ORDER BY data_comanda DESC`, [], (err, rows) => res.json(rows));
+    const lang = getLanguage(req);
+    db.all(`SELECT * FROM rezervari_mancare ORDER BY data_comanda DESC`, [], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: t('data_error', lang) });
+        }
+        return res.json(rows || []);
+    });
 });
 
 app.listen(port, () => {

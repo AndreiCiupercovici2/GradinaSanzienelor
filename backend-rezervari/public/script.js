@@ -128,7 +128,7 @@ function arataSectiune(tip) {
 
                     if (maxOcupateInInterval > 0) {
                         warningDiv.style.display = 'block';
-                        warningDiv.innerHTML = `<strong>Atenție:</strong> În această perioadă cabana mai găzduiește <strong>${maxOcupateInInterval} oaspeți</strong>. Spațiile comune se împart. <br>Mai sunt doar <strong>${locuriDisponibile} locuri libere</strong>.`;
+                        warningDiv.innerHTML = template.replace(/\{oaspeți\}/g, maxOcupateInInterval).replace(/\{locuri\}/g, locuriDisponibile  );
                     } else {
                         warningDiv.style.display = 'none';
                         inputPersoane.max = 8;

@@ -17,7 +17,8 @@ const traduceri = {
         subSectiuneMancare: "Selecteaza o zi din calendar pentru a face rezervarea la masă.",
         subSectiuneCabana: "Selectează perioada în care dorești să te cazezi în cabană.",
         pretCabanaAfisaj: "Preț estimat: 0 RON",
-        pretMeniuAfisaj: "Preț estimat: 0 RON"
+        pretMeniuAfisaj: "Preț estimat: 0 RON",
+        warningCabana: "<strong>Atenție:</strong> În această perioadă cabana mai găzduiește <strong>{oaspeți} oaspeți</strong>. Spațiile comune se împart. <br>Mai sunt doar <strong>{locuri} locuri libere</strong>."
     },
     en: {
         titlu_principal: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -37,6 +38,7 @@ const traduceri = {
         subSectiuneMancare: "Select a date from the calendar to make your meal reservation.",
         subSectiuneCabana: "Select the period you want to stay in the cabin.",
         pretCabanaAfisaj: "Estimated Price: 0 RON",
-        pretMeniuAfisaj: "Estimated Price: 0 RON"
+        pretMeniuAfisaj: "Estimated Price: 0 RON",
+        warningCabana: "<strong>Attention:</strong> During this period the cabin hosts <strong>{guests} guests</strong>. Common areas are shared. <br>There are only <strong>{spaces} spaces left</strong>."
     }
 }
