@@ -2,13 +2,9 @@
   "hooks": {
     "SessionStart": [
       {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat .claude/AGENTS.md 2>/dev/null | jq -Rs '{\"systemMessage\": \"Team Instructions (AGENTS.md):\\n\\n\" + .}' || echo '{\"systemMessage\": \"Note: AGENTS.md not found\"}'",
-            "statusMessage": "Loading team instructions..."
-          }
-        ]
+        "type": "command",
+        "command": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && cat .claude/AGENTS.md 2>/dev/null | jq -Rs '{\"systemMessage\": \"Team Instructions (AGENTS.md):\\n\\n\" + .}' || echo '{\"systemMessage\": \"Note: AGENTS.md not found\"}'",
+        "statusMessage": "Loading team instructions..."
       }
     ],
     "PreToolUse": [

@@ -1,3 +1,81 @@
+// --- SLIDESHOW FUNCTIONALITY ---
+let currentSlide = 1;
+let slideShowInterval = null;
+const SLIDESHOW_INTERVAL = 5000; // 5 seconds
+const TOTAL_SLIDES = 4;
+
+function showSlide(n) {
+    // Validate slide number
+    if (n > TOTAL_SLIDES) currentSlide = 1;
+    if (n < 1) currentSlide = TOTAL_SLIDES;
+
+    // Hide all slides
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach(slide => slide.classList.remove('active'));
+
+    // Remove active class from all dots
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach(dot => dot.classList.remove('active'));
+
+    // Show current slide and highlight dot
+    const currentSlideElement = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+    const currentDot = document.querySelector(`.dot[data-slide="${currentSlide}"]`);
+
+    if (currentSlideElement) currentSlideElement.classList.add('active');
+    if (currentDot) currentDot.classList.add('active');
+}
+
+function nextSlide() {
+    currentSlide++;
+    if (currentSlide > TOTAL_SLIDES) currentSlide = 1;
+    showSlide(currentSlide);
+}
+
+function goToSlide(n) {
+    currentSlide = n;
+    showSlide(currentSlide);
+    resetAutoplay();
+}
+
+function startAutoplay() {
+    if (slideShowInterval) clearInterval(slideShowInterval);
+    slideShowInterval = setInterval(nextSlide, SLIDESHOW_INTERVAL);
+}
+
+function resetAutoplay() {
+    if (slideShowInterval) clearInterval(slideShowInterval);
+    startAutoplay();
+}
+
+function stopAutoplay() {
+    if (slideShowInterval) {
+        clearInterval(slideShowInterval);
+        slideShowInterval = null;
+    }
+}
+
+// Initialize slideshow on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Show first slide initially
+    showSlide(currentSlide);
+
+    // Start autoplay
+    startAutoplay();
+
+    // Pause autoplay on mouse enter, resume on mouse leave
+    const heroSection = document.getElementById('heroSlideshow');
+    if (heroSection) {
+        heroSection.addEventListener('mouseenter', stopAutoplay);
+        heroSection.addEventListener('mouseleave', startAutoplay);
+    }
+
+    // Pause autoplay when user interacts with dots
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach(dot => {
+        dot.addEventListener('click', resetAutoplay);
+    });
+});
+
 // --- 1. LOCALIZARE (TRADUCERI) ---
 let limbaCurenta = localStorage.getItem('limba_preferata') || 'ro';
 
