@@ -62,23 +62,109 @@ h2 {
 }
 
 /* --- Containere și Formulare --- */
-.form-container { 
-    background: white; 
-    padding: 20px; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-    margin-bottom: 30px; 
+.form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
 }
 
-.form-group { 
-    margin-bottom: 15px; 
+.section-description {
+    text-align: center;
+    color: #555;
+    margin-bottom: 25px;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
-label { 
-    display: block; 
-    margin-bottom: 5px; 
-    font-weight: bold; 
-    font-size: 14px; 
+.calendar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.quick-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.quick-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.quick-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quick-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.quick-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.quick-btn-today {
+    background-color: #007bff;
+    color: white;
+}
+
+.quick-btn-today:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.quick-btn-tomorrow {
+    background-color: #28a745;
+    color: white;
+}
+
+.quick-btn-tomorrow:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.notification {
+    padding: 12px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+.notification-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group:has(input[required]) label::after {
+    content: ' *';
+    color: #dc3545;
 }
 
 /* --- Câmpuri de Input --- */
@@ -149,25 +235,69 @@ button[type="submit"]:hover {
 }
 
 /* --- Configurări Flatpickr --- */
-.flatpickr-calendar { 
-    z-index: 99 !important; 
+.flatpickr-calendar {
+    z-index: 99 !important;
 }
 
-.calendar-wrapper { 
-    display: flex; 
-    justify-content: center; 
-    margin-bottom: 20px; 
-    margin-top: 20px;
+.calendar-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0;
 }
 
-.flatpickr-calendar.inline { 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-    border: 1px solid #ddd; 
-    position: static !important; 
+.flatpickr-calendar.inline {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    position: static !important;
 }
 
 /* Ascunde input-urile originale ale calendarelor */
-input#calendarMancare, 
+input#calendarMancare,
 input#calendarCabana {
     display: none !important;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+        margin: 20px auto;
+    }
+
+    .quick-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quick-btn {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .notification {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    .menu-selector {
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .menu-selector button {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .section-description {
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+
+    .calendar-section {
+        gap: 12px;
+    }
 }

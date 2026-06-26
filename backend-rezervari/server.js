@@ -49,8 +49,16 @@ const messages = {
         invalid_infants: 'Copii nu pot fi negativi.',
         invalid_pets: 'Animale de companie nu pot fi negative.',
         invalid_rooms: 'Camere necesare trebuie să fie între 1 și 3.',
-        meal_max_persons: 'Maxim 15 persoane permise pentru mese.',
-        same_day_after_10am: 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.'
+        invalid_meal_max_persons: 'Maxim 15 persoane permise pentru mese.',
+        invalid_same_day_after_10am: 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.',
+        invalid_nume: 'Nume invalid.',
+        invalid_email: 'Email invalid.',
+        invalid_telefon: 'Telefon invalid.',
+        invalid_data_rezervare: 'Data rezervare invalidă.',
+        invalid_ora: 'Ora invalidă.',
+        invalid_data_inceput: 'Data început invalidă.',
+        invalid_data_sfarsit: 'Data sfârșit invalidă.',
+        invalid_data_sfarsit_dupa_inceput: 'Data sfârșit trebuie după data început.'
     },
     en: {
         num_persoane_invalid: `Number of people must be between ${MIN_NR_CABANA} and ${CAPACITATE_MAX_CABANA}.`,
@@ -71,8 +79,16 @@ const messages = {
         invalid_infants: 'Infants cannot be negative.',
         invalid_pets: 'Pets cannot be negative.',
         invalid_rooms: 'Rooms needed must be between 1 and 3.',
-        meal_max_persons: 'Maximum 15 people allowed for meals.',
-        same_day_after_10am: 'Same-day requests are no longer accepted. Please call.'
+        invalid_meal_max_persons: 'Maximum 15 people allowed for meals.',
+        invalid_same_day_after_10am: 'Same-day requests are no longer accepted. Please call.',
+        invalid_nume: 'Invalid name.',
+        invalid_email: 'Invalid email.',
+        invalid_telefon: 'Invalid phone number.',
+        invalid_data_rezervare: 'Invalid reservation date.',
+        invalid_ora: 'Invalid time.',
+        invalid_data_inceput: 'Invalid start date.',
+        invalid_data_sfarsit: 'Invalid end date.',
+        invalid_data_sfarsit_dupa_inceput: 'End date must be after start date.'
     }
 };
 
@@ -105,36 +121,36 @@ const isAfter10Am = () => {
     return now.getHours() >= 10;
 };
 
-const validateReservationInput = (data, isFood = false) => {
+const validateReservationInput = (data, lang, isFood = false) => {
     const errors = [];
 
-    if (!data.nume || !sanitizeText(data.nume)) errors.push('Nume invalid');
-    if (!isValidEmail(data.email)) errors.push('Email invalid');
-    if (!isValidPhoneNumber(data.telefon)) errors.push('Telefon invalid');
+    if (!data.nume || !sanitizeText(data.nume)) errors.push(t('invalid_nume', lang));
+    if (!isValidEmail(data.email)) errors.push(t('invalid_email', lang));
+    if (!isValidPhoneNumber(data.telefon)) errors.push(t('invalid_telefon', lang));
 
     const adults = parseInt(data.adults) || 0;
     const infants = parseInt(data.infants) || 0;
     const pets = parseInt(data.pets) || 0;
     const totalPeople = adults + infants;
 
-    if (adults < 1) errors.push('Adulți trebuie să fie cel puțin 1');
-    if (infants < 0) errors.push('Copii nu pot fi negativi');
-    if (pets < 0) errors.push('Animale de companie nu pot fi negative');
+    if (adults < 1) errors.push(t('invalid_adults', lang));
+    if (infants < 0) errors.push(t('invalid_infants', lang));
+    if (pets < 0) errors.push(t('invalid_pets', lang));
 
     if (isFood) {
-        if (!isValidDate(data.data_rezervare)) errors.push('Data rezervare invalidă');
-        if (!data.ora) errors.push('Ora invalidă');
-        if (totalPeople > MAX_PERSOANE_MANCARE) errors.push(`Maxim ${MAX_PERSOANE_MANCARE} persoane pentru mese`);
-        if (isToday(data.data_rezervare) && isAfter10Am()) errors.push('Cererea pentru azi nu mai este acceptată');
+        if (!isValidDate(data.data_rezervare)) errors.push(t('invalid_data_rezervare', lang));
+        if (!data.ora) errors.push(t('invalid_ora', lang));
+        if (totalPeople > MAX_PERSOANE_MANCARE) errors.push(t('invalid_meal_max_persons', lang));
+        if (isToday(data.data_rezervare) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
     } else {
-        if (!isValidDate(data.data_inceput)) errors.push('Data început invalidă');
-        if (!isValidDate(data.data_sfarsit)) errors.push('Data sfârșit invalidă');
-        if (new Date(data.data_inceput) >= new Date(data.data_sfarsit)) errors.push('Data sfârșit trebuie după data început');
+        if (!isValidDate(data.data_inceput)) errors.push(t('invalid_data_inceput', lang));
+        if (!isValidDate(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit', lang));
+        if (new Date(data.data_inceput) >= new Date(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit_dupa_inceput', lang));
 
         const rooms = parseInt(data.rooms_needed) || 1;
-        if (rooms < MIN_CAMERE || rooms > MAX_CAMERE) errors.push(`Camere necesare trebuie să fie între ${MIN_CAMERE} și ${MAX_CAMERE}`);
+        if (rooms < MIN_CAMERE || rooms > MAX_CAMERE) errors.push(t('invalid_rooms', lang));
 
-        if (isToday(data.data_inceput) && isAfter10Am()) errors.push('Cererea pentru azi nu mai este acceptată');
+        if (isToday(data.data_inceput) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
     }
 
     return errors.length > 0 ? errors : null;
@@ -144,9 +160,6 @@ const sendConfirmationEmail = async (detaliiRezervare, tipRezervare) => {
     try {
         const emailText = detaliiRezervare.email || 'Nu a lăsat email';
         let continutEmail = `Ai o rezervare nouă pentru: ${tipRezervare}\n\n`;
-        continutEmail += `Nume: ${sanitizeText(detaliiRezervare.nume)}\n`;
-        continutEmail += `Telefon: ${isValidPhoneNumber(detaliiRezervare.telefon)}\n`;
-        continutEmail += `Email: ${emailText}\n`;
 
         const adults = parseInt(detaliiRezervare.adults) || 1;
         const infants = parseInt(detaliiRezervare.infants) || 0;
@@ -260,7 +273,7 @@ app.post('/api/rezervari_cabana', async (req, res) => {
     const lang = getLanguage(req);
     const { nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu, adults, infants, pets, rooms_needed } = req.body;
 
-    const validationErrors = validateReservationInput(req.body, false);
+    const validationErrors = validateReservationInput(req.body, lang, false);
     if (validationErrors) {
         return res.status(400).json({ error: validationErrors.join(', ') });
     }
@@ -321,14 +334,14 @@ app.post('/api/rezervari_mancare', async (req, res) => {
     const lang = getLanguage(req);
     const { nume, email, telefon, data_rezervare, ora, numar_persoane, adults, infants, pets } = req.body;
 
-    const validationErrors = validateReservationInput(req.body, true);
+    const validationErrors = validateReservationInput(req.body, lang, true);
     if (validationErrors) {
         return res.status(400).json({ error: validationErrors.join(', ') });
     }
 
     const totalPeople = (parseInt(adults) || 1) + (parseInt(infants) || 0);
     if (totalPeople > MAX_PERSOANE_MANCARE) {
-        return res.status(400).json({ error: t('meal_max_persons', lang) });
+        return res.status(400).json({ error: t('invalid_meal_max_persons', lang) });
     }
 
     const sql = `INSERT INTO rezervari_mancare (nume, email, telefon, data_rezervare, ora, numar_persoane, adults, infants, pets) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;

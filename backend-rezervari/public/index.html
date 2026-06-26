@@ -23,15 +23,19 @@
     </div>
 
     <div id="sectiuneMancare" class="form-container" style="display: none;">
-        <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
+        <p class="section-description" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
 
-        <div class="calendar-wrapper">
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
-                <button type="button" id="btnToday" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" data-i18n="btn_today">Azi</button>
-                <button type="button" id="btnTomorrow" style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" data-i18n="btn_tomorrow">Mâine</button>
+        <div class="calendar-section">
+            <div class="quick-buttons">
+                <button type="button" id="btnToday" class="quick-btn quick-btn-today" data-i18n="btn_today">Azi</button>
+                <button type="button" id="btnTomorrow" class="quick-btn quick-btn-tomorrow" data-i18n="btn_tomorrow">Mâine</button>
             </div>
-            <div id="notificationTodayMancare" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
-            <input type="text" id="calendarMancare">
+
+            <div id="notificationTodayMancare" class="notification notification-warning" style="display: none;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
+
+            <div class="calendar-wrapper">
+                <input type="text" id="calendarMancare">
+            </div>
         </div>
 
         <div id="formMancareContainer" class="hidden-form">
@@ -46,11 +50,11 @@
                 </div>
                 <div class="form-group">
                     <label data-i18n="label_email">Email:</label>
-                    <input type="email" id="emailM" required>
+                    <input type="email" id="emailM">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="label_telefon">Telefon (Opțional):</label>
-                    <input type="tel" id="telefonM">
+                    <label data-i18n="label_telefon">Telefon:</label>
+                    <input type="tel" id="telefonM" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="label_ora_sosire">Ora Sosirii:</label>
@@ -71,7 +75,7 @@
                 <div style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
                     <span data-i18n="total_people" id="totalPeopleM">Total: 1 persoane</span>
                 </div>
-                <div id="warningPendingM" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
+                <div id="warningPendingM" class="notification notification-warning" style="display: none;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
                 <div class="pret-estimat" id="pretMancareAfisaj" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON</div>
                 <br>
                 <button type="submit" data-i18n="btn_trimite">Trimite Cererea de Masă</button>
@@ -80,17 +84,19 @@
     </div>
 
     <div id="sectiuneCabana" class="form-container" style="display: none;">
-        <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
+        <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
 
-        <div id="notificationTodayCabana" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
-        <div class="calendar-wrapper">
-            <input type="text" id="calendarCabana">
+        <div class="calendar-section">
+            <div id="notificationTodayCabana" class="notification notification-warning" style="display: none;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
+            <div class="calendar-wrapper">
+                <input type="text" id="calendarCabana">
+            </div>
         </div>
 
         <div id="formCabanaContainer" class="hidden-form">
             <form id="formCabana">
                 <div id="warningCabana"></div>
-                <div id="warningPendingC" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
+                <div id="warningPendingC" class="notification notification-warning" style="display: none;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
 
                 <div class="form-group">
                     <label data-i18n="label_data_check_in">Data Check-in (Început):</label>
@@ -106,11 +112,11 @@
                 </div>
                 <div class="form-group">
                     <label data-i18n="label_email">Email:</label>
-                    <input type="email" id="emailC" required>
+                    <input type="email" id="emailC">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="label_telefon">Telefon (Opțional):</label>
-                    <input type="tel" id="telefonC">
+                    <label data-i18n="label_telefon">Telefon:</label>
+                    <input type="tel" id="telefonC" required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="label_adults">Adulți:</label>

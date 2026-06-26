@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cat AGENTS.md 2>/dev/null | jq -Rs '{\"systemMessage\": \"Team Instructions (AGENTS.md):\\n\\n\" + .}' || echo '{\"systemMessage\": \"Note: AGENTS.md not found\"}'",
+            "command": "cat .claude/AGENTS.md 2>/dev/null | jq -Rs '{\"systemMessage\": \"Team Instructions (AGENTS.md):\\n\\n\" + .}' || echo '{\"systemMessage\": \"Note: AGENTS.md not found\"}'",
             "statusMessage": "Loading team instructions..."
           }
         ]
