@@ -74,6 +74,17 @@ document.addEventListener('DOMContentLoaded', function() {
     dots.forEach(dot => {
         dot.addEventListener('click', resetAutoplay);
     });
+
+    // Add scroll functionality to down arrow
+    const arrowDown = document.querySelector('.arrow-down');
+    if (arrowDown) {
+        arrowDown.addEventListener('click', function() {
+            window.scrollBy({
+                top: window.innerHeight,
+                behavior: 'smooth'
+            });
+        });
+    }
 });
 
 // --- 1. LOCALIZARE (TRADUCERI) ---

@@ -156,6 +156,7 @@ h2 {
     transform: rotate(-45deg);
     animation: bounce 2s infinite;
     margin: 0 auto;
+    cursor: pointer;
 }
 
 @keyframes bounce {
