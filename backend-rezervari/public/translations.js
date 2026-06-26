@@ -12,13 +12,23 @@ const traduceri = {
         label_ora_sosire: "Ora Sosirii",
         label_numar_persoane: "Număr Persoane",
         label_meniu: "Doresc și meniu gastronomic",
+        label_adults: "Adulți",
+        label_infants: "Copii",
+        label_pets: "Animale de companie",
+        label_rooms_needed: "Camere necesare",
         btn_trimite: "Trimite Rezervarea",
         alerta_success: "Rezervarea a fost trimisă cu succes!",
         subSectiuneMancare: "Selecteaza o zi din calendar pentru a face rezervarea la masă.",
         subSectiuneCabana: "Selectează perioada în care dorești să te cazezi în cabană.",
         pretCabanaAfisaj: "Preț estimat: 0 RON",
         pretMeniuAfisaj: "Preț estimat: 0 RON",
-        warningCabana: "<strong>Atenție:</strong> În această perioadă cabana mai găzduiește <strong>{oaspeți} oaspeți</strong>. Spațiile comune se împart. <br>Mai sunt doar <strong>{locuri} locuri libere</strong>."
+        warningCabana: "<strong>Atenție:</strong> În această perioadă cabana mai găzduiește <strong>{oaspeți} oaspeți</strong>. Spațiile comune se împart. <br>Mai sunt doar <strong>{locuri} locuri libere</strong>.",
+        notification_today_disabled: "Dacă doriți să rezervați pentru azi, vă rog sunați.",
+        btn_today: "Azi",
+        btn_tomorrow: "Mâine",
+        confirmation_pending: "Cererea a fost trimisă pentru aprobare. Un administrator vă va contacta pentru a confirma detaliile.",
+        warning_pending_reservation: "Atenție: Există o rezervare în așteptare pentru această perioadă.",
+        total_people: "Total: {total} persoane"
     },
     en: {
         titlu_principal: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -33,12 +43,22 @@ const traduceri = {
         label_ora_sosire: "Arrival Time",
         label_numar_persoane: "Number of People",
         label_meniu: "I also want the gastronomic menu",
+        label_adults: "Adults",
+        label_infants: "Infants",
+        label_pets: "Pets",
+        label_rooms_needed: "Rooms needed",
         btn_trimite: "Submit Reservation",
         alerta_success: "Reservation submitted successfully!",
         subSectiuneMancare: "Select a date from the calendar to make your meal reservation.",
         subSectiuneCabana: "Select the period you want to stay in the cabin.",
         pretCabanaAfisaj: "Estimated Price: 0 RON",
         pretMeniuAfisaj: "Estimated Price: 0 RON",
-        warningCabana: "<strong>Attention:</strong> During this period the cabin hosts <strong>{guests} guests</strong>. Common areas are shared. <br>There are only <strong>{spaces} spaces left</strong>."
+        warningCabana: "<strong>Attention:</strong> During this period the cabin hosts <strong>{guests} guests</strong>. Common areas are shared. <br>There are only <strong>{spaces} spaces left</strong>.",
+        notification_today_disabled: "If you want to book for today please call us.",
+        btn_today: "Today",
+        btn_tomorrow: "Tomorrow",
+        confirmation_pending: "Your request has been submitted for approval. An administrator will contact you to confirm the details.",
+        warning_pending_reservation: "Note: There is a pending reservation for this period.",
+        total_people: "Total: {total} people"
     }
 }

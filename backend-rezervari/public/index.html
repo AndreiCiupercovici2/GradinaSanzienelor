@@ -24,8 +24,13 @@
 
     <div id="sectiuneMancare" class="form-container" style="display: none;">
         <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
-        
+
         <div class="calendar-wrapper">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
+                <button type="button" id="btnToday" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" data-i18n="btn_today">Azi</button>
+                <button type="button" id="btnTomorrow" style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" data-i18n="btn_tomorrow">Mâine</button>
+            </div>
+            <div id="notificationTodayMancare" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
             <input type="text" id="calendarMancare">
         </div>
 
@@ -33,7 +38,7 @@
             <form id="formMancare">
                 <div class="form-group">
                     <label data-i18n="label_data_mesei">Data Mesei:</label>
-                    <input type="text" id="dataM" readonly required> 
+                    <input type="text" id="dataM" readonly required>
                 </div>
                 <div class="form-group">
                     <label data-i18n="label_nume">Nume Complet:</label>
@@ -52,9 +57,21 @@
                     <input type="time" id="oraM" required>
                 </div>
                 <div class="form-group">
-                    <label data-i18n="label_numar_persoane">Număr Persoane:</label>
-                    <input type="number" id="persoaneM" min="1" value="1" required>
+                    <label data-i18n="label_adults">Adulți:</label>
+                    <input type="number" id="adultiM" min="1" value="1" required>
                 </div>
+                <div class="form-group">
+                    <label data-i18n="label_infants">Copii:</label>
+                    <input type="number" id="copiiM" min="0" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_pets">Animale de companie:</label>
+                    <input type="number" id="animaleM" min="0" value="0" required>
+                </div>
+                <div style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
+                    <span data-i18n="total_people" id="totalPeopleM">Total: 1 persoane</span>
+                </div>
+                <div id="warningPendingM" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
                 <div class="pret-estimat" id="pretMancareAfisaj" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON</div>
                 <br>
                 <button type="submit" data-i18n="btn_trimite">Trimite Cererea de Masă</button>
@@ -65,6 +82,7 @@
     <div id="sectiuneCabana" class="form-container" style="display: none;">
         <p style="text-align: center; color: #555; margin-bottom: 20px;" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
 
+        <div id="notificationTodayCabana" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
         <div class="calendar-wrapper">
             <input type="text" id="calendarCabana">
         </div>
@@ -72,6 +90,7 @@
         <div id="formCabanaContainer" class="hidden-form">
             <form id="formCabana">
                 <div id="warningCabana"></div>
+                <div id="warningPendingC" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px; color: #856404;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
 
                 <div class="form-group">
                     <label data-i18n="label_data_check_in">Data Check-in (Început):</label>
@@ -94,8 +113,23 @@
                     <input type="tel" id="telefonC">
                 </div>
                 <div class="form-group">
-                    <label data-i18n="label_numar_persoane">Număr Persoane (Max 8):</label>
-                    <input type="number" id="persoaneC" min="1" max="8" value="1" required>
+                    <label data-i18n="label_adults">Adulți:</label>
+                    <input type="number" id="adultiC" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_infants">Copii:</label>
+                    <input type="number" id="copiiC" min="0" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_pets">Animale de companie:</label>
+                    <input type="number" id="animaleC" min="0" value="0" required>
+                </div>
+                <div style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
+                    <span data-i18n="total_people" id="totalPeopleC">Total: 1 persoane</span>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_rooms_needed">Camere necesare:</label>
+                    <input type="number" id="camereC" min="1" max="3" value="1" required>
                 </div>
                 <div class="form-group">
                     <input type="checkbox" id="meniuC">

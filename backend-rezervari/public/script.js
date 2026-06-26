@@ -42,9 +42,11 @@ function schimbaLimba(nouaLimba) {
 aplicaTraducerile();
 
 // --- 2. SETĂRI GLOBALE ---
-const PRET_NOAPTE_PERSOANA = 100; 
+const PRET_NOAPTE_PERSOANA = 100;
 const PRET_MENIU_PERSOANA = 70;
-const backendUrl = '/api'; 
+const MAX_PERSOANE_MANCARE = 15;
+const MAX_CAMERE = 3;
+const backendUrl = '/api';
 
 let ocupareZilnica = {};
 let zileCompletOcupate = [];
@@ -58,6 +60,31 @@ function getLocaleConfig() {
     return { locale: 'en' };
 }
 
+function isToday(dateStr) {
+    const today = new Date();
+    const date = new Date(dateStr);
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+}
+
+function isAfter10Am() {
+    const now = new Date();
+    return now.getHours() >= 10;
+}
+
+function calculateTotalPeople(adults, infants) {
+    return (parseInt(adults) || 0) + (parseInt(infants) || 0);
+}
+
+function updateTotalDisplay(adultsId, infantsId, displayId) {
+    const adults = parseInt(document.getElementById(adultsId).value) || 0;
+    const infants = parseInt(document.getElementById(infantsId).value) || 0;
+    const total = calculateTotalPeople(adults, infants);
+    const totalText = limbaCurenta === 'en' ? `Total: ${total} people` : `Total: ${total} persoane`;
+    document.getElementById(displayId).textContent = totalText;
+}
+
 // Deschide secțiunea selectată și inițializează calendarul aferent ei
 function arataSectiune(tip) {
     // Afișăm containerul corect și îl ascundem pe celălalt
@@ -67,6 +94,18 @@ function arataSectiune(tip) {
     // Schimbăm clasa activă pe butoane pentru feedback vizual albastru/gri
     document.getElementById('btnMancare').classList.toggle('active', tip === 'mancare');
     document.getElementById('btnCabana').classList.toggle('active', tip === 'cabana');
+
+    const todayDisabled = isToday(new Date().toISOString().split('T')[0]) && isAfter10Am();
+    if (tip === 'mancare') {
+        document.getElementById('notificationTodayMancare').style.display = todayDisabled ? 'block' : 'none';
+        document.getElementById('btnToday').disabled = todayDisabled;
+        if (todayDisabled) {
+            document.getElementById('btnToday').style.opacity = '0.5';
+            document.getElementById('btnToday').style.cursor = 'not-allowed';
+        }
+    } else {
+        document.getElementById('notificationTodayCabana').style.display = todayDisabled ? 'block' : 'none';
+    }
 
     const setariComune = {
         dateFormat: "Y-m-d",
@@ -102,11 +141,11 @@ function arataSectiune(tip) {
             onChange: function(selectedDates, dateStr, instance) {
                 const formContainer = document.getElementById('formCabanaContainer');
                 const warningDiv = document.getElementById('warningCabana');
-                
+
                 if (selectedDates.length === 2) {
                     document.getElementById('dataInceputC').value = instance.formatDate(selectedDates[0], "Y-m-d");
                     document.getElementById('dataSfarsitC').value = instance.formatDate(selectedDates[1], "Y-m-d");
-                    
+
                     let maxOcupateInInterval = 0;
                     let startSafe = new Date(selectedDates[0]); startSafe.setHours(12, 0, 0, 0);
                     let endSafe = new Date(selectedDates[1]); endSafe.setHours(12, 0, 0, 0);
@@ -119,19 +158,18 @@ function arataSectiune(tip) {
                     }
 
                     const locuriDisponibile = 8 - maxOcupateInInterval;
-                    const inputPersoane = document.getElementById('persoaneC');
-                    inputPersoane.max = locuriDisponibile;
-                    
-                    if (parseInt(inputPersoane.value) > locuriDisponibile) {
-                        inputPersoane.value = locuriDisponibile;
+                    const inputAdulti = document.getElementById('adultiC');
+                    const inputCopii = document.getElementById('copiiC');
+
+                    if (parseInt(inputAdulti.value) + parseInt(inputCopii.value) > locuriDisponibile) {
+                        inputAdulti.value = Math.max(1, locuriDisponibile - parseInt(inputCopii.value));
                     }
 
                     if (maxOcupateInInterval > 0) {
                         warningDiv.style.display = 'block';
-                        warningDiv.innerHTML = template.replace(/\{oaspeți\}/g, maxOcupateInInterval).replace(/\{locuri\}/g, locuriDisponibile  );
+                        warningDiv.innerHTML = template.replace(/\{oaspeți\}/g, maxOcupateInInterval).replace(/\{locuri\}/g, locuriDisponibile);
                     } else {
                         warningDiv.style.display = 'none';
-                        inputPersoane.max = 8;
                     }
 
                     formContainer.style.display = 'block';
@@ -189,7 +227,9 @@ function calculeazaNopti(start, end) {
 }
 
 function calculeazaPretCabana() {
-    const persoane = parseInt(document.getElementById('persoaneC').value) || 0;
+    const adulti = parseInt(document.getElementById('adultiC').value) || 0;
+    const copii = parseInt(document.getElementById('copiiC').value) || 0;
+    const persoane = adulti + copii;
     const nopti = calculeazaNopti(document.getElementById('dataInceputC').value, document.getElementById('dataSfarsitC').value);
     const vreaMeniu = document.getElementById('meniuC').checked;
 
@@ -198,28 +238,44 @@ function calculeazaPretCabana() {
 
     const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
     document.getElementById('pretCabanaAfisaj').innerText = `${pretEstimatiText} ${pretTotal} RON`;
+    updateTotalDisplay('adultiC', 'copiiC', 'totalPeopleC');
 }
 
 function calculeazaPretMancare() {
-    const persoane = parseInt(document.getElementById('persoaneM').value) || 0;
+    const adulti = parseInt(document.getElementById('adultiM').value) || 0;
+    const copii = parseInt(document.getElementById('copiiM').value) || 0;
+    const persoane = adulti + copii;
+
+    if (persoane > MAX_PERSOANE_MANCARE) {
+        document.getElementById('adultiM').value = Math.max(1, MAX_PERSOANE_MANCARE - copii);
+    }
+
     const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
     document.getElementById('pretMancareAfisaj').innerText = `${pretEstimatiText} ${persoane * PRET_MENIU_PERSOANA} RON`;
+    updateTotalDisplay('adultiM', 'copiiM', 'totalPeopleM');
 }
 
-document.getElementById('persoaneC').addEventListener('input', calculeazaPretCabana);
+document.getElementById('adultiC').addEventListener('input', calculeazaPretCabana);
+document.getElementById('copiiC').addEventListener('input', calculeazaPretCabana);
 document.getElementById('meniuC').addEventListener('change', calculeazaPretCabana);
-document.getElementById('persoaneM').addEventListener('input', calculeazaPretMancare);
+document.getElementById('adultiM').addEventListener('input', calculeazaPretMancare);
+document.getElementById('copiiM').addEventListener('input', calculeazaPretMancare);
 
 // --- 5. COMUNICARE BACKEND ---
 document.getElementById('formMancare').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const adulti = parseInt(document.getElementById('adultiM').value) || 0;
+    const copii = parseInt(document.getElementById('copiiM').value) || 0;
     const payload = {
         nume: document.getElementById('numeM').value,
         email: document.getElementById('emailM').value,
         telefon: document.getElementById('telefonM').value || null,
         data_rezervare: document.getElementById('dataM').value,
         ora: document.getElementById('oraM').value,
-        numar_persoane: parseInt(document.getElementById('persoaneM').value)
+        adults: adulti,
+        infants: copii,
+        pets: parseInt(document.getElementById('animaleM').value) || 0,
+        numar_persoane: adulti + copii
     };
 
     try {
@@ -227,7 +283,10 @@ document.getElementById('formMancare').addEventListener('submit', async (e) => {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         if (res.ok) {
-            alert(traduceri[limbaCurenta].alerta_success || 'Cerere trimisă!');
+            const confirmMsg = limbaCurenta === 'en'
+                ? 'Meal request submitted for approval. An administrator will contact you to confirm details.'
+                : 'Cererea de masă trimisă pentru aprobare. Un administrator vă va contacta pentru a confirma detaliile.';
+            alert(confirmMsg);
             document.getElementById('formMancare').reset();
             document.getElementById('formMancareContainer').style.display = 'none';
             calculeazaPretMancare();
@@ -238,15 +297,45 @@ document.getElementById('formMancare').addEventListener('submit', async (e) => {
     } catch (err) { alert('Nu se poate contacta serverul.'); }
 });
 
+// Today/Tomorrow button handlers for meal form
+document.getElementById('btnToday').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (!this.disabled) {
+        const today = new Date();
+        const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+        document.getElementById('dataM').value = dateStr;
+        document.getElementById('formMancareContainer').style.display = 'block';
+        document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        calculeazaPretMancare();
+    }
+});
+
+document.getElementById('btnTomorrow').addEventListener('click', function(e) {
+    e.preventDefault();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
+    document.getElementById('dataM').value = dateStr;
+    document.getElementById('formMancareContainer').style.display = 'block';
+    document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    calculeazaPretMancare();
+});
+
 document.getElementById('formCabana').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const adulti = parseInt(document.getElementById('adultiC').value) || 0;
+    const copii = parseInt(document.getElementById('copiiC').value) || 0;
     const payload = {
         nume: document.getElementById('numeC').value,
         email: document.getElementById('emailC').value,
         telefon: document.getElementById('telefonC').value || null,
         data_inceput: document.getElementById('dataInceputC').value,
         data_sfarsit: document.getElementById('dataSfarsitC').value,
-        numar_persoane: parseInt(document.getElementById('persoaneC').value),
+        adults: adulti,
+        infants: copii,
+        pets: parseInt(document.getElementById('animaleC').value) || 0,
+        rooms_needed: parseInt(document.getElementById('camereC').value) || 1,
+        numar_persoane: adulti + copii,
         vrea_meniu: document.getElementById('meniuC').checked
     };
 
@@ -255,7 +344,10 @@ document.getElementById('formCabana').addEventListener('submit', async (e) => {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         if (res.ok) {
-            alert(traduceri[limbaCurenta].alerta_success || 'Cerere trimisă!');
+            const confirmMsg = limbaCurenta === 'en'
+                ? 'Reservation request submitted for approval. An administrator will contact you to confirm details.'
+                : 'Cererea de rezervare a fost trimisă pentru aprobare. Un administrator vă va contacta pentru a confirma detaliile.';
+            alert(confirmMsg);
             document.getElementById('formCabana').reset();
             document.getElementById('formCabanaContainer').style.display = 'none';
             calculeazaPretCabana();
@@ -264,4 +356,28 @@ document.getElementById('formCabana').addEventListener('submit', async (e) => {
             alert('Eroare: ' + (data.error || 'Date incorecte.'));
         }
     } catch (err) { alert('Nu se poate contacta serverul.'); }
+});
+
+// Today/Tomorrow button handlers for meal form
+document.getElementById('btnToday').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (!this.disabled) {
+        const today = new Date();
+        const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+        document.getElementById('dataM').value = dateStr;
+        document.getElementById('formMancareContainer').style.display = 'block';
+        document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        calculeazaPretMancare();
+    }
+});
+
+document.getElementById('btnTomorrow').addEventListener('click', function(e) {
+    e.preventDefault();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
+    document.getElementById('dataM').value = dateStr;
+    document.getElementById('formMancareContainer').style.display = 'block';
+    document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    calculeazaPretMancare();
 });
