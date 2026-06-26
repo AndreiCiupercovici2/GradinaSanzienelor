@@ -3,6 +3,7 @@ let currentSlide = 1;
 let slideShowInterval = null;
 const SLIDESHOW_INTERVAL = 10000; // 10 seconds
 const TOTAL_SLIDES = 11;
+let slideshowInitialized = false;
 
 function showSlide(n) {
     // Validate slide number
@@ -61,7 +62,14 @@ function stopAutoplay() {
 }
 
 // Initialize slideshow on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Guard against multiple initializations
+    if (slideshowInitialized) return;
+    slideshowInitialized = true;
+
+    // Load occupation data
+    await incarcatDateOcupare();
+
     // Show first slide initially
     showSlide(currentSlide);
 
@@ -351,12 +359,6 @@ async function incarcatDateOcupare() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", async function() {
-    await incarcatDateOcupare();
-    // Pagina de mâncare rămâne prima deschisă automat la încărcare
-    //arataSectiune('mancare');
-});
-
 // --- 4. CALCUL PREȚ ---
 function calculeazaNopti(start, end) {
     if (!start || !end) return 0;
@@ -495,28 +497,4 @@ document.getElementById('formCabana').addEventListener('submit', async (e) => {
             alert('Eroare: ' + (data.error || 'Date incorecte.'));
         }
     } catch (err) { alert('Nu se poate contacta serverul.'); }
-});
-
-// Today/Tomorrow button handlers for meal form
-document.getElementById('btnToday').addEventListener('click', function(e) {
-    e.preventDefault();
-    if (!this.disabled) {
-        const today = new Date();
-        const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-        document.getElementById('dataM').value = dateStr;
-        document.getElementById('formMancareContainer').style.display = 'block';
-        document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        calculeazaPretMancare();
-    }
-});
-
-document.getElementById('btnTomorrow').addEventListener('click', function(e) {
-    e.preventDefault();
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
-    document.getElementById('dataM').value = dateStr;
-    document.getElementById('formMancareContainer').style.display = 'block';
-    document.getElementById('formMancareContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    calculeazaPretMancare();
 });

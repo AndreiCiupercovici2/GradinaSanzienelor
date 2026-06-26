@@ -194,28 +194,32 @@ h2 {
 
 /* Left chevron */
 .arrow-chevron-left::before {
-    left: 12px;
-    top: 4px;
+    left: 8px;
+    top: 0px;
     transform: rotate(-45deg);
+    transform-origin: center;
 }
 
 .arrow-chevron-left::after {
-    left: 12px;
-    top: 4px;
+    left: 8px;
+    top: 8px;
     transform: rotate(45deg);
+    transform-origin: center;
 }
 
 /* Right chevron */
 .arrow-chevron-right::before {
-    right: 12px;
-    top: 4px;
+    right: 8px;
+    top: 0px;
     transform: rotate(45deg);
+    transform-origin: center;
 }
 
 .arrow-chevron-right::after {
-    right: 12px;
-    top: 4px;
+    right: 8px;
+    top: 8px;
     transform: rotate(-45deg);
+    transform-origin: center;
 }
 
 /* Down Arrow Indicator */
