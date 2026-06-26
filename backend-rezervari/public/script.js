@@ -163,6 +163,7 @@ function updateTotalDisplay(adultsId, infantsId, displayId) {
     document.getElementById(displayId).textContent = totalText;
 }
 
+
 // Deschide secțiunea selectată și inițializează calendarul aferent ei
 function arataSectiune(tip) {
     // Afișăm containerul corect și îl ascundem pe celălalt
@@ -207,6 +208,12 @@ function arataSectiune(tip) {
                 }
             }
         });
+
+        // Scroll calendar into view immediately when section is shown
+        const calendarWrapperMancare = document.querySelector('#sectiuneMancare .calendar-wrapper');
+        if (calendarWrapperMancare) {
+            calendarWrapperMancare.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     // Inițializare Calendar Cabană la cerere
@@ -258,6 +265,25 @@ function arataSectiune(tip) {
                 }
             }
         });
+
+        // Scroll calendar into view immediately when section is shown
+        const calendarWrapperCabana = document.querySelector('#sectiuneCabana .calendar-wrapper');
+        if (calendarWrapperCabana) {
+            calendarWrapperCabana.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Also scroll calendar into view if it's already initialized (already visible section)
+    if (tip === 'mancare' && calendarMancareInstanta) {
+        const calendarWrapperMancare = document.querySelector('#sectiuneMancare .calendar-wrapper');
+        if (calendarWrapperMancare) {
+            calendarWrapperMancare.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    } else if (tip === 'cabana' && calendarCabanaInstanta) {
+        const calendarWrapperCabana = document.querySelector('#sectiuneCabana .calendar-wrapper');
+        if (calendarWrapperCabana) {
+            calendarWrapperCabana.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 }
 
