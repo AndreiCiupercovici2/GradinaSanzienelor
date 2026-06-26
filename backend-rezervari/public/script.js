@@ -1,8 +1,8 @@
 // --- SLIDESHOW FUNCTIONALITY ---
 let currentSlide = 1;
 let slideShowInterval = null;
-const SLIDESHOW_INTERVAL = 5000; // 5 seconds
-const TOTAL_SLIDES = 4;
+const SLIDESHOW_INTERVAL = 10000; // 10 seconds
+const TOTAL_SLIDES = 11;
 
 function showSlide(n) {
     // Validate slide number
@@ -28,6 +28,12 @@ function showSlide(n) {
 function nextSlide() {
     currentSlide++;
     if (currentSlide > TOTAL_SLIDES) currentSlide = 1;
+    showSlide(currentSlide);
+}
+
+function previousSlide() {
+    currentSlide--;
+    if (currentSlide < 1) currentSlide = TOTAL_SLIDES;
     showSlide(currentSlide);
 }
 
@@ -62,12 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start autoplay
     startAutoplay();
 
-    // Pause autoplay on mouse enter, resume on mouse leave
-    const heroSection = document.getElementById('heroSlideshow');
-    if (heroSection) {
-        heroSection.addEventListener('mouseenter', stopAutoplay);
-        heroSection.addEventListener('mouseleave', startAutoplay);
-    }
+    // // Pause autoplay on mouse enter, resume on mouse leave
+    // const heroSection = document.getElementById('heroSlideshow');
+    // if (heroSection) {
+    //     heroSection.addEventListener('mouseenter', stopAutoplay);
+    //     heroSection.addEventListener('mouseleave', startAutoplay);
+    // }
 
     // Pause autoplay when user interacts with dots
     const dots = document.querySelectorAll('.dot');
@@ -83,6 +89,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 top: window.innerHeight,
                 behavior: 'smooth'
             });
+        });
+    }
+
+    // Add click functionality to navigation arrows
+    const prevSlideBtn = document.getElementById('prevSlideBtn');
+    const nextSlideBtn = document.getElementById('nextSlideBtn');
+
+    if (prevSlideBtn) {
+        prevSlideBtn.addEventListener('click', function() {
+            previousSlide();
+            resetAutoplay();
+        });
+    }
+
+    if (nextSlideBtn) {
+        nextSlideBtn.addEventListener('click', function() {
+            nextSlide();
+            resetAutoplay();
         });
     }
 });

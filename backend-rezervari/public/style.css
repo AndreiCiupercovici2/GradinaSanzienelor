@@ -137,6 +137,87 @@ h2 {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
+/* Navigation Arrows */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.nav-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.nav-arrow:active {
+    transform: translateY(-50%) scale(0.98);
+}
+
+.nav-arrow-left {
+    left: 20px;
+}
+
+.nav-arrow-right {
+    right: 20px;
+}
+
+/* Chevron arrow styling */
+.arrow-chevron-left,
+.arrow-chevron-right {
+    display: block;
+    width: 24px;
+    height: 24px;
+    position: relative;
+}
+
+.arrow-chevron-left::before,
+.arrow-chevron-left::after,
+.arrow-chevron-right::before,
+.arrow-chevron-right::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 16px;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Left chevron */
+.arrow-chevron-left::before {
+    left: 12px;
+    top: 4px;
+    transform: rotate(-45deg);
+}
+
+.arrow-chevron-left::after {
+    left: 12px;
+    top: 4px;
+    transform: rotate(45deg);
+}
+
+/* Right chevron */
+.arrow-chevron-right::before {
+    right: 12px;
+    top: 4px;
+    transform: rotate(45deg);
+}
+
+.arrow-chevron-right::after {
+    right: 12px;
+    top: 4px;
+    transform: rotate(-45deg);
+}
+
 /* Down Arrow Indicator */
 .scroll-indicator {
     position: absolute;
@@ -504,5 +585,33 @@ input#calendarCabana {
     .arrow-down {
         width: 20px;
         height: 20px;
+    }
+
+    /* Navigation arrows responsive */
+    .nav-arrow {
+        width: 40px;
+        height: 40px;
+    }
+
+    .nav-arrow-left {
+        left: 10px;
+    }
+
+    .nav-arrow-right {
+        right: 10px;
+    }
+
+    .arrow-chevron-left,
+    .arrow-chevron-right {
+        width: 18px;
+        height: 18px;
+    }
+
+    .arrow-chevron-left::before,
+    .arrow-chevron-left::after,
+    .arrow-chevron-right::before,
+    .arrow-chevron-right::after {
+        height: 12px;
+        width: 1.5px;
     }
 }
