@@ -7,28 +7,59 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; }
         h1, h2 { color: #333; }
-        .tabel-container { 
-            overflow-x: auto; 
-            margin-bottom: 40px; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        .tabel-container {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #2c3e50; color: white; font-size: 15px; }
         tr:hover { background-color: #f9f9f9; }
-        
-        /* O mică stilizare pentru textul de status (opțional, js-ul face grosul) */
+
+        /* Status styles */
         .status-text { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+        .status-draft { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; }
         .data-mica { color: #888; font-size: 12px; }
+
+        /* Button styles */
+        button { margin: 2px; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-delete:hover { background-color: #c82333; }
+        .btn-remind { background-color: #007bff; color: white; }
+        .btn-remind:hover { background-color: #0056b3; }
+        .btn-complete { background-color: #28a745; color: white; }
+        .btn-complete:hover { background-color: #218838; }
+        .btn-approve { background-color: #28a745; color: white; }
+        .btn-approve:hover { background-color: #218838; }
+        .btn-reject { background-color: #dc3545; color: white; }
+        .btn-reject:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
 
     <h1>Panou Administrare Rezervări</h1>
     <p>Aici poți aproba sau respinge cererile de rezervare primite de la clienți.</p>
+
+    <h2>0. Rezervări în Progres (Ciorne)</h2>
+    <div class="tabel-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data Cererii</th>
+                    <th>Nume / Contact</th>
+                    <th>Tip</th>
+                    <th>Pas</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody id="tabelCiorne">
+                </tbody>
+        </table>
+    </div>
 
     <h2>1. Rezervări Mâncare</h2>
     <div class="tabel-container">
