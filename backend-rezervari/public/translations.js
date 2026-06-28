@@ -71,7 +71,9 @@ const traduceri = {
         summary_extras: "Extra Servicii",
         summary_total: "Total Estimat",
         hottub_description: "Relaxați-vă sub stele în cada noastră privată cu apă fierbinte. Disponibilă tot anul, cada poate găzdui până la 6 oaspeți și este inclusă pentru întreaga sejur.",
-        meal_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte."
+        meal_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
+        titlu_cazare: "Rezervări Cazare",
+        titlu_mancare: "Rezervări Masă"
     },
     en: {
         titlu_principal: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -145,6 +147,8 @@ const traduceri = {
         summary_extras: "Extras",
         summary_total: "Estimated Total",
         hottub_description: "Relax under the stars in our private outdoor hot tub. Available year-round, the hot tub accommodates up to 6 guests and is included for your entire stay.",
-        meal_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night."
+        meal_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night.",
+        titlu_cazare: "Accommodation Reservations",
+        titlu_mancare: "Meal Reservations"
     }
 }

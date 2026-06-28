@@ -358,7 +358,7 @@ async function loadAndRestoreMealDraft(email, phone) {
 
         // Update totals and prices
         updateTotalDisplay('adultiMStep1', 'copiiMStep1', 'totalPeopleMStep1');
-        calculeazaPretMancare();
+        // calculeazaPretMancare();
 
         // Show appropriate step
         showMealStep(draft.current_step);
@@ -573,9 +573,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Add click handlers to make the readonly date inputs open the calendar
     document.addEventListener('click', function(e) {
         if (e.target.id === 'cabinArrivalInput') {
-            console.log('Clicked on cabinArrivalInput');
             if (!cabinArrivalFP) {
-                console.log('Initializing calendars on first click...');
                 arataSectiune('cabana');
             }
             if (cabinArrivalFP) {
@@ -583,14 +581,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     e.preventDefault();
                     e.stopPropagation();
                     cabinArrivalFP.open();
-                    console.log('Arrival calendar opened via click handler');
                 } catch (err) {
                     console.error('Error opening arrival calendar:', err);
                 }
             }
         }
         if (e.target.id === 'cabinDepartureInput') {
-            console.log('Clicked on cabinDepartureInput');
             if (!cabinDepartureFP) {
                 console.log('Initializing calendars on first click...');
                 arataSectiune('cabana');
@@ -600,7 +596,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                     e.preventDefault();
                     e.stopPropagation();
                     cabinDepartureFP.open();
-                    console.log('Departure calendar opened via click handler');
                 } catch (err) {
                     console.error('Error opening departure calendar:', err);
                 }
@@ -793,13 +788,13 @@ function schimbaLimba(nouaLimba) {
         arataSectiune('cabana');
     }
 
-    // Refresh price displays with new language
-    if (document.getElementById('pretMancareAfisajStep1')?.innerText.includes('RON')) {
-        calculeazaPretMancare();
-    }
-    if (document.getElementById('summaryContent')?.innerText.includes('RON')) {
-        updateCabinSummary();
-    }
+    // // Refresh price displays with new language
+    // if (document.getElementById('pretMancareAfisajStep1')?.innerText.includes('RON')) {
+    //     calculeazaPretMancare();
+    // }
+    // if (document.getElementById('summaryContent')?.innerText.includes('RON')) {
+    //     updateCabinSummary();
+    // }
 }
 aplicaTraducerile();
 
@@ -1090,7 +1085,7 @@ function arataSectiune(tip) {
                 if (selectedDates.length > 0) {
                     document.getElementById('dataMStep1').value = dateStr;
                     showMealStep(1);
-                    calculeazaPretMancare();
+                    // calculeazaPretMancare();
                 }
             }
         });
@@ -1131,7 +1126,6 @@ function arataSectiune(tip) {
                 clickOpens: true,
                 onChange: handleArrivalChange,
                 onOpen: function(dates, dateStr, instance) {
-                    console.log('✓ Arrival calendar opened');
                     instance.calendarContainer.style.zIndex = '99999';
                 }
             });
@@ -1179,8 +1173,6 @@ function arataSectiune(tip) {
                     cabinDepartureFP.open();
                 }
             }, true);
-
-            console.log('✓ Cabin calendars initialized and listeners attached');
         } catch (err) {
             console.error('Critical error initializing cabin calendars:', err.message, err.stack);
         }
@@ -1273,31 +1265,31 @@ async function incarcatDateOcupare() {
 }
 
 // --- 4. CALCUL PREȚ ---
-function calculeazaNopti(start, end) {
-    if (!start || !end) return 0;
-    const diff = new Date(end) - new Date(start);
-    const zile = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    return zile > 0 ? zile : 0;
-}
+// function calculeazaNopti(start, end) {
+//     if (!start || !end) return 0;
+//     const diff = new Date(end) - new Date(start);
+//     const zile = Math.ceil(diff / (1000 * 60 * 60 * 24));
+//     return zile > 0 ? zile : 0;
+// }
 
-function calculeazaPretMancare() {
-    const adulti = parseInt(document.getElementById('adultiMStep1').value) || 0;
-    const copii = parseInt(document.getElementById('copiiMStep1').value) || 0;
-    const persoane = adulti + copii;
+// function calculeazaPretMancare() {
+//     const adulti = parseInt(document.getElementById('adultiMStep1').value) || 0;
+//     const copii = parseInt(document.getElementById('copiiMStep1').value) || 0;
+//     const persoane = adulti + copii;
 
-    if (persoane > MAX_PERSOANE_MANCARE) {
-        document.getElementById('adultiMStep1').value = Math.max(1, MAX_PERSOANE_MANCARE - copii);
-    }
+//     if (persoane > MAX_PERSOANE_MANCARE) {
+//         document.getElementById('adultiMStep1').value = Math.max(1, MAX_PERSOANE_MANCARE - copii);
+//     }
 
-    const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
-    document.getElementById('pretMancareAfisajStep1').innerText = `${pretEstimatiText} ${persoane * PRET_MENIU_PERSOANA} RON`;
-    updateTotalDisplay('adultiMStep1', 'copiiMStep1', 'totalPeopleMStep1');
-}
+//     const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
+//     document.getElementById('pretMancareAfisajStep1').innerText = `${pretEstimatiText} ${persoane * PRET_MENIU_PERSOANA} RON`;
+//     updateTotalDisplay('adultiMStep1', 'copiiMStep1', 'totalPeopleMStep1');
+// }
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('adultiMStep1')?.addEventListener('input', calculeazaPretMancare);
-    document.getElementById('copiiMStep1')?.addEventListener('input', calculeazaPretMancare);
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//     document.getElementById('adultiMStep1')?.addEventListener('input', calculeazaPretMancare);
+//     document.getElementById('copiiMStep1')?.addEventListener('input', calculeazaPretMancare);
+// });
 
 // --- 5. COMUNICARE BACKEND (FORMULARE FINALIZARE) ---
 document.getElementById('formMancareStep2')?.addEventListener('submit', async (e) => {
@@ -1341,7 +1333,7 @@ document.getElementById('formMancareStep2')?.addEventListener('submit', async (e
             showMealStep(1);
             WIZARD_STATE.mealFormDirty = false;
             WIZARD_STATE.mealDraftId = null;
-            calculeazaPretMancare();
+            // calculeazaPretMancare();
         } else {
             const data = await res.json();
             alert('Eroare: ' + (data.error || 'Date incorecte.'));
@@ -1357,7 +1349,7 @@ document.getElementById('btnToday')?.addEventListener('click', function(e) {
         const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
         document.getElementById('dataMStep1').value = dateStr;
         showMealStep(1);
-        calculeazaPretMancare();
+        // calculeazaPretMancare();
     }
 });
 
@@ -1368,6 +1360,6 @@ document.getElementById('btnTomorrow')?.addEventListener('click', function(e) {
     const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
     document.getElementById('dataMStep1').value = dateStr;
     showMealStep(1);
-    calculeazaPretMancare();
+    // calculeazaPretMancare();
 });
 

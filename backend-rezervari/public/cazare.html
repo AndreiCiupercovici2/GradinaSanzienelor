@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title i18n="titlu_principal"></title>
+    <title data-i18n="titlu_cazare"></title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="flatpickr.min.css">
     <link rel="stylesheet" href="style.css">
@@ -19,8 +19,8 @@
         
         <nav class="main-nav">
             <ul>
+                <li><a href="index.html" data-i18n="nav_home">Acasă</a></li>
                 <li><a href="mancare.html" data-i18n="nav_mancare">Rezervă Masă</a></li>
-                <li><a href="cazare.html" data-i18n="nav_cabana">Cazare</a></li>
                 <li><a href="contact.html" data-i18n="nav_contact">Contact</a></li>
             </ul>
         </nav>
@@ -83,119 +83,15 @@
         </div>
     </section>
 
-    <h1 data-i18n="titlu_principal" style="text-align: center;"></h1>
+    <div class="lang-selector">
+        <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
+        <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+    </div>
+
+    <h1 data-i18n="titlu_cazare" style="text-align: center;"></h1>
 
     <div class="menu-selector">
-        <button onclick="arataSectiune('mancare')" id="btnMancare" data-i18n="nav_mancare">Rezervă Masă</button>
         <button onclick="arataSectiune('cabana')" id="btnCabana" data-i18n="nav_cabana">Cazare</button>
-    </div>
-
-    <!-- Resume Draft Banner for Meal - placed above the section -->
-    <div id="resumeBannerMancare" class="resume-banner" style="display: none;">
-        <p data-i18n="draft_exists_message">Ai o rezervare de masă în curs de finalizare.</p>
-        <button type="button" id="resumeButtonMancare" class="btn-resume" data-i18n="btn_resume">Continuă
-            Rezervarea</button>
-    </div>
-
-    <div id="sectiuneMancare" class="form-container" style="display: none;">
-        <p class="section-description" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face
-            rezervarea la masă.</p>
-
-        <!-- Progress Indicator for Meal -->
-        <div id="progressMeal" class="progress-indicator">
-            <div class="progress-step active" id="step1Meal">
-                <span class="step-number">1</span>
-                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-step" id="step2Meal">
-                <span class="step-number">2</span>
-                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
-            </div>
-        </div>
-
-        <!-- STEP 1: Travel Information for Meal -->
-        <div id="step1ContainerMeal" class="step-container">
-            <h3 data-i18n="step_travel_info">Informații Călătorie</h3>
-            <p data-i18n="step_progress_1of2">Pasul 1 din 2</p>
-
-            <div class="calendar-section">
-                <div class="quick-buttons">
-                    <button type="button" id="btnToday" class="quick-btn quick-btn-today"
-                        data-i18n="btn_today">Azi</button>
-                    <button type="button" id="btnTomorrow" class="quick-btn quick-btn-tomorrow"
-                        data-i18n="btn_tomorrow">Mâine</button>
-                </div>
-
-                <div id="notificationTodayMancare" class="notification notification-warning" style="display: flex;"
-                    data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
-
-                <div class="calendar-wrapper">
-                    <input type="text" id="calendarMancare">
-                </div>
-            </div>
-
-            <form id="formMancareStep1">
-                <div class="form-group">
-                    <label data-i18n="label_data_mesei">Data Mesei:</label>
-                    <input type="text" id="dataMStep1" readonly required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_ora_sosire">Ora Sosirii:</label>
-                    <input type="time" id="oraMStep1" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_adults">Adulți:</label>
-                    <input type="number" id="adultiMStep1" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_infants">Copii:</label>
-                    <input type="number" id="copiiMStep1" min="0" value="0" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_pets">Animale de companie:</label>
-                    <input type="number" id="animaleMStep1" min="0" value="0" required>
-                </div>
-                <div
-                    style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
-                    <span data-i18n="total_people" id="totalPeopleMStep1">Total: 1 persoane</span>
-                </div>
-                <div id="warningPendingMStep1" class="notification notification-warning" style="display: none;"
-                    data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această
-                    perioadă.</div>
-                <div class="pret-estimat" id="pretMancareAfisajStep1" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON
-                </div>
-                <br>
-                <button type="button" id="continueMealBtn" class="btn-primary"
-                    data-i18n="btn_continue">Continuă</button>
-            </form>
-        </div>
-
-        <!-- STEP 2: Personal Information for Meal -->
-        <div id="step2ContainerMeal" class="step-container" style="display: none;">
-            <h3 data-i18n="step_personal_info">Informații Personale</h3>
-            <p data-i18n="step_progress_2of2">Pasul 2 din 2</p>
-
-            <form id="formMancareStep2">
-                <div class="form-group">
-                    <label data-i18n="label_nume">Nume Complet:</label>
-                    <input type="text" id="numeMStep2" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_email">Email:</label>
-                    <input type="email" id="emailMStep2">
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_telefon">Telefon:</label>
-                    <input type="tel" id="telefonMStep2" required>
-                </div>
-                <br>
-                <div class="form-actions">
-                    <button type="button" id="backMealBtn" class="btn-secondary" data-i18n="btn_back">Înapoi</button>
-                    <button type="submit" class="btn-primary" data-i18n="btn_submit">Trimite Cererea de Masă</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- Resume Draft Banner for Cabin -->
