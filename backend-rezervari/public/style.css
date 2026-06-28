@@ -815,3 +815,668 @@ input#calendarCabana {
         text-align: center;
     }
 }
+
+/* ==========================================================
+   CABIN WIZARD — 4-Step New Styles
+   ========================================================== */
+
+/* Override max-width so cabin container is wider than the
+   default 600 px applied by the body > .form-container rule */
+#sectiuneCabana {
+    max-width: 900px;
+}
+
+/* ── Section A & B: inner cards ── */
+.cabin-dates-card,
+.cabin-guests-card {
+    background: #f8f9fa;
+    border: 1px solid #e2e6ea;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+}
+
+.cabin-card-title {
+    margin: 0 0 16px 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+/* ── Dates row: arrival | counter | departure ── */
+.dates-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.date-field-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.date-field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+/* Clickable card look for date inputs */
+.date-input-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.date-input-card:hover,
+.date-input-card:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.12);
+}
+
+.date-icon {
+    font-size: 15px;
+    flex-shrink: 0;
+    color: #666;
+}
+
+/* Override the global input[readonly] gray rule for cabin date inputs */
+#cabinArrivalInput,
+#cabinDepartureInput {
+    background-color: #fff !important;
+    cursor: pointer !important;
+    border: none;
+    outline: none;
+    padding: 0;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+}
+
+#cabinArrivalInput::placeholder,
+#cabinDepartureInput::placeholder {
+    color: #aaa;
+    font-size: 13px;
+}
+
+/* ── Night counter stepper widget ── */
+.nights-counter-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding-bottom: 2px;
+}
+
+.nights-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid #007bff;
+    background: #fff;
+    color: #007bff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nights-btn:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+.nights-display {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 60px;
+}
+
+/* ── Guests grid: 3 equal columns ── */
+.guests-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.cabin-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    appearance: auto;
+}
+
+.cabin-select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ── Step 1 continue button (full width) ── */
+.cabin-continue-btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Step actions row */
+.cabin-step-actions {
+    margin-top: 24px;
+}
+
+/* ==========================================================
+   STEP 2 — Extras
+   ========================================================== */
+
+.extra-item-card {
+    display: flex;
+    flex-direction: row;
+    background: #fff;
+    border: 1px solid #e2e6ea;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Slideshow panel — 55 % */
+.extra-slideshow-panel {
+    position: relative;
+    width: 55%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #1a1a1a;
+    min-height: 280px;
+}
+
+.extras-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+}
+
+.extras-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.extras-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Overlay navigation buttons */
+.extras-prev-btn,
+.extras-next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.40);
+    color: #fff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.extras-prev-btn:hover,
+.extras-next-btn:hover {
+    background: rgba(0, 0, 0, 0.65);
+}
+
+.extras-prev-btn {
+    left: 8px;
+}
+
+.extras-next-btn {
+    right: 8px;
+}
+
+/* Info panel — 45 % */
+.extra-info-panel {
+    flex: 1;
+    padding: 28px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.extra-badge {
+    display: inline-block;
+    background: #e8f4fd;
+    color: #0077cc;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    width: fit-content;
+}
+
+.extra-info-panel h4 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #222;
+    font-weight: 700;
+}
+
+.extra-description {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.65;
+    margin: 0 0 16px 0;
+}
+
+.extra-price-tag {
+    margin-bottom: 18px;
+}
+
+.price-amount {
+    font-size: 22px;
+    font-weight: 800;
+    color: #222;
+}
+
+.price-unit {
+    font-size: 13px;
+    color: #888;
+    margin-left: 4px;
+}
+
+.extra-toggle-btn {
+    padding: 10px 20px;
+    border: 2px solid #adb5bd;
+    border-radius: 6px;
+    background: #fff;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    width: fit-content;
+}
+
+.extra-toggle-btn:hover {
+    border-color: #495057;
+    color: #343a40;
+}
+
+.extra-toggle-btn.extra-toggle-added {
+    background: #28a745;
+    border-color: #28a745;
+    color: #fff;
+}
+
+.extra-toggle-btn.extra-toggle-added:hover {
+    background: #218838;
+    border-color: #218838;
+}
+
+/* ==========================================================
+   STEP 3 — Personal Information (2-column layout)
+   ========================================================== */
+
+.step3-layout {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.step3-form-col {
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+
+/* First name / last name side by side */
+.name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* Phone prefix select + number input side by side */
+.phone-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.phone-prefix-select {
+    flex-shrink: 0;
+    width: 120px;
+    padding: 10px 8px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.phone-prefix-select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.phone-input-row input[type="tel"] {
+    flex: 1;
+}
+
+/* Newsletter row */
+.newsletter-group {
+    margin-bottom: 16px;
+}
+
+.newsletter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.newsletter-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Info tooltip */
+.info-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.tooltip-text {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 240px;
+    z-index: 100;
+    pointer-events: none;
+    font-weight: normal;
+    white-space: normal;
+}
+
+.info-tooltip:hover .tooltip-text,
+.info-tooltip:focus .tooltip-text {
+    display: block;
+}
+
+/* Legal note */
+.legal-note {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.legal-link {
+    color: #555;
+    text-decoration: underline;
+}
+
+.legal-link:hover {
+    color: #007bff;
+}
+
+.required {
+    color: #dc3545;
+}
+
+/* Booking summary panel */
+.booking-summary-panel {
+    flex: 0 0 40%;
+    max-width: 40%;
+    background: #f8f9fa;
+    border: 1px solid #e2e6ea;
+    border-radius: 8px;
+    padding: 20px;
+    position: sticky;
+    top: 20px;
+}
+
+.booking-summary-panel h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.summary-content {
+    font-size: 14px;
+    color: #555;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-section {
+    margin-bottom: 4px;
+}
+
+.summary-divider {
+    height: 1px;
+    background: #ddd;
+    margin: 8px 0;
+}
+
+.summary-label {
+    color: #666;
+}
+
+.summary-extra .summary-label {
+    color: #28a745;
+}
+
+.summary-total-row {
+    border-top: 2px solid #ddd;
+    margin-top: 4px;
+    padding-top: 10px !important;
+    border-bottom: none !important;
+}
+
+.summary-total-amount {
+    font-size: 17px;
+    color: #222;
+}
+
+/* Send booking button — slightly wider than Back */
+.btn-send-booking {
+    background: #007bff;
+    flex: 2;
+}
+
+.btn-send-booking:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================
+   STEP 4 — Confirmation
+   ========================================================== */
+
+.confirmation-container {
+    text-align: center;
+    padding: 48px 20px;
+}
+
+.confirmation-icon {
+    width: 72px;
+    height: 72px;
+    background: #28a745;
+    color: #fff;
+    font-size: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.30);
+}
+
+.confirmation-container h3 {
+    font-size: 24px;
+    color: #222;
+    margin-bottom: 14px;
+}
+
+.confirmation-message {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0 auto 12px auto;
+}
+
+.confirmation-sub {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 28px;
+}
+
+/* ==========================================================
+   CABIN WIZARD — Mobile Responsive (≤ 768 px)
+   ========================================================== */
+
+@media (max-width: 768px) {
+    /* Dates row: stack vertically */
+    .dates-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .date-field-wrapper {
+        width: 100%;
+    }
+
+    /* Night counter goes horizontal when stacked */
+    .nights-counter-wrapper {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+        padding-bottom: 0;
+        gap: 12px;
+    }
+
+    /* Guests grid: single column */
+    .guests-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Extras cards: slide below image */
+    .extra-item-card {
+        flex-direction: column;
+    }
+
+    .extra-slideshow-panel {
+        width: 100%;
+        min-height: 200px;
+    }
+
+    .extra-info-panel {
+        padding: 16px 18px;
+    }
+
+    /* Step 3: stack form and summary */
+    .step3-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .step3-form-col {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .booking-summary-panel {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+        position: static;
+    }
+
+    /* Name row: single column on very small screens */
+    .name-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    /* Phone prefix narrower on mobile */
+    .phone-prefix-select {
+        width: 100px;
+    }
+
+    /* Progress indicator: narrower labels fit 4 steps */
+    #progressCabin .step-label {
+        font-size: 10px;
+        max-width: 72px;
+    }
+
+    #progressCabin .progress-line {
+        width: 20px;
+    }
+}

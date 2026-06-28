@@ -178,99 +178,254 @@
         <button type="button" id="resumeButtonCabana" class="btn-resume" data-i18n="btn_resume">Continuă Rezervarea</button>
     </div>
 
-    <div id="sectiuneCabana" class="form-container" style="display: none;">
+    <div id="sectiuneCabana" class="form-container cabin-container" style="display: none;">
         <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
 
-        <!-- Progress Indicator for Cabin -->
+        <!-- Progress Indicator for Cabin — 4 steps -->
         <div id="progressCabin" class="progress-indicator">
             <div class="progress-step active" id="step1Cabin">
                 <span class="step-number">1</span>
-                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
+                <span class="step-label">Travel Information</span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step2Cabin">
                 <span class="step-number">2</span>
-                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
+                <span class="step-label">Extras</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="step3Cabin">
+                <span class="step-number">3</span>
+                <span class="step-label">Personal Information</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="step4Cabin">
+                <span class="step-number">4</span>
+                <span class="step-label">Price</span>
             </div>
         </div>
 
-        <!-- STEP 1: Travel Information for Cabin -->
+        <!-- STEP 1: Travel Information -->
         <div id="step1ContainerCabin" class="step-container">
-            <h3 data-i18n="step_travel_info">Informații Călătorie</h3>
-            <p data-i18n="step_progress_1of2">Pasul 1 din 2</p>
 
-            <div class="calendar-section">
-                <div id="notificationTodayCabana" class="notification notification-warning" style="display: none;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
-                <div class="calendar-wrapper">
-                    <input type="text" id="calendarCabana">
+            <!-- Section A: Dates card -->
+            <div class="cabin-dates-card">
+                <h4 class="cabin-card-title">Arrival and Departure</h4>
+                <div class="dates-row">
+                    <div class="date-field-wrapper">
+                        <span class="date-field-label">Arrival</span>
+                        <div class="date-input-card">
+                            <span class="date-icon">&#128197;</span>
+                            <input type="text" id="cabinArrivalInput" readonly placeholder="Select arrival date">
+                        </div>
+                    </div>
+                    <div class="nights-counter-wrapper">
+                        <button type="button" id="nightsDecBtn" class="nights-btn" aria-label="Decrease nights">&#8722;</button>
+                        <span id="nightsDisplay" class="nights-display">1 night</span>
+                        <button type="button" id="nightsIncBtn" class="nights-btn" aria-label="Increase nights">&#43;</button>
+                    </div>
+                    <div class="date-field-wrapper">
+                        <span class="date-field-label">Departure</span>
+                        <div class="date-input-card">
+                            <span class="date-icon">&#128197;</span>
+                            <input type="text" id="cabinDepartureInput" readonly placeholder="Select departure date">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <form id="formCabanaStep1">
-                <div id="warningCabana"></div>
-                <div id="warningPendingCStep1" class="notification notification-warning" style="display: none;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
+            <!-- Section B: Guests card -->
+            <div class="cabin-guests-card">
+                <h4 class="cabin-card-title">Guests</h4>
+                <div class="guests-grid">
+                    <div class="form-group">
+                        <label>No. of Rooms</label>
+                        <select id="cabinRoomsSelect" class="cabin-select">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Adults</label>
+                        <select id="cabinAdultsSelect" class="cabin-select">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pets</label>
+                        <input type="text" id="cabinPetsInput" placeholder="e.g. 1 dog">
+                    </div>
+                </div>
+            </div>
 
-                <div class="form-group">
-                    <label data-i18n="label_data_check_in">Data Check-in (Început):</label>
-                    <input type="text" id="dataInceputCStep1" readonly required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_data_check_out">Data Check-out (Sfârșit):</label>
-                    <input type="text" id="dataSfarsitCStep1" readonly required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_adults">Adulți:</label>
-                    <input type="number" id="adultiCStep1" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_infants">Copii:</label>
-                    <input type="number" id="copiiCStep1" min="0" value="0" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_pets">Animale de companie:</label>
-                    <input type="number" id="animaleCStep1" min="0" value="0" required>
-                </div>
-                <div style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
-                    <span data-i18n="total_people" id="totalPeopleCStep1">Total: 1 persoane</span>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="label_rooms_needed">Camere necesare:</label>
-                    <input type="number" id="cameresCStep1" min="1" max="3" value="1" required>
-                </div>
-                <div class="form-group">
-                    <input type="checkbox" id="meniuCStep1">
-                    <label style="display:inline;" for="meniuCStep1" data-i18n="label_meniu">Doresc și meniu gastronomic</label>
-                </div>
-                <div class="pret-estimat" id="pretCabanaAfisajStep1" data-i18n="pretCabanaAfisaj">Preț estimat: 0 RON</div>
-                <br>
-                <button type="button" id="continueCabinBtn" class="btn-primary" data-i18n="btn_continue">Continuă</button>
-            </form>
+            <!-- Section C: Warning banners -->
+            <div id="warningCabana" style="display:none;"></div>
+            <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;"></div>
+
+            <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras &#8594;</button>
         </div>
 
-        <!-- STEP 2: Personal Information for Cabin -->
-        <div id="step2ContainerCabin" class="step-container" style="display: none;">
-            <h3 data-i18n="step_personal_info">Informații Personale</h3>
-            <p data-i18n="step_progress_2of2">Pasul 2 din 2</p>
+        <!-- STEP 2: Extras -->
+        <div id="step2ContainerCabin" class="step-container" style="display:none;">
+            <h3>Choose Your Extras</h3>
 
-            <form id="formCabanaStep2">
-                <div class="form-group">
-                    <label data-i18n="label_nume">Nume Complet:</label>
-                    <input type="text" id="numeCStep2" required>
+            <!-- Hot Tub Extra -->
+            <div class="extra-item-card" id="hotTubCard">
+                <div class="extra-slideshow-panel" id="hotTubSlideshow">
+                    <div class="extras-slide active">
+                        <img src="images/slide-3.webp" alt="Hot Tub">
+                    </div>
+                    <div class="extras-slide">
+                        <img src="images/slide-4.webp" alt="Hot Tub">
+                    </div>
+                    <div class="extras-slide">
+                        <img src="images/slide-5.webp" alt="Hot Tub">
+                    </div>
+                    <button class="extras-prev-btn" aria-label="Previous">&#8249;</button>
+                    <button class="extras-next-btn" aria-label="Next">&#8250;</button>
                 </div>
-                <div class="form-group">
-                    <label data-i18n="label_email">Email:</label>
-                    <input type="email" id="emailCStep2">
+                <div class="extra-info-panel">
+                    <div class="extra-badge">Optional Extra</div>
+                    <h4>Hot Tub</h4>
+                    <p class="extra-description">Unwind in our private outdoor hot tub overlooking the forest. Perfect for romantic evenings or after a day of exploring the mountains. Available throughout your entire stay.</p>
+                    <div class="extra-price-tag">
+                        <span class="price-amount">200 RON</span>
+                        <span class="price-unit">/ stay</span>
+                    </div>
+                    <button id="hotTubToggle" class="extra-toggle-btn">+ Add Hot Tub</button>
                 </div>
-                <div class="form-group">
-                    <label data-i18n="label_telefon">Telefon:</label>
-                    <input type="tel" id="telefonCStep2" required>
+            </div>
+
+            <!-- Meal Plan Extra -->
+            <div class="extra-item-card" id="mealCard">
+                <div class="extra-slideshow-panel" id="mealExtrasSlideshow">
+                    <div class="extras-slide active">
+                        <img src="images/slide-7.webp" alt="Meal">
+                    </div>
+                    <div class="extras-slide">
+                        <img src="images/slide-8.webp" alt="Meal">
+                    </div>
+                    <div class="extras-slide">
+                        <img src="images/slide-9.webp" alt="Meal">
+                    </div>
+                    <button class="extras-prev-btn" aria-label="Previous">&#8249;</button>
+                    <button class="extras-next-btn" aria-label="Next">&#8250;</button>
                 </div>
-                <br>
-                <div class="form-actions">
-                    <button type="button" id="backCabinBtn" class="btn-secondary" data-i18n="btn_back">Înapoi</button>
-                    <button type="submit" class="btn-primary" data-i18n="btn_submit">Trimite Rezervarea Cabană</button>
+                <div class="extra-info-panel">
+                    <div class="extra-badge">Optional Extra</div>
+                    <h4>Gastronomy Meal Plan</h4>
+                    <p class="extra-description">Savor authentic local cuisine prepared by our in-house chef. Enjoy a full breakfast and a three-course dinner using seasonal ingredients from our garden. A true farm-to-table experience.</p>
+                    <div class="extra-price-tag">
+                        <span class="price-amount">70 RON</span>
+                        <span class="price-unit">/ person / night</span>
+                    </div>
+                    <button id="mealToggle" class="extra-toggle-btn">+ Add Meal Plan</button>
                 </div>
-            </form>
+            </div>
+
+            <div class="form-actions cabin-step-actions">
+                <button type="button" id="backToTravelBtn" class="btn-secondary">&#8592; Back</button>
+                <button type="button" id="continueToPersonalBtn" class="btn-primary cabin-continue-btn">Continue &#8594;</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Personal Information -->
+        <div id="step3ContainerCabin" class="step-container" style="display:none;">
+            <div class="step3-layout">
+                <div class="step3-form-col">
+                    <h3>Personal Information</h3>
+
+                    <div class="form-group">
+                        <label>Salutation</label>
+                        <select id="cabinSalutation" class="cabin-select">
+                            <option value="">&#8212; Select &#8212;</option>
+                            <option value="Mr.">Mr.</option>
+                            <option value="Ms.">Ms.</option>
+                            <option value="Mrs.">Mrs.</option>
+                            <option value="Dr.">Dr.</option>
+                            <option value="Prof.">Prof.</option>
+                        </select>
+                    </div>
+
+                    <div class="name-row">
+                        <div class="form-group">
+                            <label>First Name <span class="required">*</span></label>
+                            <input type="text" id="cabinFirstName" placeholder="First name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required">*</span></label>
+                            <input type="text" id="cabinLastName" placeholder="Last name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" id="cabinEmail" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telephone <span class="required">*</span></label>
+                        <div class="phone-input-row">
+                            <select id="cabinPhonePrefix" class="phone-prefix-select">
+                                <option value="+40">&#127479;&#127476; +40</option>
+                                <option value="+49">&#127465;&#127466; +49</option>
+                                <option value="+44">&#127468;&#127463; +44</option>
+                                <option value="+33">&#127467;&#127479; +33</option>
+                                <option value="+39">&#127470;&#127481; +39</option>
+                                <option value="+34">&#127466;&#127480; +34</option>
+                                <option value="+43">&#127462;&#127481; +43</option>
+                                <option value="+41">&#127464;&#127469; +41</option>
+                                <option value="+31">&#127475;&#127473; +31</option>
+                                <option value="+32">&#127463;&#127466; +32</option>
+                                <option value="+48">&#127477;&#127473; +48</option>
+                                <option value="+36">&#127469;&#127482; +36</option>
+                                <option value="+380">&#127482;&#127462; +380</option>
+                                <option value="+1">&#127482;&#127480; +1</option>
+                                <option value="+7">&#127479;&#127482; +7</option>
+                            </select>
+                            <input type="tel" id="cabinPhone" placeholder="Phone number" required>
+                        </div>
+                    </div>
+
+                    <div class="newsletter-group">
+                        <label class="newsletter-label">
+                            <input type="checkbox" id="newsletterCheck">
+                            <span>I agree to receive information</span>
+                            <span class="info-tooltip" tabindex="0">
+                                &#9432;
+                                <span class="tooltip-text">In the future, I would like to receive newsletters with current information and travel offers by email. This consent can be withdrawn at any time.</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <p class="legal-note">By confirming the booking you agree to the <a href="#" class="legal-link" id="termsLink">Terms and Conditions</a> and <a href="#" class="legal-link" id="privacyLink">Privacy Policy</a>.</p>
+
+                    <div class="form-actions cabin-step-actions">
+                        <button type="button" id="backToExtrasBtn" class="btn-secondary">&#8592; Back</button>
+                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking">Send Booking for Confirmation</button>
+                    </div>
+                </div>
+
+                <aside class="booking-summary-panel">
+                    <h4>Booking Summary</h4>
+                    <div id="summaryContent" class="summary-content">
+                        <!-- populated by JS -->
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- STEP 4: Confirmation -->
+        <div id="step4ContainerCabin" class="step-container" style="display:none;">
+            <div class="confirmation-container">
+                <div class="confirmation-icon">&#10003;</div>
+                <h3>Booking Request Submitted</h3>
+                <p class="confirmation-message">Thank you for your booking request. Our host will personally review your details and contact you within 24 hours to confirm your reservation. We look forward to welcoming you to Gr&#259;dina S&#226;nzienelor!</p>
+                <p class="confirmation-sub">Please check your email for a summary of your request.</p>
+                <button id="newBookingBtn" class="btn-secondary">Make Another Booking</button>
+            </div>
         </div>
     </div>
 

@@ -163,10 +163,10 @@ function showCabinStep(stepNumber) {
             break;
     }
 
-    // Scroll to top of form
-    const activeStep = document.getElementById(`step${stepNumber}ContainerCabin`);
-    if (activeStep) {
-        activeStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll to top of cabin section
+    const cabinSection = document.getElementById('sectiuneCabana');
+    if (cabinSection) {
+        cabinSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
@@ -826,23 +826,31 @@ function updateCabinSummary() {
     const departure = document.getElementById('cabinDepartureInput')?.value || '—';
     const rooms = document.getElementById('cabinRoomsSelect')?.value || '1';
     const adults = document.getElementById('cabinAdultsSelect')?.value || '1';
+    const pets = document.getElementById('cabinPetsInput')?.value || '';
     const nights = cabinNights;
 
-    let total = 0;
-    const PRET_NOAPTE = 100; // RON per person per night
-    total += parseInt(adults) * nights * PRET_NOAPTE;
-    if (WIZARD_STATE.cabinExtras.hotTub) total += PRET_HOTTUB;
-    if (WIZARD_STATE.cabinExtras.meal) total += parseInt(adults) * nights * PRET_MENIU_PER_PERSON_NIGHT;
+    let basePrice = parseInt(adults) * nights * PRET_NOAPTE_PERSOANA;
+    let hotTubPrice = WIZARD_STATE.cabinExtras.hotTub ? PRET_HOTTUB : 0;
+    let mealPrice = WIZARD_STATE.cabinExtras.meal ? parseInt(adults) * nights * PRET_MENIU_PER_PERSON_NIGHT : 0;
+    let total = basePrice + hotTubPrice + mealPrice;
 
     panel.innerHTML = `
-        <div class="summary-row"><span>Arrival:</span><strong>${arrival}</strong></div>
-        <div class="summary-row"><span>Departure:</span><strong>${departure}</strong></div>
-        <div class="summary-row"><span>Nights:</span><strong>${nights}</strong></div>
-        <div class="summary-row"><span>Rooms:</span><strong>${rooms}</strong></div>
-        <div class="summary-row"><span>Adults:</span><strong>${adults}</strong></div>
-        ${WIZARD_STATE.cabinExtras.hotTub ? '<div class="summary-row extras-line"><span>Hot Tub:</span><strong>200 RON</strong></div>' : ''}
-        ${WIZARD_STATE.cabinExtras.meal ? `<div class="summary-row extras-line"><span>Meal Plan:</span><strong>${parseInt(adults) * nights * 70} RON</strong></div>` : ''}
-        <div class="summary-row summary-total"><span>Estimated Total:</span><strong>${total} RON</strong></div>
+        <div class="summary-section">
+            <div class="summary-row"><span class="summary-label">Check-in</span><strong>${arrival}</strong></div>
+            <div class="summary-row"><span class="summary-label">Check-out</span><strong>${departure}</strong></div>
+            <div class="summary-row"><span class="summary-label">Duration</span><strong>${nights} ${nights === 1 ? 'night' : 'nights'}</strong></div>
+            <div class="summary-row"><span class="summary-label">Rooms</span><strong>${rooms}</strong></div>
+            <div class="summary-row"><span class="summary-label">Adults</span><strong>${adults}</strong></div>
+            ${pets ? `<div class="summary-row"><span class="summary-label">Pets</span><strong>${pets}</strong></div>` : ''}
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-section">
+            <div class="summary-row"><span class="summary-label">Accommodation</span><strong>${basePrice} RON</strong></div>
+            ${WIZARD_STATE.cabinExtras.hotTub ? `<div class="summary-row summary-extra"><span class="summary-label">🛁 Hot Tub</span><strong>${hotTubPrice} RON</strong></div>` : ''}
+            ${WIZARD_STATE.cabinExtras.meal ? `<div class="summary-row summary-extra"><span class="summary-label">🍽️ Meal Plan</span><strong>${mealPrice} RON</strong></div>` : ''}
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-total-row"><span class="summary-label">Estimated Total</span><strong class="summary-total-amount">${total} RON</strong></div>
     `;
 }
 
@@ -854,6 +862,7 @@ function resetCabinForm() {
     document.getElementById('cabinFirstName').value = '';
     document.getElementById('cabinLastName').value = '';
     document.getElementById('cabinEmail').value = '';
+    document.getElementById('cabinPhonePrefix').value = '+40';
     document.getElementById('cabinPhone').value = '';
     document.getElementById('cabinSalutation').value = '';
     document.getElementById('cabinPetsInput').value = '';
