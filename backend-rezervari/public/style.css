@@ -73,11 +73,11 @@ h2 {
 /* --- Hero Slideshow Section --- */
 .hero-slideshow {
     position: relative;
-    width: 100vw;
-    height: calc(100vh - 100px); /* Adjust height based on header */
+    width: 70vw;
+    height: calc(80vh - 100px); /* Adjust height based on header */
     overflow: hidden;
     background-color: #000;
-    margin: 0 calc(-50vw + 50%);
+    margin: 0 calc(-35vw + 50%);
     margin-bottom: 40px;
 }
 

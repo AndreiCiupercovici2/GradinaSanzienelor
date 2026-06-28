@@ -73,7 +73,8 @@ const traduceri = {
         hottub_description: "Relaxați-vă sub stele în cada noastră privată cu apă fierbinte. Disponibilă tot anul, cada poate găzdui până la 6 oaspeți și este inclusă pentru întreaga sejur.",
         meal_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
         titlu_cazare: "Rezervări Cazare",
-        titlu_mancare: "Rezervări Masă"
+        titlu_mancare: "Rezervări Masă",
+        
     },
     en: {
         titlu_principal: "Grădina Sânzienelor - Local Gastronomic Point",

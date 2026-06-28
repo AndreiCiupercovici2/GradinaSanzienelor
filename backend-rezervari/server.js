@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const nodemailer = require('nodemailer');
@@ -835,6 +836,57 @@ setInterval(() => {
         }
     );
 }, 60 * 60 * 1000); // Every hour
+
+// Page routes configuration
+const validPages = ['mancare', 'cazare', 'contact', 'punct-gastronomic', 'admin'];
+const pageFilePath = (page) => path.join(__dirname, 'public', 'Pages', `${page}.html`);
+
+// Clean URL routes (without .html extension)
+app.get('/', (req, res) => {
+    res.sendFile(pageFilePath('index'), (err) => {
+        if (err) {
+            console.error('Error serving index page:', err);
+            res.status(500).send('Internal Server Error');
+        }
+    });
+    console.log('Served index page', res.statusCode);
+});
+
+validPages.forEach((page) => {
+    app.get(`/${page}`, (req, res) => {
+        res.sendFile(pageFilePath(page), (err) => {
+            if (err) {
+                console.error(`Error serving ${page} page:`, err);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+        console.log(`Served ${page} page`, res.statusCode);
+    });
+});
+
+// Backwards compatibility: serve pages with .html extension
+app.get('/:page.html', (req, res) => {
+    const page = req.params.page;
+    const allPages = ['index', ...validPages];
+
+    if (allPages.includes(page)) {
+        res.sendFile(pageFilePath(page), (err) => {
+            if (err) {
+                console.error(`Error serving ${page} page:`, err);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+        console.log(`Served ${page} page`, res.statusCode);
+    } else {
+        res.status(404).send('Page not found');
+    }
+});
+
+// Catch-all 404 handler for unmatched routes
+app.use((req, res) => {
+    res.status(404).send('Page not found');
+    console.log(`Page not found: ${req.originalUrl}`, res.statusCode);
+});
 
 app.listen(port, () => {
     console.log(`Serverul rulează pe portul ${port}`);

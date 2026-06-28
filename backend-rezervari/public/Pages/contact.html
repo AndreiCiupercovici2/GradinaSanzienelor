@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="titlu_contact"></title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="flatpickr.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
+        </div>
+
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/" data-i18n="nav_home">Acasă</a></li>
+                <li><a href="/punct-gastronomic" data-i18n="nav_punct_gastronomic">Ce este un Punct Gastronomic?</a></li>
+                <li><a href="/mancare" data-i18n="nav_mancare">Rezervă Masă</a></li>
+                <li><a href="/cazare" data-i18n="nav_cabana">Rezervă Cazare</a></li>
+                <li><a href="/contact" data-i18n="nav_contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="lang-selector">
+            <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
+            <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+        </div>
+    </header>
+
+    <h1 data-i18n="titlu_contact" style="text-align: center;"></h1>
+
+    <!-- Hero Slideshow Section -->
+    <section class="hero-slideshow" id="heroSlideshow">
+        <div class="slideshow-container">
+            <div class="slide fade" data-slide="1">
+                <img src="images/slide-1.webp" alt="Slide 1">
+            </div>
+            <div class="slide fade" data-slide="2">
+                <img src="images/slide-2.webp" alt="Slide 2">
+            </div>
+            <div class="slide fade" data-slide="3">
+                <img src="images/slide-3.webp" alt="Slide 3">
+            </div>
+            <div class="slide fade" data-slide="4">
+                <img src="images/slide-4.webp" alt="Slide 4">
+            </div>
+            <div class="slide fade" data-slide="5">
+                <img src="images/slide-5.webp" alt="Slide 5">
+            </div>
+            <div class="slide fade" data-slide="6">
+                <img src="images/slide-6.webp" alt="Slide 6">
+            </div>
+            <div class="slide fade" data-slide="7">
+                <img src="images/slide-7.webp" alt="Slide 7">
+            </div>
+            <div class="slide fade" data-slide="8">
+                <img src="images/slide-8.webp" alt="Slide 8">
+            </div>
+            <div class="slide fade" data-slide="9">
+                <img src="images/slide-9.webp" alt="Slide 9">
+            </div>
+            <div class="slide fade" data-slide="10">
+                <img src="images/slide-10.webp" alt="Slide 10">
+            </div>
+            <div class="slide fade" data-slide="11">
+                <img src="images/slide-11.webp" alt="Slide 11">
+            </div>
+
+            <!-- Navigation Arrows -->
+            <button class="nav-arrow nav-arrow-left" id="prevSlideBtn" aria-label="Previous slide">
+                <span class="arrow-chevron-left"></span>
+            </button>
+            <button class="nav-arrow nav-arrow-right" id="nextSlideBtn" aria-label="Next slide">
+                <span class="arrow-chevron-right"></span>
+            </button>
+        </div>
+
+        <!-- Down Arrow Indicator -->
+        <div class="scroll-indicator">
+            <span class="arrow-down"></span>
+        </div>
+    </section>
+
+    <script src="flatpickr.min.js"></script>
+    <script src="ro.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
