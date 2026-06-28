@@ -124,7 +124,15 @@ const isAfter10Am = () => {
 const validateReservationInput = (data, lang, isFood = false) => {
     const errors = [];
 
-    if (!data.nume || !sanitizeText(data.nume)) errors.push(t('invalid_nume', lang));
+    // For non-food (cabin), accept either nume OR both first_name + last_name
+    if (isFood) {
+        if (!data.nume || !sanitizeText(data.nume)) errors.push(t('invalid_nume', lang));
+    } else {
+        const hasNume = data.nume && sanitizeText(data.nume);
+        const hasNames = data.first_name && sanitizeText(data.first_name) && data.last_name && sanitizeText(data.last_name);
+        if (!hasNume && !hasNames) errors.push(t('invalid_nume', lang));
+    }
+
     if (!isValidEmail(data.email)) errors.push(t('invalid_email', lang));
     if (!isValidPhoneNumber(data.telefon)) errors.push(t('invalid_telefon', lang));
 
@@ -177,6 +185,8 @@ const sendConfirmationEmail = async (detaliiRezervare, tipRezervare) => {
             continutEmail += `Data sfârșit: ${detaliiRezervare.data_sfarsit}\n`;
             continutEmail += `Camere necesare: ${detaliiRezervare.rooms_needed || 1}\n`;
             continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
+            continutEmail += `Vrea cada cu apă fierbinte: ${detaliiRezervare.vrea_hottub ? 'Da' : 'Nu'}\n`;
+            continutEmail += `Consimțământ newsletter: ${detaliiRezervare.newsletter ? 'Da' : 'Nu'}\n`;
         } else {
             continutEmail += `\nData: ${detaliiRezervare.data_rezervare}\n`;
             continutEmail += `Ora: ${detaliiRezervare.ora}\n`;
@@ -266,6 +276,21 @@ db.serialize(() => {
         if (!columnNames.includes('rooms_needed')) {
             db.run("ALTER TABLE rezervari_cabana ADD COLUMN rooms_needed INTEGER NOT NULL DEFAULT 1");
         }
+        if (!columnNames.includes('salutation')) {
+            db.run("ALTER TABLE rezervari_cabana ADD COLUMN salutation TEXT DEFAULT ''");
+        }
+        if (!columnNames.includes('first_name')) {
+            db.run("ALTER TABLE rezervari_cabana ADD COLUMN first_name TEXT DEFAULT ''");
+        }
+        if (!columnNames.includes('last_name')) {
+            db.run("ALTER TABLE rezervari_cabana ADD COLUMN last_name TEXT DEFAULT ''");
+        }
+        if (!columnNames.includes('vrea_hottub')) {
+            db.run("ALTER TABLE rezervari_cabana ADD COLUMN vrea_hottub BOOLEAN DEFAULT 0");
+        }
+        if (!columnNames.includes('newsletter')) {
+            db.run("ALTER TABLE rezervari_cabana ADD COLUMN newsletter BOOLEAN DEFAULT 0");
+        }
     });
 
     db.all("PRAGMA table_info(rezervari_mancare)", [], (err, columns) => {
@@ -284,11 +309,35 @@ db.serialize(() => {
 
 app.post('/api/rezervari_cabana', async (req, res) => {
     const lang = getLanguage(req);
-    const { nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, vrea_meniu, adults, infants, pets, rooms_needed } = req.body;
+    const {
+        nume,
+        salutation,
+        first_name,
+        last_name,
+        email,
+        telefon,
+        data_inceput,
+        data_sfarsit,
+        numar_persoane,
+        vrea_meniu,
+        vrea_hottub,
+        adults,
+        infants,
+        pets,
+        rooms_needed,
+        newsletter,
+        pets_info
+    } = req.body;
 
     const validationErrors = validateReservationInput(req.body, lang, false);
     if (validationErrors) {
         return res.status(400).json({ error: validationErrors.join(', ') });
+    }
+
+    // Build nume from first_name/last_name if not provided
+    let finalNume = nume;
+    if (!finalNume) {
+        finalNume = `${salutation || ''} ${first_name || ''} ${last_name || ''}`.trim();
     }
 
     const totalPeople = (parseInt(adults) || 1) + (parseInt(infants) || 0);
@@ -296,9 +345,12 @@ app.post('/api/rezervari_cabana', async (req, res) => {
         return res.status(400).json({ error: t('num_persoane_invalid', lang) });
     }
 
-    return new Promise((resolve) => {
-        db.serialize(() => {
-            db.run("BEGIN TRANSACTION");
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION", (beginErr) => {
+            if (beginErr) {
+                console.error('BEGIN TRANSACTION error:', beginErr);
+                return res.status(500).json({ error: t('save_error', lang) });
+            }
 
             const sqlVerificare = `
                 SELECT SUM(adults + infants) AS total_oaspeti
@@ -308,34 +360,55 @@ app.post('/api/rezervari_cabana', async (req, res) => {
 
             db.get(sqlVerificare, [data_inceput, data_sfarsit], (err, row) => {
                 if (err) {
-                    db.run("ROLLBACK");
-                    resolve(res.status(500).json({ error: t('availability_error', lang) }));
-                    return;
+                    db.run("ROLLBACK", (rollbackErr) => {
+                        if (rollbackErr) console.error('ROLLBACK error:', rollbackErr);
+                    });
+                    return res.status(500).json({ error: t('availability_error', lang) });
                 }
 
                 const oaspetiExistenti = row.total_oaspeti || 0;
                 if (oaspetiExistenti + totalPeople > CAPACITATE_MAX_CABANA) {
-                    db.run("ROLLBACK");
-                    resolve(res.status(400).json({ error: t('fully_booked', lang) }));
-                    return;
+                    db.run("ROLLBACK", (rollbackErr) => {
+                        if (rollbackErr) console.error('ROLLBACK error:', rollbackErr);
+                    });
+                    return res.status(400).json({ error: t('fully_booked', lang) });
                 }
 
-                const sqlInsert = `INSERT INTO rezervari_cabana (nume, email, telefon, data_inceput, data_sfarsit, numar_persoane, adults, infants, pets, rooms_needed, vrea_meniu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                db.run(sqlInsert, [sanitizeText(nume), email, sanitizeText(telefon), data_inceput, data_sfarsit, totalPeople, adults, infants, pets, rooms_needed, vrea_meniu ? 1 : 0], function(err) {
+                const sqlInsert = `INSERT INTO rezervari_cabana (nume, salutation, first_name, last_name, email, telefon, data_inceput, data_sfarsit, numar_persoane, adults, infants, pets, rooms_needed, vrea_meniu, vrea_hottub, newsletter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                db.run(sqlInsert, [
+                    sanitizeText(finalNume),
+                    sanitizeText(salutation || ''),
+                    sanitizeText(first_name || ''),
+                    sanitizeText(last_name || ''),
+                    email,
+                    sanitizeText(telefon),
+                    data_inceput,
+                    data_sfarsit,
+                    totalPeople,
+                    adults,
+                    infants,
+                    pets,
+                    rooms_needed,
+                    vrea_meniu ? 1 : 0,
+                    vrea_hottub ? 1 : 0,
+                    newsletter ? 1 : 0
+                ], function(err) {
                     if (err) {
-                        db.run("ROLLBACK");
-                        resolve(res.status(500).json({ error: t('save_error', lang) }));
-                        return;
+                        db.run("ROLLBACK", (rollbackErr) => {
+                            if (rollbackErr) console.error('ROLLBACK error:', rollbackErr);
+                        });
+                        return res.status(500).json({ error: t('save_error', lang) });
                     }
 
-                    db.run("COMMIT", async (err) => {
-                        if (err) {
-                            resolve(res.status(500).json({ error: t('commit_error', lang) }));
-                            return;
+                    const insertedId = this.lastID;
+                    db.run("COMMIT", async (commitErr) => {
+                        if (commitErr) {
+                            console.error('COMMIT error:', commitErr);
+                            return res.status(500).json({ error: t('commit_error', lang) });
                         }
 
                         await sendConfirmationEmail(req.body, 'cabana');
-                        resolve(res.status(201).json({ message: t('cabin_success', lang), id: this.lastID }));
+                        res.status(201).json({ message: t('cabin_success', lang), id: insertedId });
                     });
                 });
             });
@@ -440,47 +513,99 @@ const saveDraft = (email, phone, reservationType, currentStep, formData) => {
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
         const formDataJson = JSON.stringify(formData);
 
-        db.get(
-            `SELECT id FROM reservation_drafts WHERE email = ? AND phone = ? AND reservation_type = ?`,
-            [email, phone, reservationType],
-            (err, row) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
+        // Step 2 or higher with filled email/phone: look for existing draft first
+        if (currentStep >= 2 && email && phone) {
+            db.get(
+                `SELECT id FROM reservation_drafts WHERE email = ? AND phone = ? AND reservation_type = ?`,
+                [email, phone, reservationType],
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
 
-                if (row) {
-                    // Update existing draft
-                    db.run(
-                        `UPDATE reservation_drafts
-                         SET current_step = ?, form_data = ?, updated_at = CURRENT_TIMESTAMP, expires_at = ?
-                         WHERE id = ?`,
-                        [currentStep, formDataJson, expiresAt, row.id],
-                        function(err) {
+                    if (row) {
+                        return updateExistingDraft(row.id);
+                    }
+
+                    // If not found with filled email/phone, look for Step 1 draft with empty values
+                    db.get(
+                        `SELECT id FROM reservation_drafts
+                         WHERE (email = '' OR email IS NULL) AND (phone = '' OR phone IS NULL)
+                         AND reservation_type = ?
+                         ORDER BY updated_at DESC LIMIT 1`,
+                        [reservationType],
+                        (err, step1Row) => {
                             if (err) {
                                 reject(err);
-                            } else {
-                                resolve({ draftId: row.id, isNew: false });
+                                return;
                             }
-                        }
-                    );
-                } else {
-                    // Insert new draft
-                    db.run(
-                        `INSERT INTO reservation_drafts (email, phone, reservation_type, current_step, form_data, expires_at)
-                         VALUES (?, ?, ?, ?, ?, ?)`,
-                        [email, phone, reservationType, currentStep, formDataJson, expiresAt],
-                        function(err) {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve({ draftId: this.lastID, isNew: true });
+
+                            if (step1Row) {
+                                return updateExistingDraft(step1Row.id);
                             }
+
+                            insertNewDraft();
                         }
                     );
                 }
-            }
-        );
+            );
+        } else {
+            // Step 1 or no complete email/phone: look by type only
+            db.get(
+                `SELECT id FROM reservation_drafts
+                 WHERE (email = ? OR (? = '' AND email = ''))
+                 AND (phone = ? OR (? = '' AND phone = ''))
+                 AND reservation_type = ?
+                 ORDER BY updated_at DESC LIMIT 1`,
+                [email, email, phone, phone, reservationType],
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    if (row) {
+                        return updateExistingDraft(row.id);
+                    }
+
+                    insertNewDraft();
+                }
+            );
+        }
+
+        function updateExistingDraft(draftId) {
+            db.run(
+                `UPDATE reservation_drafts
+                 SET current_step = ?, form_data = ?, email = ?, phone = ?, updated_at = CURRENT_TIMESTAMP, expires_at = ?
+                 WHERE id = ?`,
+                [currentStep, formDataJson, email || '', phone || '', expiresAt, draftId],
+                function(err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log(`Updated draft ${draftId} to step ${currentStep}`);
+                        resolve({ draftId: draftId, isNew: false });
+                    }
+                }
+            );
+        }
+
+        function insertNewDraft() {
+            db.run(
+                `INSERT INTO reservation_drafts (email, phone, reservation_type, current_step, form_data, expires_at)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [email || '', phone || '', reservationType, currentStep, formDataJson, expiresAt],
+                function(err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log(`Created new draft ${this.lastID} for step ${currentStep}`);
+                        resolve({ draftId: this.lastID, isNew: true });
+                    }
+                }
+            );
+        }
     });
 };
 
@@ -488,25 +613,28 @@ app.post('/api/reservations/draft', async (req, res) => {
     const lang = getLanguage(req);
     const { email, phone, reservation_type, current_step, step_data } = req.body;
 
-    // Validation
-    if (!email || !isValidEmail(email)) {
-        return res.status(400).json({ error: t('invalid_email', lang) });
+    // Validation - only require email/phone for Step 2+; Step 1 can have empty values
+    if (current_step >= 2) {
+        if (!email || !isValidEmail(email)) {
+            return res.status(400).json({ error: t('invalid_email', lang) });
+        }
+        if (!phone || !isValidPhoneNumber(phone)) {
+            return res.status(400).json({ error: t('invalid_telefon', lang) });
+        }
     }
-    if (!phone || !isValidPhoneNumber(phone)) {
-        return res.status(400).json({ error: t('invalid_telefon', lang) });
-    }
+
     if (!['mancare', 'cabana'].includes(reservation_type)) {
         return res.status(400).json({ error: t('invalid_type', lang) });
     }
-    if (![1, 2].includes(current_step)) {
-        return res.status(400).json({ error: 'Invalid step. Must be 1 or 2.' });
+    if (![1, 2, 3, 4].includes(current_step)) {
+        return res.status(400).json({ error: 'Invalid step. Must be 1, 2, 3 or 4.' });
     }
     if (!step_data || typeof step_data !== 'object') {
         return res.status(400).json({ error: 'Invalid step_data. Must be an object.' });
     }
 
     try {
-        const result = await saveDraft(email, phone, reservation_type, current_step, step_data);
+        const result = await saveDraft(email || '', phone || '', reservation_type, current_step, step_data);
         return res.status(result.isNew ? 201 : 200).json({
             success: true,
             draft_id: result.draftId,
@@ -629,7 +757,7 @@ Datele tale vor fi șterse în 24 de ore din momentul înregistrării.
 Dacă ai întrebări, ne poți contacta.
 
 Cu plăcere,
-Echipa Diana
+Echipa Grădina Sânzienelor
                 `.trim();
 
                 await transporter.sendMail({
