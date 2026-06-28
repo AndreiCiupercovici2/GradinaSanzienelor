@@ -17,10 +17,10 @@ const WIZARD_STATE = {
 };
 
 // --- PRICING CONSTANTS ---
-const PRET_NOAPTE_PERSOANA = 100;
-const PRET_MENIU_PERSOANA = 70;
-const PRET_HOTTUB = 200;         // RON per stay
-const PRET_MENIU_PER_PERSON_NIGHT = 70;  // RON per person per night
+//const PRET_NOAPTE_PERSOANA = 100;
+//const PRET_MENIU_PERSOANA = 70;
+//const PRET_HOTTUB = 200;         // RON per stay
+//const PRET_MENIU_PER_PERSON_NIGHT = 70;  // RON per person per night
 const MAX_PERSOANE_MANCARE = 15;
 const CAPACITATE_MAX_CABANA = 8;
 const MAX_CAMERE = 3;
@@ -164,7 +164,7 @@ function showCabinStep(stepNumber) {
     }
 
     // Update price displays on all steps
-    updateCabinPriceDisplays();
+    // updateCabinPriceDisplays();
 
     // Scroll to top of cabin section
     const cabinSection = document.getElementById('sectiuneCabana');
@@ -299,7 +299,6 @@ async function saveCabinDraft(step) {
     const step2Data = step >= 2 ? { hotTub: WIZARD_STATE.cabinExtras.hotTub, meal: WIZARD_STATE.cabinExtras.meal } : {};
 
     const step3Data = step >= 3 ? {
-        salutation: document.getElementById('cabinSalutation')?.value || '',
         first_name: document.getElementById('cabinFirstName').value.trim(),
         last_name: document.getElementById('cabinLastName').value.trim(),
         email: email,
@@ -573,25 +572,73 @@ document.addEventListener('DOMContentLoaded', async function() {
     // --- CALENDAR INPUT CLICK HANDLERS (Issue #2: Non-responsive Calendar Inputs) ---
     // Add click handlers to make the readonly date inputs open the calendar
     document.addEventListener('click', function(e) {
-        if (e.target.id === 'cabinArrivalInput' && cabinArrivalFP) {
-            cabinArrivalFP.open();
+        if (e.target.id === 'cabinArrivalInput') {
+            console.log('Clicked on cabinArrivalInput');
+            if (!cabinArrivalFP) {
+                console.log('Initializing calendars on first click...');
+                arataSectiune('cabana');
+            }
+            if (cabinArrivalFP) {
+                try {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cabinArrivalFP.open();
+                    console.log('Arrival calendar opened via click handler');
+                } catch (err) {
+                    console.error('Error opening arrival calendar:', err);
+                }
+            }
         }
-        if (e.target.id === 'cabinDepartureInput' && cabinDepartureFP) {
-            cabinDepartureFP.open();
+        if (e.target.id === 'cabinDepartureInput') {
+            console.log('Clicked on cabinDepartureInput');
+            if (!cabinDepartureFP) {
+                console.log('Initializing calendars on first click...');
+                arataSectiune('cabana');
+            }
+            if (cabinDepartureFP) {
+                try {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cabinDepartureFP.open();
+                    console.log('Departure calendar opened via click handler');
+                } catch (err) {
+                    console.error('Error opening departure calendar:', err);
+                }
+            }
         }
     });
+
+    // Also add focus handlers as backup to open calendars
+    document.addEventListener('focus', function(e) {
+        if (e.target.id === 'cabinArrivalInput') {
+            if (!cabinArrivalFP) {
+                arataSectiune('cabana');
+            }
+            if (cabinArrivalFP) {
+                cabinArrivalFP.open();
+            }
+        }
+        if (e.target.id === 'cabinDepartureInput') {
+            if (!cabinDepartureFP) {
+                arataSectiune('cabana');
+            }
+            if (cabinDepartureFP) {
+                cabinDepartureFP.open();
+            }
+        }
+    }, true);
 
     // --- ROOMS/ADULTS DEPENDENCY ---
     document.getElementById('cabinRoomsSelect')?.addEventListener('change', function() {
         updateAdultsOptions(parseInt(this.value));
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
     });
 
     // Update price displays when adults count changes
     document.getElementById('cabinAdultsSelect')?.addEventListener('change', function() {
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
     });
 
     // --- EXTRAS TOGGLES ---
@@ -600,7 +647,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         this.textContent = WIZARD_STATE.cabinExtras.hotTub ? 'Added ✓' : 'Add Hot Tub';
         this.classList.toggle('extra-toggle-added', WIZARD_STATE.cabinExtras.hotTub);
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
     });
 
     document.getElementById('mealToggle')?.addEventListener('click', function() {
@@ -608,7 +655,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         this.textContent = WIZARD_STATE.cabinExtras.meal ? 'Added ✓' : 'Add Meal Plan';
         this.classList.toggle('extra-toggle-added', WIZARD_STATE.cabinExtras.meal);
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
     });
 
     // --- EXTRAS SLIDESHOWS ---
@@ -628,7 +675,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('continueToPersonalBtn')?.addEventListener('click', function(e) {
         e.preventDefault();
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
         saveCabinDraft(2);
         showCabinStep(3);
     });
@@ -789,12 +836,12 @@ function updateTotalDisplay(adultsId, infantsId, displayId) {
     document.getElementById(displayId).textContent = totalText;
 }
 
-function updateNightsDisplay() {
+function updateNightsDisplay(shouldUpdateDeparture = true) {
     const el = document.getElementById('nightsDisplay');
     if (el) el.textContent = cabinNights === 1 ? '1 night' : `${cabinNights} nights`;
 
-    // Recalculate departure based on arrival + nights
-    if (cabinArrivalFP && cabinArrivalFP.selectedDates[0]) {
+    // Only recalculate departure based on arrival + nights if not called from handleDepartureChange
+    if (shouldUpdateDeparture && cabinArrivalFP && cabinArrivalFP.selectedDates[0]) {
         const arrivalDate = new Date(cabinArrivalFP.selectedDates[0]);
         const dep = new Date(arrivalDate);
         dep.setDate(dep.getDate() + cabinNights);
@@ -811,7 +858,7 @@ function updateNightsDisplay() {
         }
     }
     updateCabinSummary();
-    updateCabinPriceDisplays();
+    // updateCabinPriceDisplays();
 }
 
 function updateAdultsOptions(rooms) {
@@ -863,10 +910,10 @@ function updateCabinSummary() {
     const pets = document.getElementById('cabinPetsInput')?.value || '';
     const nights = cabinNights;
 
-    let basePrice = parseInt(adults) * nights * PRET_NOAPTE_PERSOANA;
-    let hotTubPrice = WIZARD_STATE.cabinExtras.hotTub ? PRET_HOTTUB : 0;
-    let mealPrice = WIZARD_STATE.cabinExtras.meal ? parseInt(adults) * nights * PRET_MENIU_PER_PERSON_NIGHT : 0;
-    let total = basePrice + hotTubPrice + mealPrice;
+    // let basePrice = parseInt(adults) * nights * PRET_NOAPTE_PERSOANA;
+    // let hotTubPrice = WIZARD_STATE.cabinExtras.hotTub ? PRET_HOTTUB : 0;
+    // let mealPrice = WIZARD_STATE.cabinExtras.meal ? parseInt(adults) * nights * PRET_MENIU_PER_PERSON_NIGHT : 0;
+    // let total = basePrice + hotTubPrice + mealPrice;
 
     panel.innerHTML = `
         <div class="summary-section">
@@ -877,19 +924,11 @@ function updateCabinSummary() {
             <div class="summary-row"><span class="summary-label">Adults</span><strong>${adults}</strong></div>
             ${pets ? `<div class="summary-row"><span class="summary-label">Pets</span><strong>${pets}</strong></div>` : ''}
         </div>
-        <div class="summary-divider"></div>
-        <div class="summary-section">
-            <div class="summary-row"><span class="summary-label">Accommodation</span><strong>${basePrice} RON</strong></div>
-            ${WIZARD_STATE.cabinExtras.hotTub ? `<div class="summary-row summary-extra"><span class="summary-label">🛁 Hot Tub</span><strong>${hotTubPrice} RON</strong></div>` : ''}
-            ${WIZARD_STATE.cabinExtras.meal ? `<div class="summary-row summary-extra"><span class="summary-label">🍽️ Meal Plan</span><strong>${mealPrice} RON</strong></div>` : ''}
-        </div>
-        <div class="summary-divider"></div>
-        <div class="summary-row summary-total-row"><span class="summary-label">Estimated Total</span><strong class="summary-total-amount">${total} RON</strong></div>
     `;
 }
 
 // --- NEW FUNCTION: Update price displays on all steps ---
-function updateCabinPriceDisplays() {
+/* function updateCabinPriceDisplays() {
     const adults = parseInt(document.getElementById('cabinAdultsSelect')?.value) || 1;
     const nights = cabinNights;
 
@@ -923,7 +962,7 @@ function updateCabinPriceDisplays() {
 
     const step4Display = document.getElementById('priceDisplayStep4');
     if (step4Display) step4Display.style.display = hasValidDates ? 'block' : 'none';
-}
+} */
 
 function resetCabinForm() {
     document.getElementById('cabinArrivalInput').value = '';
@@ -1007,23 +1046,32 @@ async function submitCabinBooking() {
 // Deschide secțiunea selectată și inițializează calendarul aferent ei
 function arataSectiune(tip) {
     // Afișăm containerul corect și îl ascundem pe celălalt
-    document.getElementById('sectiuneMancare').style.display = tip === 'mancare' ? 'block' : 'none';
-    document.getElementById('sectiuneCabana').style.display = tip === 'cabana' ? 'block' : 'none';
+    const mancareEl = document.getElementById('sectiuneMancare');
+    const cabanaEl = document.getElementById('sectiuneCabana');
+    if (mancareEl) mancareEl.style.display = tip === 'mancare' ? 'block' : 'none';
+    if (cabanaEl) cabanaEl.style.display = tip === 'cabana' ? 'flex' : 'none';
 
     // Schimbăm clasa activă pe butoane pentru feedback vizual albastru/gri
-    document.getElementById('btnMancare').classList.toggle('active', tip === 'mancare');
-    document.getElementById('btnCabana').classList.toggle('active', tip === 'cabana');
+    const btnMancare = document.getElementById('btnMancare');
+    const btnCabana = document.getElementById('btnCabana');
+    if (btnMancare) btnMancare.classList.toggle('active', tip === 'mancare');
+    if (btnCabana) btnCabana.classList.toggle('active', tip === 'cabana');
 
     const todayDisabled = isToday(new Date().toISOString().split('T')[0]) && isAfter10Am();
     if (tip === 'mancare') {
-        document.getElementById('notificationTodayMancare').style.display = todayDisabled ? 'block' : 'none';
-        document.getElementById('btnToday').disabled = todayDisabled;
-        if (todayDisabled) {
-            document.getElementById('btnToday').style.opacity = '0.5';
-            document.getElementById('btnToday').style.cursor = 'not-allowed';
+        const notifMancare = document.getElementById('notificationTodayMancare');
+        if (notifMancare) notifMancare.style.display = todayDisabled ? 'block' : 'none';
+        const btnToday = document.getElementById('btnToday');
+        if (btnToday) {
+            btnToday.disabled = todayDisabled;
+            if (todayDisabled) {
+                btnToday.style.opacity = '0.5';
+                btnToday.style.cursor = 'not-allowed';
+            }
         }
     } else {
-        document.getElementById('notificationTodayCabana').style.display = todayDisabled ? 'block' : 'none';
+        const notifCabana = document.getElementById('notificationTodayCabana');
+        if (notifCabana) notifCabana.style.display = todayDisabled ? 'block' : 'none';
     }
 
     const setariComune = {
@@ -1056,26 +1104,91 @@ function arataSectiune(tip) {
 
     // Inițializare Calendar Cabană la cerere - two popup calendars
     if (tip === 'cabana' && !cabinArrivalFP) {
-        cabinArrivalFP = flatpickr("#cabinArrivalInput", {
-            mode: 'single',
-            minDate: 'today',
-            disable: zileCompletOcupate,
-            dateFormat: "Y-m-d",
-            locale: limbaCurenta === 'ro' ? flatpickr.l10ns.ro : 'en',
-            onChange: handleArrivalChange
-        });
+        if (typeof flatpickr === 'undefined') {
+            console.error('CRITICAL: Flatpickr library is not loaded!');
+            alert('Error: Calendar library failed to load. Please refresh the page.');
+            return;
+        }
 
-        cabinDepartureFP = flatpickr("#cabinDepartureInput", {
-            mode: 'single',
-            dateFormat: "Y-m-d",
-            locale: limbaCurenta === 'ro' ? flatpickr.l10ns.ro : 'en',
-            onChange: handleDepartureChange
-        });
+        try {
+            const arrivalInput = document.getElementById('cabinArrivalInput');
+            const departureInput = document.getElementById('cabinDepartureInput');
 
-        // Scroll calendar into view immediately when section is shown
-        const calendarWrapperCabana = document.querySelector('#sectiuneCabana .calendar-wrapper');
-        if (calendarWrapperCabana) {
-            calendarWrapperCabana.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (!arrivalInput || !departureInput) {
+                console.error('Error: Calendar input elements not found in DOM');
+                return;
+            }
+
+            // Create arrival calendar
+            cabinArrivalFP = flatpickr(arrivalInput, {
+                mode: 'single',
+                minDate: 'today',
+                disable: zileCompletOcupate,
+                dateFormat: "Y-m-d",
+                locale: limbaCurenta === 'ro' ? flatpickr.l10ns.ro : 'en',
+                focusInput: false,
+                allowInput: false,
+                clickOpens: true,
+                onChange: handleArrivalChange,
+                onOpen: function(dates, dateStr, instance) {
+                    console.log('✓ Arrival calendar opened');
+                    instance.calendarContainer.style.zIndex = '99999';
+                }
+            });
+
+            // Create departure calendar
+            cabinDepartureFP = flatpickr(departureInput, {
+                mode: 'single',
+                dateFormat: "Y-m-d",
+                locale: limbaCurenta === 'ro' ? flatpickr.l10ns.ro : 'en',
+                focusInput: false,
+                allowInput: false,
+                clickOpens: true,
+                onChange: handleDepartureChange,
+                onOpen: function(dates, dateStr, instance) {
+                    console.log('✓ Departure calendar opened');
+                    instance.calendarContainer.style.zIndex = '99999';
+                }
+            });
+
+            // Attach event listeners to ensure calendar opens on click/focus
+            arrivalInput.addEventListener('click', (e) => {
+                if (cabinArrivalFP && !cabinArrivalFP.isOpen) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cabinArrivalFP.open();
+                }
+            }, true);
+
+            arrivalInput.addEventListener('focus', (e) => {
+                if (cabinArrivalFP && !cabinArrivalFP.isOpen) {
+                    cabinArrivalFP.open();
+                }
+            }, true);
+
+            departureInput.addEventListener('click', (e) => {
+                if (cabinDepartureFP && !cabinDepartureFP.isOpen) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cabinDepartureFP.open();
+                }
+            }, true);
+
+            departureInput.addEventListener('focus', (e) => {
+                if (cabinDepartureFP && !cabinDepartureFP.isOpen) {
+                    cabinDepartureFP.open();
+                }
+            }, true);
+
+            console.log('✓ Cabin calendars initialized and listeners attached');
+        } catch (err) {
+            console.error('Critical error initializing cabin calendars:', err.message, err.stack);
+        }
+
+        // Scroll cabin dates card into view instead of non-existent wrapper
+        const cabinDatesCard = document.querySelector('#sectiuneCabana .cabin-dates-card');
+        if (cabinDatesCard) {
+            cabinDatesCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 
@@ -1086,9 +1199,9 @@ function arataSectiune(tip) {
             calendarWrapperMancare.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     } else if (tip === 'cabana' && cabinArrivalFP) {
-        const calendarWrapperCabana = document.querySelector('#sectiuneCabana .calendar-wrapper');
-        if (calendarWrapperCabana) {
-            calendarWrapperCabana.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const cabinDatesCard = document.querySelector('#sectiuneCabana .cabin-dates-card');
+        if (cabinDatesCard) {
+            cabinDatesCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 }
@@ -1111,7 +1224,7 @@ function handleArrivalChange(dates) {
         }
         updateNightsDisplay();
         updateCabinSummary();
-        updateCabinPriceDisplays();
+        // updateCabinPriceDisplays();
     }
 }
 
@@ -1123,9 +1236,9 @@ function handleDepartureChange(dates) {
         const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
         if (nights > 0) {
             cabinNights = nights;
-            updateNightsDisplay();
+            updateNightsDisplay(false);
             updateCabinSummary();
-            updateCabinPriceDisplays();
+            // updateCabinPriceDisplays();
         }
     }
 }
@@ -1257,3 +1370,4 @@ document.getElementById('btnTomorrow')?.addEventListener('click', function(e) {
     showMealStep(1);
     calculeazaPretMancare();
 });
+

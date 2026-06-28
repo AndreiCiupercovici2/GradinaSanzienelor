@@ -513,8 +513,8 @@ const saveDraft = (email, phone, reservationType, currentStep, formData) => {
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
         const formDataJson = JSON.stringify(formData);
 
-        // Step 2 or higher with filled email/phone: look for existing draft first
-        if (currentStep >= 2 && email && phone) {
+        // Step 3 or higher with filled email/phone: look for existing draft first
+        if (currentStep >= 3 && email && phone) {
             db.get(
                 `SELECT id FROM reservation_drafts WHERE email = ? AND phone = ? AND reservation_type = ?`,
                 [email, phone, reservationType],
@@ -613,14 +613,14 @@ app.post('/api/reservations/draft', async (req, res) => {
     const lang = getLanguage(req);
     const { email, phone, reservation_type, current_step, step_data } = req.body;
 
-    // Validation - only require email/phone for Step 2+; Step 1 can have empty values
-    if (current_step >= 2) {
-        if (!email || !isValidEmail(email)) {
-            return res.status(400).json({ error: t('invalid_email', lang) });
-        }
-        if (!phone || !isValidPhoneNumber(phone)) {
-            return res.status(400).json({ error: t('invalid_telefon', lang) });
-        }
+    // For drafts, only validate email/phone IF they are provided (non-empty).
+    // Empty email/phone are allowed for all draft steps since this is a temporary save.
+    // Full validation happens when the reservation is actually submitted.
+    if (email && !isValidEmail(email)) {
+        return res.status(400).json({ error: t('invalid_email', lang) });
+    }
+    if (phone && !isValidPhoneNumber(phone)) {
+        return res.status(400).json({ error: t('invalid_telefon', lang) });
     }
 
     if (!['mancare', 'cabana'].includes(reservation_type)) {
@@ -650,11 +650,12 @@ app.get('/api/reservations/draft', (req, res) => {
     const lang = getLanguage(req);
     const { email, phone, reservation_type } = req.query;
 
-    // Validation
-    if (!email || !isValidEmail(email)) {
+    // For draft retrieval, allow empty email/phone to support resuming drafts at step 1-2.
+    // Only validate format if email/phone are provided (non-empty).
+    if (email && !isValidEmail(email)) {
         return res.status(400).json({ error: t('invalid_email', lang) });
     }
-    if (!phone || !isValidPhoneNumber(phone)) {
+    if (phone && !isValidPhoneNumber(phone)) {
         return res.status(400).json({ error: t('invalid_telefon', lang) });
     }
     if (!['mancare', 'cabana'].includes(reservation_type)) {
@@ -665,7 +666,7 @@ app.get('/api/reservations/draft', (req, res) => {
         `SELECT * FROM reservation_drafts
          WHERE email = ? AND phone = ? AND reservation_type = ?
          AND expires_at > CURRENT_TIMESTAMP`,
-        [email, phone, reservation_type],
+        [email || '', phone || '', reservation_type],
         (err, row) => {
             if (err) {
                 console.error('Database error:', err);

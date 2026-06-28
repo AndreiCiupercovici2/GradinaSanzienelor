@@ -336,8 +336,14 @@ h2 {
 .notification-warning {
     background-color: #fff3cd;
     border: 1px solid #ffc107;
-    border-left: 4px solid #ffc107;
+    border-left: 5px solid #ffc107;
     color: #856404;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 15px 0;
+    text-align: center;
+    padding: 12px 20px;
 }
 
 .form-group {
@@ -425,7 +431,19 @@ button[type="submit"]:hover {
 
 /* --- Configurări Flatpickr --- */
 .flatpickr-calendar {
-    z-index: 99 !important;
+    z-index: 99999 !important;
+    position: absolute !important;
+    visibility: visible !important;
+}
+
+.flatpickr-calendar.open {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.flatpickr-calendar.closed {
+    display: none !important;
 }
 
 .calendar-wrapper {
@@ -433,6 +451,11 @@ button[type="submit"]:hover {
     display: flex;
     justify-content: center;
     margin: 0;
+}
+
+.calendar-popup-wrapper {
+    position: relative;
+    min-height: 0;
 }
 
 .flatpickr-calendar.inline {
@@ -823,7 +846,8 @@ input#calendarCabana {
 /* Override max-width so cabin container is wider than the
    default 600 px applied by the body > .form-container rule */
 #sectiuneCabana {
-    max-width: 900px;
+    max-width: 1000px;
+    flex-direction: column;
 }
 
 /* ── Section A & B: inner cards ── */
@@ -876,6 +900,7 @@ input#calendarCabana {
     padding: 10px 12px;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    pointer-events: auto;
 }
 
 .date-input-card:hover,
@@ -888,6 +913,7 @@ input#calendarCabana {
     font-size: 15px;
     flex-shrink: 0;
     color: #666;
+    pointer-events: none;
 }
 
 /* Override the global input[readonly] gray rule for cabin date inputs */
@@ -901,6 +927,7 @@ input#calendarCabana {
     width: 100%;
     font-size: 14px;
     color: #333;
+    pointer-events: auto;
 }
 
 #cabinArrivalInput::placeholder,
@@ -978,7 +1005,6 @@ input#calendarCabana {
 /* ── Step 1 continue button (full width) ── */
 .cabin-continue-btn {
     width: 100%;
-    margin-top: 8px;
 }
 
 /* Step actions row */
@@ -1302,8 +1328,8 @@ input#calendarCabana {
 
 /* Booking summary panel */
 .booking-summary-panel {
-    flex: 0 0 40%;
-    max-width: 40%;
+    flex: 0 0 30%;
+    max-width: 30%;
     background: #f8f9fa;
     border: 1px solid #e2e6ea;
     border-radius: 8px;

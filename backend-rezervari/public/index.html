@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ro">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="flatpickr.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- Hero Slideshow Section -->
@@ -77,11 +79,13 @@
     <!-- Resume Draft Banner for Meal - placed above the section -->
     <div id="resumeBannerMancare" class="resume-banner" style="display: none;">
         <p data-i18n="draft_exists_message">Ai o rezervare de masă în curs de finalizare.</p>
-        <button type="button" id="resumeButtonMancare" class="btn-resume" data-i18n="btn_resume">Continuă Rezervarea</button>
+        <button type="button" id="resumeButtonMancare" class="btn-resume" data-i18n="btn_resume">Continuă
+            Rezervarea</button>
     </div>
 
     <div id="sectiuneMancare" class="form-container" style="display: none;">
-        <p class="section-description" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face rezervarea la masă.</p>
+        <p class="section-description" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face
+            rezervarea la masă.</p>
 
         <!-- Progress Indicator for Meal -->
         <div id="progressMeal" class="progress-indicator">
@@ -103,11 +107,14 @@
 
             <div class="calendar-section">
                 <div class="quick-buttons">
-                    <button type="button" id="btnToday" class="quick-btn quick-btn-today" data-i18n="btn_today">Azi</button>
-                    <button type="button" id="btnTomorrow" class="quick-btn quick-btn-tomorrow" data-i18n="btn_tomorrow">Mâine</button>
+                    <button type="button" id="btnToday" class="quick-btn quick-btn-today"
+                        data-i18n="btn_today">Azi</button>
+                    <button type="button" id="btnTomorrow" class="quick-btn quick-btn-tomorrow"
+                        data-i18n="btn_tomorrow">Mâine</button>
                 </div>
 
-                <div id="notificationTodayMancare" class="notification notification-warning" style="display: none;" data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
+                <div id="notificationTodayMancare" class="notification notification-warning" style="display: flex;"
+                    data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
 
                 <div class="calendar-wrapper">
                     <input type="text" id="calendarMancare">
@@ -135,13 +142,18 @@
                     <label data-i18n="label_pets">Animale de companie:</label>
                     <input type="number" id="animaleMStep1" min="0" value="0" required>
                 </div>
-                <div style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
+                <div
+                    style="padding: 10px; background-color: #e7f3ff; border-left: 4px solid #007bff; margin-bottom: 15px;">
                     <span data-i18n="total_people" id="totalPeopleMStep1">Total: 1 persoane</span>
                 </div>
-                <div id="warningPendingMStep1" class="notification notification-warning" style="display: none;" data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această perioadă.</div>
-                <div class="pret-estimat" id="pretMancareAfisajStep1" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON</div>
+                <div id="warningPendingMStep1" class="notification notification-warning" style="display: none;"
+                    data-i18n="warning_pending_reservation">Atenție: Există o rezervare în așteptare pentru această
+                    perioadă.</div>
+                <div class="pret-estimat" id="pretMancareAfisajStep1" data-i18n="pretMeniuAfisaj">Preț estimat: 0 RON
+                </div>
                 <br>
-                <button type="button" id="continueMealBtn" class="btn-primary" data-i18n="btn_continue">Continuă</button>
+                <button type="button" id="continueMealBtn" class="btn-primary"
+                    data-i18n="btn_continue">Continuă</button>
             </form>
         </div>
 
@@ -175,11 +187,15 @@
     <!-- Resume Draft Banner for Cabin -->
     <div id="resumeBannerCabana" class="resume-banner" style="display: none;">
         <p data-i18n="draft_exists_message">Ai o rezervare de cazare în curs de finalizare.</p>
-        <button type="button" id="resumeButtonCabana" class="btn-resume" data-i18n="btn_resume">Continuă Rezervarea</button>
+        <button type="button" id="resumeButtonCabana" class="btn-resume" data-i18n="btn_resume">Continuă
+            Rezervarea</button>
     </div>
 
     <div id="sectiuneCabana" class="form-container cabin-container" style="display: none;">
-        <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în cabană.</p>
+        <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în
+            cabană.</p>
+        <div id="notificationTodayCabana" class="notification notification-warning" style="display: flex;"
+            data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
 
         <!-- Progress Indicator for Cabin — 4 steps -->
         <div id="progressCabin" class="progress-indicator">
@@ -208,10 +224,10 @@
         <div id="step1ContainerCabin" class="step-container">
 
             <!-- Dynamic Price Display for Step 1 -->
-            <div id="priceDisplayStep1" class="cabin-price-display" style="display: none;">
+            <!-- <div id="priceDisplayStep1" class="cabin-price-display" style="display: none;">
                 <span class="price-label">Total Price:</span>
                 <span id="priceAmountStep1" class="price-amount-step">0 RON</span>
-            </div>
+            </div> -->
 
             <!-- Section A: Dates card -->
             <div class="cabin-dates-card">
@@ -223,11 +239,16 @@
                             <span class="date-icon">&#128197;</span>
                             <input type="text" id="cabinArrivalInput" readonly placeholder="Select arrival date">
                         </div>
+                        <!-- Calendar popup wrapper for arrival -->
+                        <div id="cabinArrivalCalendarWrapper" class="calendar-popup-wrapper"
+                            style="position: relative; z-index: 50;"></div>
                     </div>
                     <div class="nights-counter-wrapper">
-                        <button type="button" id="nightsDecBtn" class="nights-btn" aria-label="Decrease nights">&#8722;</button>
+                        <button type="button" id="nightsDecBtn" class="nights-btn"
+                            aria-label="Decrease nights">&#8722;</button>
                         <span id="nightsDisplay" class="nights-display">1 night</span>
-                        <button type="button" id="nightsIncBtn" class="nights-btn" aria-label="Increase nights">&#43;</button>
+                        <button type="button" id="nightsIncBtn" class="nights-btn"
+                            aria-label="Increase nights">&#43;</button>
                     </div>
                     <div class="date-field-wrapper">
                         <span class="date-field-label">Departure</span>
@@ -235,6 +256,9 @@
                             <span class="date-icon">&#128197;</span>
                             <input type="text" id="cabinDepartureInput" readonly placeholder="Select departure date">
                         </div>
+                        <!-- Calendar popup wrapper for departure -->
+                        <div id="cabinDepartureCalendarWrapper" class="calendar-popup-wrapper"
+                            style="position: relative; z-index: 50;"></div>
                     </div>
                 </div>
             </div>
@@ -270,18 +294,19 @@
             <div id="warningCabana" style="display:none;"></div>
             <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;"></div>
 
-            <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras &#8594;</button>
+            <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras
+                &#8594;</button>
         </div>
 
         <!-- STEP 2: Extras -->
         <div id="step2ContainerCabin" class="step-container" style="display:none;">
             <h3>Choose Your Extras</h3>
 
-            <!-- Dynamic Price Display for Step 2 -->
+            <!-- Dynamic Price Display for Step 2
             <div id="priceDisplayStep2" class="cabin-price-display">
                 <span class="price-label">Total Price:</span>
                 <span id="priceAmountStep2" class="price-amount-step">0 RON</span>
-            </div>
+            </div> -->
 
             <!-- Hot Tub Extra -->
             <div class="extra-item-card" id="hotTubCard">
@@ -301,11 +326,13 @@
                 <div class="extra-info-panel">
                     <div class="extra-badge">Optional Extra</div>
                     <h4>Hot Tub</h4>
-                    <p class="extra-description">Unwind in our private outdoor hot tub overlooking the forest. Perfect for romantic evenings or after a day of exploring the mountains. Available throughout your entire stay.</p>
-                    <div class="extra-price-tag">
+                    <p class="extra-description">Unwind in our private outdoor hot tub overlooking the forest. Perfect
+                        for romantic evenings or after a day of exploring the mountains. Available throughout your
+                        entire stay.</p>
+                    <!-- <div class="extra-price-tag">
                         <span class="price-amount">200 RON</span>
                         <span class="price-unit">/ stay</span>
-                    </div>
+                    </div> -->
                     <button id="hotTubToggle" class="extra-toggle-btn">+ Add Hot Tub</button>
                 </div>
             </div>
@@ -328,18 +355,21 @@
                 <div class="extra-info-panel">
                     <div class="extra-badge">Optional Extra</div>
                     <h4>Gastronomy Meal Plan</h4>
-                    <p class="extra-description">Savor authentic local cuisine prepared by our in-house chef. Enjoy a full breakfast and a three-course dinner using seasonal ingredients from our garden. A true farm-to-table experience.</p>
-                    <div class="extra-price-tag">
+                    <p class="extra-description">Savor authentic local cuisine prepared by our in-house chef. Enjoy a
+                        full breakfast and a three-course dinner using seasonal ingredients from our garden. A true
+                        farm-to-table experience.</p>
+                    <!-- <div class="extra-price-tag">
                         <span class="price-amount">70 RON</span>
                         <span class="price-unit">/ person / night</span>
-                    </div>
+                    </div> -->
                     <button id="mealToggle" class="extra-toggle-btn">+ Add Meal Plan</button>
                 </div>
             </div>
 
             <div class="form-actions cabin-step-actions">
                 <button type="button" id="backToTravelBtn" class="btn-secondary">&#8592; Back</button>
-                <button type="button" id="continueToPersonalBtn" class="btn-primary cabin-continue-btn">Continue &#8594;</button>
+                <button type="button" id="continueToPersonalBtn" class="btn-primary cabin-continue-btn">Continue
+                    &#8594;</button>
             </div>
         </div>
 
@@ -348,18 +378,6 @@
             <div class="step3-layout">
                 <div class="step3-form-col">
                     <h3>Personal Information</h3>
-
-                    <div class="form-group">
-                        <label>Salutation</label>
-                        <select id="cabinSalutation" class="cabin-select">
-                            <option value="">&#8212; Select &#8212;</option>
-                            <option value="Mr.">Mr.</option>
-                            <option value="Ms.">Ms.</option>
-                            <option value="Mrs.">Mrs.</option>
-                            <option value="Dr.">Dr.</option>
-                            <option value="Prof.">Prof.</option>
-                        </select>
-                    </div>
 
                     <div class="name-row">
                         <div class="form-group">
@@ -381,21 +399,245 @@
                         <label>Telephone <span class="required">*</span></label>
                         <div class="phone-input-row">
                             <select id="cabinPhonePrefix" class="phone-prefix-select">
-                                <option value="+40">&#127479;&#127476; +40</option>
-                                <option value="+49">&#127465;&#127466; +49</option>
-                                <option value="+44">&#127468;&#127463; +44</option>
-                                <option value="+33">&#127467;&#127479; +33</option>
-                                <option value="+39">&#127470;&#127481; +39</option>
-                                <option value="+34">&#127466;&#127480; +34</option>
-                                <option value="+43">&#127462;&#127481; +43</option>
-                                <option value="+41">&#127464;&#127469; +41</option>
-                                <option value="+31">&#127475;&#127473; +31</option>
-                                <option value="+32">&#127463;&#127466; +32</option>
-                                <option value="+48">&#127477;&#127473; +48</option>
-                                <option value="+36">&#127469;&#127482; +36</option>
-                                <option value="+380">&#127482;&#127462; +380</option>
-                                <option value="+1">&#127482;&#127480; +1</option>
-                                <option value="+7">&#127479;&#127482; +7</option>
+                                <option value="+40">🇷🇴 +40</option>
+                                <option value="+93">🇦🇫 +93</option>
+                                <option value="+355">🇦🇱 +355</option>
+                                <option value="+213">🇩🇿 +213</option>
+                                <option value="+1684">🇦🇸 +1</option>
+                                <option value="+376">🇦🇩 +376</option>
+                                <option value="+244">🇦🇴 +244</option>
+                                <option value="+1264">🇦🇮 +1</option>
+                                <option value="+672">🇦🇶 +672</option>
+                                <option value="+1268">🇦🇬 +1</option>
+                                <option value="+54">🇦🇷 +54</option>
+                                <option value="+374">🇦🇲 +374</option>
+                                <option value="+297">🇦🇼 +297</option>
+                                <option value="+61">🇦🇺 +61</option>
+                                <option value="+43">🇦🇹 +43</option>
+                                <option value="+994">🇦🇿 +994</option>
+                                <option value="+1242">🇧🇸 +1</option>
+                                <option value="+973">🇧🇭 +973</option>
+                                <option value="+880">🇧🇩 +880</option>
+                                <option value="+1246">🇧🇧 +1</option>
+                                <option value="+375">🇧🇾 +375</option>
+                                <option value="+32">🇧🇪 +32</option>
+                                <option value="+501">🇧🇿 +501</option>
+                                <option value="+229">🇧🇯 +229</option>
+                                <option value="+1441">🇧🇲 +1</option>
+                                <option value="+975">🇧🇹 +975</option>
+                                <option value="+591">🇧🇴 +591</option>
+                                <option value="+387">🇧🇦 +387</option>
+                                <option value="+267">🇧🇼 +267</option>
+                                <option value="+55">🇧🇷 +55</option>
+                                <option value="+246">🇮🇴 +246</option>
+                                <option value="+1284">🇻🇬 +1</option>
+                                <option value="+673">🇧🇳 +673</option>
+                                <option value="+359">🇧🇬 +359</option>
+                                <option value="+226">🇧🇫 +226</option>
+                                <option value="+257">🇧🇮 +257</option>
+                                <option value="+855">🇰🇭 +855</option>
+                                <option value="+237">🇨🇲 +237</option>
+                                <option value="+1">🇨🇦 +1</option>
+                                <option value="+238">🇨🇻 +238</option>
+                                <option value="+1345">🇰🇾 +1</option>
+                                <option value="+236">🇨🇫 +236</option>
+                                <option value="+235">🇹🇩 +235</option>
+                                <option value="+56">🇨🇱 +56</option>
+                                <option value="+86">🇨🇳 +86</option>
+                                <option value="+61">🇨🇽 +61</option>
+                                <option value="+61">🇨🇨 +61</option>
+                                <option value="+57">🇨🇴 +57</option>
+                                <option value="+269">🇰🇲 +269</option>
+                                <option value="+682">🇨🇰 +682</option>
+                                <option value="+506">🇨🇷 +506</option>
+                                <option value="+385">🇭🇷 +385</option>
+                                <option value="+53">🇨🇺 +53</option>
+                                <option value="+599">🇨🇼 +599</option>
+                                <option value="+357">🇨🇾 +357</option>
+                                <option value="+420">🇨🇿 +420</option>
+                                <option value="+243">🇨🇩 +243</option>
+                                <option value="+45">🇩🇰 +45</option>
+                                <option value="+253">🇩🇯 +253</option>
+                                <option value="+1767">🇩🇲 +1</option>
+                                <option value="+1809">🇩🇴 +1</option>
+                                <option value="+670">🇹🇱 +670</option>
+                                <option value="+593">🇪🇨 +593</option>
+                                <option value="+20">🇪🇬 +20</option>
+                                <option value="+503">🇸🇻 +503</option>
+                                <option value="+240">🇬🇶 +240</option>
+                                <option value="+291">🇪🇷 +291</option>
+                                <option value="+372">🇪🇪 +372</option>
+                                <option value="+251">🇪🇹 +251</option>
+                                <option value="+500">🇫🇰 +500</option>
+                                <option value="+298">🇫🇴 +298</option>
+                                <option value="+679">🇫🇯 +679</option>
+                                <option value="+358">🇫🇮 +358</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+689">🇵🇫 +689</option>
+                                <option value="+241">🇬🇦 +241</option>
+                                <option value="+220">🇬🇲 +220</option>
+                                <option value="+995">🇬🇪 +995</option>
+                                <option value="+49">🇩🇪 +49</option>
+                                <option value="+233">🇬🇭 +233</option>
+                                <option value="+350">🇬🇮 +350</option>
+                                <option value="+30">🇬🇷 +30</option>
+                                <option value="+299">🇬🇱 +299</option>
+                                <option value="+1473">🇬🇩 +1</option>
+                                <option value="+1671">🇬🇺 +1</option>
+                                <option value="+502">🇬🇹 +502</option>
+                                <option value="+44">🇬🇬 +44</option>
+                                <option value="+224">🇬🇳 +224</option>
+                                <option value="+245">🇬🇼 +245</option>
+                                <option value="+592">🇬🇾 +592</option>
+                                <option value="+509">🇭🇹 +509</option>
+                                <option value="+504">🇭🇳 +504</option>
+                                <option value="+852">🇭🇰 +852</option>
+                                <option value="+36">🇭🇺 +36</option>
+                                <option value="+354">🇮🇸 +354</option>
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+62">🇮🇩 +62</option>
+                                <option value="+98">🇮🇷 +98</option>
+                                <option value="+964">🇮🇶 +964</option>
+                                <option value="+353">🇮🇪 +353</option>
+                                <option value="+44">🇮🇲 +44</option>
+                                <option value="+972">🇮🇱 +972</option>
+                                <option value="+39">🇮🇹 +39</option>
+                                <option value="+225">🇨🇮 +225</option>
+                                <option value="+1876">🇯🇲 +1</option>
+                                <option value="+81">🇯🇵 +81</option>
+                                <option value="+44">🇯🇪 +44</option>
+                                <option value="+962">🇯🇴 +962</option>
+                                <option value="+7">🇰🇿 +7</option>
+                                <option value="+254">🇰🇪 +254</option>
+                                <option value="+686">🇰🇮 +686</option>
+                                <option value="+383">🇽🇰 +383</option>
+                                <option value="+965">🇰🇼 +965</option>
+                                <option value="+996">🇰🇬 +996</option>
+                                <option value="+856">🇱🇦 +856</option>
+                                <option value="+371">🇱🇻 +371</option>
+                                <option value="+961">🇱🇧 +961</option>
+                                <option value="+266">🇱🇸 +266</option>
+                                <option value="+231">🇱🇷 +231</option>
+                                <option value="+218">🇱🇾 +218</option>
+                                <option value="+423">🇱🇮 +423</option>
+                                <option value="+370">🇱🇹 +370</option>
+                                <option value="+352">🇱🇺 +352</option>
+                                <option value="+853">🇲🇴 +853</option>
+                                <option value="+389">🇲🇰 +389</option>
+                                <option value="+261">🇲🇬 +261</option>
+                                <option value="+265">🇲🇼 +265</option>
+                                <option value="+60">🇲🇾 +60</option>
+                                <option value="+960">🇲🇻 +960</option>
+                                <option value="+223">🇲🇱 +223</option>
+                                <option value="+356">🇲🇹 +356</option>
+                                <option value="+692">🇲🇭 +692</option>
+                                <option value="+222">🇲🇷 +222</option>
+                                <option value="+230">🇲🇺 +230</option>
+                                <option value="+262">🇾🇹 +262</option>
+                                <option value="+52">🇲🇽 +52</option>
+                                <option value="+691">🇫🇲 +691</option>
+                                <option value="+373">🇲🇩 +373</option>
+                                <option value="+377">🇲🇨 +377</option>
+                                <option value="+976">🇲🇳 +976</option>
+                                <option value="+382">🇲🇪 +382</option>
+                                <option value="+1664">🇲🇸 +1</option>
+                                <option value="+212">🇲🇦 +212</option>
+                                <option value="+258">🇲🇿 +258</option>
+                                <option value="+95">🇲🇲 +95</option>
+                                <option value="+264">🇳🇦 +264</option>
+                                <option value="+674">🇳🇷 +674</option>
+                                <option value="+977">🇳🇵 +977</option>
+                                <option value="+31">🇳🇱 +31</option>
+                                <option value="+599">🇦🇳 +599</option>
+                                <option value="+687">🇳🇨 +687</option>
+                                <option value="+64">🇳🇿 +64</option>
+                                <option value="+505">🇳🇮 +505</option>
+                                <option value="+227">🇳🇪 +227</option>
+                                <option value="+234">🇳🇬 +234</option>
+                                <option value="+683">🇳🇺 +683</option>
+                                <option value="+850">🇰🇵 +850</option>
+                                <option value="+1670">🇲🇵 +1</option>
+                                <option value="+47">🇳🇴 +47</option>
+                                <option value="+968">🇴🇲 +968</option>
+                                <option value="+92">🇵🇰 +92</option>
+                                <option value="+680">🇵🇼 +680</option>
+                                <option value="+970">🇵🇸 +970</option>
+                                <option value="+507">🇵🇦 +507</option>
+                                <option value="+675">🇵🇬 +675</option>
+                                <option value="+595">🇵🇾 +595</option>
+                                <option value="+51">🇵🇪 +51</option>
+                                <option value="+63">🇵🇭 +63</option>
+                                <option value="+870">🇵🇳 +870</option>
+                                <option value="+48">🇵🇱 +48</option>
+                                <option value="+351">🇵🇹 +351</option>
+                                <option value="+1787">🇵🇷 +1</option>
+                                <option value="+974">🇶🇦 +974</option>
+                                <option value="+242">🇨🇬 +242</option>
+                                <option value="+262">🇷🇪 +262</option>
+                                <option value="+7">🇷🇺 +7</option>
+                                <option value="+250">🇷🇼 +250</option>
+                                <option value="+590">🇧🇱 +590</option>
+                                <option value="+290">🇸🇭 +290</option>
+                                <option value="+1869">🇰🇳 +1</option>
+                                <option value="+1758">🇱🇨 +1</option>
+                                <option value="+590">🇲🇫 +590</option>
+                                <option value="+508">🇵🇲 +508</option>
+                                <option value="+1784">🇻🇨 +1</option>
+                                <option value="+685">🇼🇸 +685</option>
+                                <option value="+378">🇸🇲 +378</option>
+                                <option value="+239">🇸🇹 +239</option>
+                                <option value="+966">🇸🇦 +966</option>
+                                <option value="+221">🇸🇳 +221</option>
+                                <option value="+381">🇷🇸 +381</option>
+                                <option value="+248">🇸🇨 +248</option>
+                                <option value="+232">🇸🇱 +232</option>
+                                <option value="+65">🇸🇬 +65</option>
+                                <option value="+1721">🇸🇽 +1</option>
+                                <option value="+421">🇸🇰 +421</option>
+                                <option value="+386">🇸🇮 +386</option>
+                                <option value="+677">🇸🇧 +677</option>
+                                <option value="+252">🇸🇴 +252</option>
+                                <option value="+27">🇿🇦 +27</option>
+                                <option value="+82">🇰🇷 +82</option>
+                                <option value="+211">🇸🇸 +211</option>
+                                <option value="+34">🇪🇸 +34</option>
+                                <option value="+94">🇱🇰 +94</option>
+                                <option value="+249">🇸🇩 +249</option>
+                                <option value="+597">🇸🇷 +597</option>
+                                <option value="+47">🇸🇯 +47</option>
+                                <option value="+268">🇸🇿 +268</option>
+                                <option value="+46">🇸🇪 +46</option>
+                                <option value="+41">🇨🇭 +41</option>
+                                <option value="+963">🇸🇾 +963</option>
+                                <option value="+886">🇹🇼 +886</option>
+                                <option value="+992">🇹🇯 +992</option>
+                                <option value="+255">🇹🇿 +255</option>
+                                <option value="+66">🇹🇭 +66</option>
+                                <option value="+228">🇹🇬 +228</option>
+                                <option value="+690">🇹🇰 +690</option>
+                                <option value="+676">🇹🇴 +676</option>
+                                <option value="+1868">🇹🇹 +1</option>
+                                <option value="+216">🇹🇳 +216</option>
+                                <option value="+90">🇹🇷 +90</option>
+                                <option value="+993">🇹🇲 +993</option>
+                                <option value="+1649">🇹🇨 +1</option>
+                                <option value="+688">🇹🇻 +688</option>
+                                <option value="+256">🇺🇬 +256</option>
+                                <option value="+380">🇺🇦 +380</option>
+                                <option value="+971">🇦🇪 +971</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+598">🇺🇾 +598</option>
+                                <option value="+998">🇺🇿 +998</option>
+                                <option value="+678">🇻🇺 +678</option>
+                                <option value="+379">🇻🇦 +379</option>
+                                <option value="+58">🇻🇪 +58</option>
+                                <option value="+84">🇻🇳 +84</option>
+                                <option value="+681">🇼🇫 +681</option>
+                                <option value="+212">🇪🇭 +212</option>
+                                <option value="+967">🇾🇪 +967</option>
+                                <option value="+260">🇿🇲 +260</option>
+                                <option value="+263">🇿🇼 +263</option>
                             </select>
                             <input type="tel" id="cabinPhone" placeholder="Phone number" required>
                         </div>
@@ -407,16 +649,21 @@
                             <span>I agree to receive information</span>
                             <span class="info-tooltip" tabindex="0">
                                 &#9432;
-                                <span class="tooltip-text">In the future, I would like to receive newsletters with current information and travel offers by email. This consent can be withdrawn at any time.</span>
+                                <span class="tooltip-text">In the future, I would like to receive newsletters with
+                                    current information and travel offers by email. This consent can be withdrawn at any
+                                    time.</span>
                             </span>
                         </label>
                     </div>
 
-                    <p class="legal-note">By confirming the booking you agree to the <a href="#" class="legal-link" id="termsLink">Terms and Conditions</a> and <a href="#" class="legal-link" id="privacyLink">Privacy Policy</a>.</p>
+                    <p class="legal-note">By confirming the booking you agree to the <a href="#" class="legal-link"
+                            id="termsLink">Terms and Conditions</a> and <a href="#" class="legal-link"
+                            id="privacyLink">Privacy Policy</a>.</p>
 
                     <div class="form-actions cabin-step-actions">
                         <button type="button" id="backToExtrasBtn" class="btn-secondary">&#8592; Back</button>
-                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking">Send Booking for Confirmation</button>
+                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking">Send Booking for
+                            Confirmation</button>
                     </div>
                 </div>
 
@@ -431,15 +678,18 @@
 
         <!-- STEP 4: Confirmation -->
         <div id="step4ContainerCabin" class="step-container" style="display:none;">
-            <!-- Dynamic Price Display for Step 4 -->
-            <div id="priceDisplayStep4" class="cabin-price-display">
-                <span class="price-label">Total Price:</span>
-                <span id="priceAmountStep4" class="price-amount-step">0 RON</span>
+            <!-- Dynamic Confirmation Display for Step 4 -->
+            <div id="confirmationDisplayStep4" class="cabin-confirmation-display">
+                <span class="confirmation-label">Confirmation</span>
+                <span id="confirmationMessageStep4" class="confirmation-message-step">Your booking has been
+                    submitted.</span>
             </div>
             <div class="confirmation-container">
                 <div class="confirmation-icon">&#10003;</div>
                 <h3>Booking Request Submitted</h3>
-                <p class="confirmation-message">Thank you for your booking request. Our host will personally review your details and contact you within 24 hours to confirm your reservation. We look forward to welcoming you to Gr&#259;dina S&#226;nzienelor!</p>
+                <p class="confirmation-message">Thank you for your booking request. Our host will personally review your
+                    details and contact you within 24 hours to confirm your reservation. We look forward to welcoming
+                    you to Gr&#259;dina S&#226;nzienelor!</p>
                 <p class="confirmation-sub">Please check your email for a summary of your request.</p>
                 <button id="newBookingBtn" class="btn-secondary">Make Another Booking</button>
             </div>
@@ -451,4 +701,5 @@
     <script src="translations.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
