@@ -207,6 +207,12 @@
         <!-- STEP 1: Travel Information -->
         <div id="step1ContainerCabin" class="step-container">
 
+            <!-- Dynamic Price Display for Step 1 -->
+            <div id="priceDisplayStep1" class="cabin-price-display" style="display: none;">
+                <span class="price-label">Total Price:</span>
+                <span id="priceAmountStep1" class="price-amount-step">0 RON</span>
+            </div>
+
             <!-- Section A: Dates card -->
             <div class="cabin-dates-card">
                 <h4 class="cabin-card-title">Arrival and Departure</h4>
@@ -270,6 +276,12 @@
         <!-- STEP 2: Extras -->
         <div id="step2ContainerCabin" class="step-container" style="display:none;">
             <h3>Choose Your Extras</h3>
+
+            <!-- Dynamic Price Display for Step 2 -->
+            <div id="priceDisplayStep2" class="cabin-price-display">
+                <span class="price-label">Total Price:</span>
+                <span id="priceAmountStep2" class="price-amount-step">0 RON</span>
+            </div>
 
             <!-- Hot Tub Extra -->
             <div class="extra-item-card" id="hotTubCard">
@@ -419,6 +431,11 @@
 
         <!-- STEP 4: Confirmation -->
         <div id="step4ContainerCabin" class="step-container" style="display:none;">
+            <!-- Dynamic Price Display for Step 4 -->
+            <div id="priceDisplayStep4" class="cabin-price-display">
+                <span class="price-label">Total Price:</span>
+                <span id="priceAmountStep4" class="price-amount-step">0 RON</span>
+            </div>
             <div class="confirmation-container">
                 <div class="confirmation-icon">&#10003;</div>
                 <h3>Booking Request Submitted</h3>

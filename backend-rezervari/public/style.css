@@ -986,6 +986,32 @@ input#calendarCabana {
     margin-top: 24px;
 }
 
+/* --- Dynamic Price Display (Issue #1: Display price on all steps) --- */
+.cabin-price-display {
+    background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.cabin-price-display .price-label {
+    color: #333;
+    font-weight: 600;
+}
+
+.cabin-price-display .price-amount-step {
+    color: #007bff;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: right;
+}
+
 /* ==========================================================
    STEP 2 — Extras
    ========================================================== */

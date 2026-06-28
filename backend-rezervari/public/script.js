@@ -163,6 +163,9 @@ function showCabinStep(stepNumber) {
             break;
     }
 
+    // Update price displays on all steps
+    updateCabinPriceDisplays();
+
     // Scroll to top of cabin section
     const cabinSection = document.getElementById('sectiuneCabana');
     if (cabinSection) {
@@ -567,10 +570,28 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
+    // --- CALENDAR INPUT CLICK HANDLERS (Issue #2: Non-responsive Calendar Inputs) ---
+    // Add click handlers to make the readonly date inputs open the calendar
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'cabinArrivalInput' && cabinArrivalFP) {
+            cabinArrivalFP.open();
+        }
+        if (e.target.id === 'cabinDepartureInput' && cabinDepartureFP) {
+            cabinDepartureFP.open();
+        }
+    });
+
     // --- ROOMS/ADULTS DEPENDENCY ---
     document.getElementById('cabinRoomsSelect')?.addEventListener('change', function() {
         updateAdultsOptions(parseInt(this.value));
         updateCabinSummary();
+        updateCabinPriceDisplays();
+    });
+
+    // Update price displays when adults count changes
+    document.getElementById('cabinAdultsSelect')?.addEventListener('change', function() {
+        updateCabinSummary();
+        updateCabinPriceDisplays();
     });
 
     // --- EXTRAS TOGGLES ---
@@ -579,6 +600,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         this.textContent = WIZARD_STATE.cabinExtras.hotTub ? 'Added ✓' : 'Add Hot Tub';
         this.classList.toggle('extra-toggle-added', WIZARD_STATE.cabinExtras.hotTub);
         updateCabinSummary();
+        updateCabinPriceDisplays();
     });
 
     document.getElementById('mealToggle')?.addEventListener('click', function() {
@@ -586,6 +608,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         this.textContent = WIZARD_STATE.cabinExtras.meal ? 'Added ✓' : 'Add Meal Plan';
         this.classList.toggle('extra-toggle-added', WIZARD_STATE.cabinExtras.meal);
         updateCabinSummary();
+        updateCabinPriceDisplays();
     });
 
     // --- EXTRAS SLIDESHOWS ---
@@ -605,6 +628,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('continueToPersonalBtn')?.addEventListener('click', function(e) {
         e.preventDefault();
         updateCabinSummary();
+        updateCabinPriceDisplays();
         saveCabinDraft(2);
         showCabinStep(3);
     });
@@ -771,13 +795,23 @@ function updateNightsDisplay() {
 
     // Recalculate departure based on arrival + nights
     if (cabinArrivalFP && cabinArrivalFP.selectedDates[0]) {
-        const dep = new Date(cabinArrivalFP.selectedDates[0]);
+        const arrivalDate = new Date(cabinArrivalFP.selectedDates[0]);
+        const dep = new Date(arrivalDate);
         dep.setDate(dep.getDate() + cabinNights);
+
+        // Update the departure Flatpickr instance
         if (cabinDepartureFP) {
             cabinDepartureFP.setDate(dep, true);
+            // Manually update the input value to ensure it's displayed
+            const year = dep.getFullYear();
+            const month = String(dep.getMonth() + 1).padStart(2, '0');
+            const day = String(dep.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            document.getElementById('cabinDepartureInput').value = dateStr;
         }
     }
     updateCabinSummary();
+    updateCabinPriceDisplays();
 }
 
 function updateAdultsOptions(rooms) {
@@ -852,6 +886,43 @@ function updateCabinSummary() {
         <div class="summary-divider"></div>
         <div class="summary-row summary-total-row"><span class="summary-label">Estimated Total</span><strong class="summary-total-amount">${total} RON</strong></div>
     `;
+}
+
+// --- NEW FUNCTION: Update price displays on all steps ---
+function updateCabinPriceDisplays() {
+    const adults = parseInt(document.getElementById('cabinAdultsSelect')?.value) || 1;
+    const nights = cabinNights;
+
+    let basePrice = adults * nights * PRET_NOAPTE_PERSOANA;
+    let hotTubPrice = WIZARD_STATE.cabinExtras.hotTub ? PRET_HOTTUB : 0;
+    let mealPrice = WIZARD_STATE.cabinExtras.meal ? adults * nights * PRET_MENIU_PER_PERSON_NIGHT : 0;
+    let total = basePrice + hotTubPrice + mealPrice;
+
+    // Update Step 1 price display
+    const step1Price = document.getElementById('priceAmountStep1');
+    if (step1Price) step1Price.textContent = `${total} RON`;
+
+    // Update Step 2 price display
+    const step2Price = document.getElementById('priceAmountStep2');
+    if (step2Price) step2Price.textContent = `${total} RON`;
+
+    // Update Step 4 price display
+    const step4Price = document.getElementById('priceAmountStep4');
+    if (step4Price) step4Price.textContent = `${total} RON`;
+
+    // Show price displays only when we have valid dates
+    const arrival = document.getElementById('cabinArrivalInput')?.value;
+    const departure = document.getElementById('cabinDepartureInput')?.value;
+    const hasValidDates = arrival && departure;
+
+    const step1Display = document.getElementById('priceDisplayStep1');
+    if (step1Display) step1Display.style.display = hasValidDates ? 'block' : 'none';
+
+    const step2Display = document.getElementById('priceDisplayStep2');
+    if (step2Display) step2Display.style.display = hasValidDates ? 'block' : 'none';
+
+    const step4Display = document.getElementById('priceDisplayStep4');
+    if (step4Display) step4Display.style.display = hasValidDates ? 'block' : 'none';
 }
 
 function resetCabinForm() {
@@ -1026,12 +1097,21 @@ function handleArrivalChange(dates) {
     if (dates.length > 0) {
         const dep = new Date(dates[0]);
         dep.setDate(dep.getDate() + cabinNights);
+
+        // Update the departure Flatpickr instance
         if (cabinDepartureFP) {
             cabinDepartureFP.setDate(dep, true);
+            // Manually update the input value
+            const year = dep.getFullYear();
+            const month = String(dep.getMonth() + 1).padStart(2, '0');
+            const day = String(dep.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            document.getElementById('cabinDepartureInput').value = dateStr;
             cabinDepartureFP.set('minDate', new Date(dates[0].getTime() + 24 * 60 * 60 * 1000));
         }
         updateNightsDisplay();
         updateCabinSummary();
+        updateCabinPriceDisplays();
     }
 }
 
@@ -1045,6 +1125,7 @@ function handleDepartureChange(dates) {
             cabinNights = nights;
             updateNightsDisplay();
             updateCabinSummary();
+            updateCabinPriceDisplays();
         }
     }
 }
