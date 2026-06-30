@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="titlu_contact"></title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="flatpickr.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -21,15 +20,15 @@
             <ul>
                 <li><a href="/" data-i18n="nav_home">Acasă</a></li>
                 <li><a href="/punct-gastronomic" data-i18n="nav_punct_gastronomic">Ce este un Punct Gastronomic?</a></li>
-                <li><a href="/mancare" data-i18n="nav_mancare">Rezervă Masă</a></li>
-                <li><a href="/cazare" data-i18n="nav_cabana">Rezervă Cazare</a></li>
+                <li><a href="/meal" data-i18n="nav_mancare">Rezervă Masă</a></li>
+                <li><a href="/accomodation" data-i18n="nav_cabana">Rezervă Cazare</a></li>
                 <li><a href="/contact" data-i18n="nav_contact">Contact</a></li>
             </ul>
         </nav>
 
         <div class="lang-selector">
-            <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
-            <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+            <button id="ro-btn">🇷🇴 RO</button>
+            <button id="en-btn">🇬🇧 EN</button>
         </div>
     </header>
 
@@ -87,10 +86,7 @@
         </div>
     </section>
 
-    <script src="flatpickr.min.js"></script>
-    <script src="ro.js"></script>
-    <script src="translations.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="../js/app.js"></script>
 </body>
 
 </html>

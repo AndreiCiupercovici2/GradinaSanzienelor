@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="titlu_cazare"></title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="flatpickr.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/flatpickr.min.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -21,15 +21,15 @@
             <ul>
                 <li><a href="/" data-i18n="nav_home">Acasă</a></li>
                 <li><a href="/punct-gastronomic" data-i18n="nav_punct_gastronomic">Ce este un Punct Gastronomic?</a></li>
-                <li><a href="/mancare" data-i18n="nav_mancare">Rezervă Masă</a></li>
-                <li><a href="/cazare" data-i18n="nav_cabana">Rezervă Cazare</a></li>
+                <li><a href="/meal" data-i18n="nav_mancare">Rezervă Masă</a></li>
+                <li><a href="/accomodation" data-i18n="nav_cabana">Rezervă Cazare</a></li>
                 <li><a href="/contact" data-i18n="nav_contact">Contact</a></li>
             </ul>
         </nav>
 
         <div class="lang-selector">
-            <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
-            <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+            <button id="ro-btn">🇷🇴 RO</button>
+            <button id="en-btn">🇬🇧 EN</button>
         </div>
     </header>
 
@@ -113,22 +113,22 @@
         <div id="progressCabin" class="progress-indicator">
             <div class="progress-step active" id="step1Cabin">
                 <span class="step-number">1</span>
-                <span class="step-label">Travel Information</span>
+                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step2Cabin">
                 <span class="step-number">2</span>
-                <span class="step-label">Extras</span>
+                <span class="step-label" data-i18n="step_extras">Extras</span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step3Cabin">
                 <span class="step-number">3</span>
-                <span class="step-label">Personal Information</span>
+                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step4Cabin">
                 <span class="step-number">4</span>
-                <span class="step-label">Price</span>
+                <span class="step-label" data-i18n="step_confirmation">Confirmare</span>
             </div>
         </div>
 
@@ -149,7 +149,7 @@
                         <span class="date-field-label">Arrival</span>
                         <div class="date-input-card">
                             <span class="date-icon">&#128197;</span>
-                            <input type="text" id="cabinArrivalInput" readonly placeholder="Select arrival date">
+                            <input type="text" id="cabinArrivalInput" readonly placeholder="Select arrival date" data-i18n-placeholder="placeholder_select_date">
                         </div>
                         <!-- Calendar popup wrapper for arrival -->
                         <div id="cabinArrivalCalendarWrapper" class="calendar-popup-wrapper"
@@ -180,7 +180,7 @@
                 <h4 class="cabin-card-title">Guests</h4>
                 <div class="guests-grid">
                     <div class="form-group">
-                        <label>No. of Rooms</label>
+                        <label data-i18n="label_no_rooms">No. of Rooms</label>
                         <select id="cabinRoomsSelect" class="cabin-select">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -188,7 +188,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Adults</label>
+                        <label data-i18n="label_adults">Adults</label>
                         <select id="cabinAdultsSelect" class="cabin-select">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -196,7 +196,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Pets</label>
+                        <label data-i18n="label_pets">Pets</label>
                         <input type="text" id="cabinPetsInput" placeholder="e.g. 1 dog">
                     </div>
                 </div>
@@ -204,7 +204,7 @@
 
             <!-- Section C: Warning banners -->
             <div id="warningCabana" style="display:none;"></div>
-            <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;"></div>
+            <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;" data-i18n="warning_pending_cabin_step1"></div>
 
             <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras
                 &#8594;</button>
@@ -212,7 +212,7 @@
 
         <!-- STEP 2: Extras -->
         <div id="step2ContainerCabin" class="step-container" style="display:none;">
-            <h3>Choose Your Extras</h3>
+            <h3 class="cabin-card-title" data-i18n="cabin_extras_title">Choose Your Extras</h3>
 
             <!-- Dynamic Price Display for Step 2
             <div id="priceDisplayStep2" class="cabin-price-display">
@@ -608,10 +608,9 @@
         </div>
     </div>
 
-    <script src="flatpickr.min.js"></script>
-    <script src="ro.js"></script>
-    <script src="translations.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="../js/vendor/flatpickr.min.js"></script>
+    <script type="module" src="../js/vendor/ro.js"></script>
+    <script type="module" src="../js/app.js"></script>
 </body>
 
 </html>

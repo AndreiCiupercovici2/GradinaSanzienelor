@@ -958,6 +958,23 @@ input#calendarCabana {
     pointer-events: auto;
 }
 
+#mealArrivalInput{
+    background-color: #fff !important;
+    cursor: pointer !important;
+    border: none;
+    outline: none;
+    padding: 0;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+    pointer-events: auto;
+}
+
+#cabinArrivalInput:placeholder{
+    color: #aaa;
+    font-size: 13px;
+}
+
 #cabinArrivalInput::placeholder,
 #cabinDepartureInput::placeholder {
     color: #aaa;
@@ -1032,6 +1049,10 @@ input#calendarCabana {
 
 /* ── Step 1 continue button (full width) ── */
 .cabin-continue-btn {
+    width: 100%;
+}
+
+.meal-continue-btn{
     width: 100%;
 }
 

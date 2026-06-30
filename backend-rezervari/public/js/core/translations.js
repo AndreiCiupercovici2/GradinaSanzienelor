@@ -153,3 +153,47 @@ const traduceri = {
         titlu_mancare: "Meal Reservations"
     }
 }
+
+// --- 1. LOCALIZARE (TRADUCERI) ---
+let limbaCurenta = localStorage.getItem('limba_preferata') || 'ro';
+
+export function applyTranslations() {
+    if (typeof traduceri === 'undefined') return;
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const cheie = element.getAttribute('data-i18n');
+        if (traduceri[limbaCurenta] && traduceri[limbaCurenta][cheie]) {
+            element.innerText = traduceri[limbaCurenta][cheie];
+        }
+    });
+}
+
+export function changeLanguage(newLanguage) {
+    limbaCurenta = newLanguage;
+    localStorage.setItem('limba_preferata', newLanguage);
+    applyTranslations();
+
+    // Recreate visible calendars with new locale
+    const mancareContainer = document.getElementById('sectiuneMancare');
+    const cabanaContainer = document.getElementById('sectiuneCabana');
+
+    if (mancareContainer && mancareContainer.style.display !== 'none' && calendarMancareInstanta) {
+        calendarMancareInstanta.destroy();
+        calendarMancareInstanta = null;
+        arataSectiune('mancare');
+    }
+    if (cabanaContainer && cabanaContainer.style.display !== 'none' && cabinArrivalFP) {
+        cabinArrivalFP.destroy();
+        cabinDepartureFP?.destroy();
+        cabinArrivalFP = null;
+        cabinDepartureFP = null;
+        arataSectiune('cabana');
+    }
+
+    // // Refresh price displays with new language
+    // if (document.getElementById('pretMancareAfisajStep1')?.innerText.includes('RON')) {
+    //     calculeazaPretMancare();
+    // }
+    // if (document.getElementById('summaryContent')?.innerText.includes('RON')) {
+    //     updateCabinSummary();
+    // }
+}

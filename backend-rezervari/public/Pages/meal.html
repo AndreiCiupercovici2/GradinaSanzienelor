@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="titlu_mancare"></title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../css/flatpickr.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
+        </div>
+        
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/" data-i18n="nav_home">Acasă</a></li>
+                <li><a href="/punct-gastronomic" data-i18n="nav_punct_gastronomic">Ce este un Punct Gastronomic?</a></li>
+                <li><a href="/meal" data-i18n="nav_mancare">Rezervă Masă</a></li>
+                <li><a href="/accomodation" data-i18n="nav_cabana">Rezervă Cazare</a></li>
+                <li><a href="/contact" data-i18n="nav_contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="lang-selector">
+            <button id="ro-btn">🇷🇴 RO</button>
+            <button id="en-btn">🇬🇧 EN</button>
+        </div>
+    </header>
+
+    <h1 data-i18n="titlu_mancare" style="text-align: center;"></h1>
+
+    <!-- Hero Slideshow Section -->
+    <section class="hero-slideshow" id="heroSlideshow">
+        <div class="slideshow-container">
+            <div class="slide fade" data-slide="1">
+                <img src="images/slide-1.webp" alt="Slide 1">
+            </div>
+            <div class="slide fade" data-slide="2">
+                <img src="images/slide-2.webp" alt="Slide 2">
+            </div>
+            <div class="slide fade" data-slide="3">
+                <img src="images/slide-3.webp" alt="Slide 3">
+            </div>
+            <div class="slide fade" data-slide="4">
+                <img src="images/slide-4.webp" alt="Slide 4">
+            </div>
+            <div class="slide fade" data-slide="5">
+                <img src="images/slide-5.webp" alt="Slide 5">
+            </div>
+            <div class="slide fade" data-slide="6">
+                <img src="images/slide-6.webp" alt="Slide 6">
+            </div>
+            <div class="slide fade" data-slide="7">
+                <img src="images/slide-7.webp" alt="Slide 7">
+            </div>
+            <div class="slide fade" data-slide="8">
+                <img src="images/slide-8.webp" alt="Slide 8">
+            </div>
+            <div class="slide fade" data-slide="9">
+                <img src="images/slide-9.webp" alt="Slide 9">
+            </div>
+            <div class="slide fade" data-slide="10">
+                <img src="images/slide-10.webp" alt="Slide 10">
+            </div>
+            <div class="slide fade" data-slide="11">
+                <img src="images/slide-11.webp" alt="Slide 11">
+            </div>
+
+            <!-- Navigation Arrows -->
+            <button class="nav-arrow nav-arrow-left" id="prevSlideBtn" aria-label="Previous slide">
+                <span class="arrow-chevron-left"></span>
+            </button>
+            <button class="nav-arrow nav-arrow-right" id="nextSlideBtn" aria-label="Next slide">
+                <span class="arrow-chevron-right"></span>
+            </button>
+        </div>
+
+        <!-- Down Arrow Indicator -->
+        <div class="scroll-indicator">
+            <span class="arrow-down"></span>
+        </div>
+    </section>
+
+    <div class="lang-selector">
+        <button onclick="schimbaLimba('ro')">🇷🇴 RO</button>
+        <button onclick="schimbaLimba('en')">🇬🇧 EN</button>
+    </div>
+
+    <div class="menu-selector">
+        <button onclick="arataSectiune('mancare')" id="btnMancare" data-i18n="nav_mancare">Rezervă Masă</button>
+    </div>
+
+    <!-- Resume Draft Banner for Meal - placed above the section -->
+    <div id="resumeBannerMancare" class="resume-banner" style="display: none;">
+        <p data-i18n="draft_exists_message">Ai o rezervare de masă în curs de finalizare.</p>
+        <button type="button" id="resumeButtonMancare" class="btn-resume" data-i18n="btn_resume">Continuă
+            Rezervarea</button>
+    </div>
+
+    <div id="sectiuneMancare" class="form-container" style="display: none;">
+        <p class="section-description" data-i18n="subSectiuneMancare">Selectează o zi din calendar pentru a face
+            rezervarea la masă.</p>
+
+        <!-- Progress Indicator for Meal — 4 steps -->
+        <div id="progressMeal" class="progress-indicator">
+            <div class="progress-step active" id="step1Meal">
+                <span class="step-number">1</span>
+                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="step2Meal">
+                <span class="step-number">2</span>
+                <span class="step-label" data-i18n="step_extras">Extras</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="step3Meal">
+                <span class="step-number">3</span>
+                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="step4Meal">
+                <span class="step-number">4</span>
+                <span class="step-label" data-i18n="step_confirmation">Confirmare</span>
+            </div>
+        </div>
+
+        <!-- STEP 1: Travel Information for Meal -->
+        <div id="step1ContainerMeal" class="step-container">
+            <!-- Section A: Meal Dates Card -->
+            <div class="meal-dates-card">
+                <h4 class="meal-card-title" data-i18n="meal_dates_title">Datele Rezervării</h4>
+                <div class="dates-row">
+                    <div class="date-field-wrapper">
+                        <span class="date-field-label" data-i18n="label_data_mesei">Data Mesei:</span>
+                        <div class="date-input-card">
+                            <span class="date-icon">&#128197;</span>
+                            <input type="text" id="mealArrivalInput" readonly placeholder="Selectează o dată" data-i18n-placeholder="placeholder_select_date">
+                        </div>
+                        <!-- Calendar popup wrapper for meal -->
+                        <div id="mealCalendarWrapper" class="calendar-popup-wrapper" style="position: relative; z-index: 50;"></div> 
+                    </div>    
+                </div>
+            </div>
+
+            <!-- Section B: Guests Card -->
+             <div class="meal-guests-card">
+                <h4 class="meal-card-title" data-i18n="meal_guests_title"></h4>
+                <div class="guests-grid">
+                    <div class="guest-type">
+                        <span class="guest-label" data-i18n="label_adults"></span>
+                        <div class="guest-controls">
+                            <button type="button" class="guest-decrement" data-guest-type="adults">-</button>
+                            <span id="adultsCount" class="guest-count">1</span>
+                            <button type="button" class="guest-increment" data-guest-type="adults">+</button>
+                        </div>
+                    </div>
+                    <div class="guest-type">
+                        <span class="guest-label" data-i18n="label_pets"></span>
+                        <div class="guest-controls">
+                            <button type="button" class="guest-decrement" data-guest-type="pets">-</button>
+                            <span id="petsCount" class="guest-count">0</span>
+                            <button type="button" class="guest-increment" data-guest-type="pets">+</button>
+                        </div>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Section C: Warning banners -->
+              <div id="warningMeal" style="display:none;"></div>
+              <div id="warningPendingMStep1" class="notification notification-warning" style="display:none;" data-i18n="warning_pending_meal_step1"></div>
+
+              <button type="button" id="continueToExtrasBtn" class="btn-primary meal-continue-btn" data-i18n="btn_continue_to_extras">Continuă la Extras
+                &#8594;</button>
+        </div>
+
+        <!-- STEP 2: Extras for Meal -->
+        <div id="step2ContainerMeal" class="step-container" style="display:none;">
+            <h3 class="meal-card-title" data-i18n="meal_extras_title"></h3>
+            <div class="extra-item-card" id="accomodationCard">
+                <div class="extras-slide active">
+                    <img src="images/slide-6.webp" alt="Accomodation">
+                </div>
+                <div class="extras-slide">
+                    <img src="images/slide-7.webp" alt="Accomodation">
+                </div>
+                <div class="extras-slide">
+                    <img src="images/slide-10.webp" alt="Accomodation">
+                </div>
+                <button class="extras-prev-btn" aria-label="Previous">&#8249;</button>
+                <button class="extras-next-btn" aria-label="Next">&#8250;</button>
+            </div>
+            <div class="extra-info-panel">
+                <div class="extra-badge" data-i18n="extra_optional">Optional Extra</div>
+                <h4 class="extra-title" data-i18n="extra_accomodation_title">Cazare</h4>
+                <p class="extra-description" data-i18n="extra_accomodation_description">
+                    Dacă dorești să te bucuri de o experiență completă la Grădina Sânzienelor, poți adăuga opțiunea de cazare la rezervarea ta. Aceasta îți oferă posibilitatea de a rămâne peste noapte și de a te bucura de toate facilitățile oferite de locație. Alege această opțiune pentru a transforma vizita ta într-o experiență de neuitat, cu confort și relaxare, fără grija de a pleca acasă după masă.
+                </p>
+                <button id="accomodationToggle" class="extra-toggle-btn" data-i18n="btn_add_accomodation">Adaugă Cazare</button>
+            </div>
+        </div>
+    </div>
+        
+
+    <script type="module" src="../js/vendor/flatpickr.min.js"></script>
+    <script type="module" src="../js/vendor/ro.js"></script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+
+</html>

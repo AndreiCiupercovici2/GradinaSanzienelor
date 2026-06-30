@@ -1,0 +1,205 @@
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+const MAX_CABIN_CAPACITY = 8;
+const MIN_CABIN_CAPACITY = 1;
+const MAX_MEAL_CAPACITY = 15;
+const MAX_ROOMS = 3;
+const MIN_ROOMS = 1;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+
+const messages = {
+    ro: {
+        num_persoane_invalid: `Numărul de persoane trebuie să fie între ${MIN_CABIN_CAPACITY} și ${MAX_CABIN_CAPACITY}.`,
+        availability_error: 'Eroare la verificarea disponibilității.',
+        fully_booked: 'Cabana nu mai are locuri disponibile în perioada selectată.',
+        save_error: 'Eroare la salvarea rezervării.',
+        commit_error: 'Eroare la confirmare.',
+        cabin_success: 'Cererea de rezervare a fost trimisă pentru aprobare.',
+        food_success: 'Cererea de masă trimisă pentru aprobare.',
+        invalid_type: 'Tip rezervare invalid.',
+        invalid_decision: 'Decizie invalidă.',
+        invalid_id: 'ID invalid.',
+        update_error: 'Eroare la actualizare.',
+        not_found: 'Rezervare nu a fost găsită.',
+        data_error: 'Eroare la preluarea datelor.',
+        update_success: (decizie) => `Rezervare ${decizie} cu succes.`,
+        invalid_adults: 'Adulți trebuie să fie cel puțin 1.',
+        invalid_infants: 'Copii nu pot fi negativi.',
+        invalid_pets: 'Animale de companie nu pot fi negative.',
+        invalid_rooms: 'Camere necesare trebuie să fie între 1 și 3.',
+        invalid_meal_max_persons: 'Maxim 15 persoane permise pentru mese.',
+        invalid_same_day_after_10am: 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.',
+        invalid_nume: 'Nume invalid.',
+        invalid_email: 'Email invalid.',
+        invalid_telefon: 'Telefon invalid.',
+        invalid_data_rezervare: 'Data rezervare invalidă.',
+        invalid_ora: 'Ora invalidă.',
+        invalid_data_inceput: 'Data început invalidă.',
+        invalid_data_sfarsit: 'Data sfârșit invalidă.',
+        invalid_data_sfarsit_dupa_inceput: 'Data sfârșit trebuie după data început.'
+    },
+    en: {
+        num_persoane_invalid: `Number of people must be between ${MIN_CABIN_CAPACITY} and ${MAX_CABIN_CAPACITY}.`,
+        availability_error: 'Error checking availability.',
+        fully_booked: 'Cabin has no available spots for this period.',
+        save_error: 'Error saving reservation.',
+        commit_error: 'Error confirming reservation.',
+        cabin_success: 'Reservation request submitted for approval.',
+        food_success: 'Meal request submitted for approval.',
+        invalid_type: 'Invalid reservation type.',
+        invalid_decision: 'Invalid decision.',
+        invalid_id: 'Invalid ID.',
+        update_error: 'Error updating reservation.',
+        not_found: 'Reservation not found.',
+        data_error: 'Error retrieving data.',
+        update_success: (decizie) => `Reservation ${decizie} successfully.`,
+        invalid_adults: 'Adults must be at least 1.',
+        invalid_infants: 'Infants cannot be negative.',
+        invalid_pets: 'Pets cannot be negative.',
+        invalid_rooms: 'Rooms needed must be between 1 and 3.',
+        invalid_meal_max_persons: 'Maximum 15 people allowed for meals.',
+        invalid_same_day_after_10am: 'Same-day requests are no longer accepted. Please call.',
+        invalid_nume: 'Invalid name.',
+        invalid_email: 'Invalid email.',
+        invalid_telefon: 'Invalid phone number.',
+        invalid_data_rezervare: 'Invalid reservation date.',
+        invalid_ora: 'Invalid time.',
+        invalid_data_inceput: 'Invalid start date.',
+        invalid_data_sfarsit: 'Invalid end date.',
+        invalid_data_sfarsit_dupa_inceput: 'End date must be after start date.'
+    }
+};
+
+const getLanguage = (req) => {
+    const lang = req.query.lang || req.headers['accept-language']?.split(',')[0]?.slice(0, 2) || 'ro';
+    return ['ro', 'en'].includes(lang) ? lang : 'ro';
+};
+
+const t = (key, lang, ...args) => {
+    const msg = messages[lang]?.[key] || messages.ro[key];
+    return typeof msg === 'function' ? msg(...args) : msg;
+};
+
+// Input validation helpers
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const isValidDate = (date) => !isNaN(Date.parse(date));
+const isValidPhoneNumber = (phone) => !phone || /^[0-9\s\-\+()]{6,}$/.test(phone);
+const sanitizeText = (text) => text?.trim().slice(0, 255) || '';
+
+const isToday = (dateStr) => {
+    const today = new Date();
+    const date = new Date(dateStr);
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+};
+
+const isAfter10Am = () => {
+    const now = new Date();
+    return now.getHours() >= 10;
+};
+
+const validateReservationInput = (data, lang, isFood = false) => {
+    const errors = [];
+
+    // For non-food (cabin), accept either nume OR both first_name + last_name
+    if (isFood) {
+        if (!data.nume || !sanitizeText(data.nume)) errors.push(t('invalid_nume', lang));
+    } else {
+        const hasNume = data.nume && sanitizeText(data.nume);
+        const hasNames = data.first_name && sanitizeText(data.first_name) && data.last_name && sanitizeText(data.last_name);
+        if (!hasNume && !hasNames) errors.push(t('invalid_nume', lang));
+    }
+
+    if (!isValidEmail(data.email)) errors.push(t('invalid_email', lang));
+    if (!isValidPhoneNumber(data.telefon)) errors.push(t('invalid_telefon', lang));
+
+    const adults = parseInt(data.adults) || 0;
+    const infants = parseInt(data.infants) || 0;
+    const pets = parseInt(data.pets) || 0;
+    const totalPeople = adults + infants;
+
+    if (adults < 1) errors.push(t('invalid_adults', lang));
+    if (infants < 0) errors.push(t('invalid_infants', lang));
+    if (pets < 0) errors.push(t('invalid_pets', lang));
+
+    if (isFood) {
+        if (!isValidDate(data.data_rezervare)) errors.push(t('invalid_data_rezervare', lang));
+        if (!data.ora) errors.push(t('invalid_ora', lang));
+        if (totalPeople > MAX_MEAL_CAPACITY) errors.push(t('invalid_meal_max_persons', lang));
+        if (isToday(data.data_rezervare) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
+    } else {
+        if (!isValidDate(data.data_inceput)) errors.push(t('invalid_data_inceput', lang));
+        if (!isValidDate(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit', lang));
+        if (new Date(data.data_inceput) >= new Date(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit_dupa_inceput', lang));
+
+        const rooms = parseInt(data.rooms_needed) || 1;
+        if (rooms < MIN_ROOMS || rooms > MAX_ROOMS) errors.push(t('invalid_rooms', lang));
+
+        if (isToday(data.data_inceput) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
+    }
+
+    return errors.length > 0 ? errors : null;
+};
+
+const sendConfirmationEmail = async (detaliiRezervare, tipRezervare) => {
+    try {
+        const emailText = detaliiRezervare.email || 'Nu a lăsat email';
+        let continutEmail = `Ai o rezervare nouă pentru: ${tipRezervare}\n\n`;
+
+        const adults = parseInt(detaliiRezervare.adults) || 1;
+        const infants = parseInt(detaliiRezervare.infants) || 0;
+        const pets = parseInt(detaliiRezervare.pets) || 0;
+        const totalPeople = adults + infants;
+
+        continutEmail += `\nCompunerea grupului:\n`;
+        continutEmail += `- Adulți: ${adults}\n`;
+        continutEmail += `- Copii: ${infants}\n`;
+        continutEmail += `- Animale de companie: ${pets}\n`;
+        continutEmail += `Persoane total: ${totalPeople}\n`;
+
+        if (tipRezervare === 'cabana') {
+            continutEmail += `\nData început: ${detaliiRezervare.data_inceput}\n`;
+            continutEmail += `Data sfârșit: ${detaliiRezervare.data_sfarsit}\n`;
+            continutEmail += `Camere necesare: ${detaliiRezervare.rooms_needed || 1}\n`;
+            continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
+            continutEmail += `Vrea ciubăr: ${detaliiRezervare.vrea_hottub ? 'Da' : 'Nu'}\n`;
+            continutEmail += `Consimțământ newsletter: ${detaliiRezervare.newsletter ? 'Da' : 'Nu'}\n`;
+        } else {
+            continutEmail += `\nData: ${detaliiRezervare.data_rezervare}\n`;
+            continutEmail += `Ora: ${detaliiRezervare.ora}\n`;
+        }
+
+        continutEmail += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/admin.html`;
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
+            subject: `Nouă rezervare - ${tipRezervare}`,
+            text: continutEmail
+        });
+    } catch (error) {
+        console.error('Email sending failed:', error);
+    }
+};
+
+module.exports = {
+    getLanguage,
+    t,
+    validateReservationInput,
+    sendConfirmationEmail,
+    sanitizeText,
+    MAX_CABIN_CAPACITY,
+    MIN_CABIN_CAPACITY,
+    MAX_MEAL_CAPACITY,
+    MAX_ROOMS,
+    MIN_ROOMS
+};
