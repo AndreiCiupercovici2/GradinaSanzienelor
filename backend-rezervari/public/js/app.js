@@ -2,8 +2,28 @@ import { initExtrasSlideshow, initHeroSlideshow } from './ui/slideshow.js';
 import { changeLanguage, applyTranslations } from './core/translations.js';
 import {backendUrl, WIZARD_STATE, APP_GLOBALS} from './core/state.js';
 
+initHeroSlideshow();
+initExtrasSlideshow();
+
 document.addEventListener('DOMContentLoaded', async function() {
     applyTranslations();
+
+    const btnRo = document.getElementById('ro-btn');
+    const btnEn = document.getElementById('en-btn');
+
+    if (btnRo) {
+        btnRo.addEventListener('click', (e) => {
+            e.preventDefault();
+            changeLanguage('ro');
+        });
+    }
+
+    if (btnEn) {
+        btnEn.addEventListener('click', (e) => {
+            e.preventDefault();
+            changeLanguage('en');
+        });
+    }
 });
 
 async function saveMealDraft(step) {
@@ -409,54 +429,3 @@ document.getElementById('btnTomorrow')?.addEventListener('click', function(e) {
     showMealStep(1);
     // calculeazaPretMancare();
 });
-
-export async function saveCabinDraft(step) {
-    const email = document.getElementById('cabinEmail')?.value || '';
-    const phone = document.getElementById('cabinPhone')?.value || '';
-    const allData = {
-        data_inceput: document.getElementById('cabinArrivalInput')?.value,
-        data_sfarsit: document.getElementById('cabinDepartureInput')?.value,
-        adults: parseInt(document.getElementById('cabinAdultsSelect')?.value) || 1,
-        rooms_needed: parseInt(document.getElementById('cabinRoomsSelect')?.value) || 1,
-        vrea_meniu: WIZARD_STATE.cabinExtras.meal,
-        vrea_hottub: WIZARD_STATE.cabinExtras.hotTub,
-        first_name: document.getElementById('cabinFirstName')?.value,
-        email: email, telefon: phone
-    };
-
-    try {
-        const resp = await fetch(`${backendUrl}/reservations/draft`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, phone, reservation_type: 'cabana', current_step: step, step_data: allData })
-        });
-        if (resp.ok) {
-            const data = await resp.json();
-            WIZARD_STATE.cabinDraftId = data.draft_id;
-        }
-    } catch (err) { console.error('Draft save failed:', err); }
-}
-
-export async function saveMealDraft(step) {
-    const email = document.getElementById('mealEmail')?.value || document.getElementById('emailMStep2')?.value || '';
-    const phone = document.getElementById('mealPhone')?.value || document.getElementById('telefonMStep2')?.value || '';
-    if (step === 2 && (!email || !phone)) return;
-
-    const allData = {
-        data_rezervare: document.getElementById('dataMStep1')?.value,
-        ora: document.getElementById('oraMStep1')?.value || document.getElementById('hourMStep1')?.value,
-        adults: parseInt(document.getElementById('adultsMStep1')?.value || document.getElementById('adultiMStep1')?.value) || 0,
-        infants: parseInt(document.getElementById('infantsMStep1')?.value || document.getElementById('copiiMStep1')?.value) || 0,
-        email: email, phone: phone
-    };
-
-    try {
-        const resp = await fetch(`${backendUrl}/reservations/draft`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, phone, reservation_type: 'mancare', current_step: step, step_data: allData })
-        });
-        if (resp.ok) {
-            const data = await resp.json();
-            WIZARD_STATE.mealDraftId = data.draft_id;
-        }
-    } catch (err) { console.error('Draft save failed:', err); }
-}

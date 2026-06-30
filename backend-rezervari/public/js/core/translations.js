@@ -1,8 +1,6 @@
 const traduceri = {
     ro: {
         titlu_principal: "Grădina Sânzienelor - Punct Gastronomic Local",
-        nav_mancare: "Rezervă Masă",
-        nav_cabana: "Cazare",
         label_nume: "Nume Complet",
         label_email: "Adresă de Email",
         label_telefon: "Telefon",
@@ -74,12 +72,15 @@ const traduceri = {
         meal_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
         titlu_cazare: "Rezervări Cazare",
         titlu_mancare: "Rezervări Masă",
+        nav_home: "Acasă",
+        nav_punct_gastronomic: "Ce este un Punct Gastronomic?",
+        nav_contact: "Contact",
+        nav_meal: "Rezervări Masă",
+        nav_cabin: "Rezervări Cazare"
         
     },
     en: {
         titlu_principal: "Grădina Sânzienelor - Local Gastronomic Point",
-        nav_mancare: "Book a Table",
-        nav_cabana: "Accommodation",
         label_nume: "Full Name",
         label_email: "Email Address",
         label_telefon: "Phone",
@@ -150,7 +151,12 @@ const traduceri = {
         hottub_description: "Relax under the stars in our private outdoor hot tub. Available year-round, the hot tub accommodates up to 6 guests and is included for your entire stay.",
         meal_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night.",
         titlu_cazare: "Accommodation Reservations",
-        titlu_mancare: "Meal Reservations"
+        titlu_mancare: "Meal Reservations",
+        nav_home: "Home",
+        nav_punct_gastronomic: "What is a Gastronomic Point?",
+        nav_contact: "Contact",
+        nav_meal: "Meal Reservations",
+        nav_cabin: "Accommodation Reservations"
     }
 }
 
