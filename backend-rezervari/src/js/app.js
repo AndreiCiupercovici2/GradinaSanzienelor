@@ -1,11 +1,19 @@
 import { initExtrasSlideshow, initHeroSlideshow } from './ui/slideshow.js';
 import { changeLanguage, applyTranslations } from './core/translations.js';
-import {backendUrl, WIZARD_STATE, APP_GLOBALS} from './core/state.js';
-
-initHeroSlideshow();
-initExtrasSlideshow();
+import { backendUrl, WIZARD_STATE, APP_GLOBALS } from './core/state.js';
+import { initWizardEventListeners, showSection, showCabinStep, showMealStep } from './ui/wizard.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        initHeroSlideshow();
+        initExtrasSlideshow('hotTubSlideshow');
+        initExtrasSlideshow('mealSlideshow');
+        initExtrasSlideshow('cabinSlideshow');
+        initWizardEventListeners();
+    } catch (err) {
+        console.error('Initialization failed:', err);
+    }
+
     applyTranslations();
 
     const btnRo = document.getElementById('ro-btn');
@@ -23,6 +31,15 @@ document.addEventListener('DOMContentLoaded', async function() {
             e.preventDefault();
             changeLanguage('en');
         });
+    }
+
+    if (document.getElementById('sectiuneCabana')) {
+        await showSection('sectiuneCabana');
+        showCabinStep(1);
+    }
+    if (document.getElementById('sectiuneMancare')) {
+        await showSection('sectiuneMancare');
+        showMealStep(1);
     }
 });
 
@@ -53,7 +70,7 @@ async function saveMealDraft(step) {
     const allData = step === 1 ? step1Data : { ...step1Data, ...step2Data };
 
     try {
-        const resp = await fetch(`${backendUrl}/reservations/draft`, {
+        const resp = await fetch(`${backendUrl}/api/reservations/draft`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -100,7 +117,7 @@ async function saveCabinDraft(step) {
     const allData = step === 1 ? step1Data : { ...step1Data, ...step2Data, ...step3Data };
 
     try {
-        const resp = await fetch(`${backendUrl}/reservations/draft`, {
+        const resp = await fetch(`${backendUrl}/api/reservations/draft`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -124,7 +141,7 @@ async function saveCabinDraft(step) {
 
 async function loadAndRestoreMealDraft(email, phone) {
     try {
-        const resp = await fetch(`${backendUrl}/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=mancare`);
+        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=mancare`);
         if (!resp.ok) return false;
 
         const data = await resp.json();
@@ -170,7 +187,7 @@ async function loadAndRestoreMealDraft(email, phone) {
 
 async function loadAndRestoreCabinDraft(email, phone) {
     try {
-        const resp = await fetch(`${backendUrl}/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=cabana`);
+        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=cabana`);
         if (!resp.ok) return false;
 
         const data = await resp.json();
@@ -242,8 +259,8 @@ let cabinDepartureFP = null;
 
 // --- 2. SETĂRI GLOBALE ---
 function getLocaleConfig() {
-    if (limbaCurenta === 'ro' && typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ro) {
-        return { locale: flatpickr.l10ns.ro };
+    if (limbaCurenta === 'ro' && typeof flatpickr !== 'undefined' && Romanian) {
+        return { locale: Romanian }; 
     }
     return { locale: 'en' };
 }
@@ -265,47 +282,10 @@ function calculateTotalPeople(adults, infants) {
     return (parseInt(adults) || 0) + (parseInt(infants) || 0);
 }
 
-// --- NEW FUNCTION: Update price displays on all steps ---
-/* function updateCabinPriceDisplays() {
-    const adults = parseInt(document.getElementById('cabinAdultsSelect')?.value) || 1;
-    const nights = cabinNights;
-
-    let basePrice = adults * nights * PRET_NOAPTE_PERSOANA;
-    let hotTubPrice = WIZARD_STATE.cabinExtras.hotTub ? PRET_HOTTUB : 0;
-    let mealPrice = WIZARD_STATE.cabinExtras.meal ? adults * nights * PRET_MENIU_PER_PERSON_NIGHT : 0;
-    let total = basePrice + hotTubPrice + mealPrice;
-
-    // Update Step 1 price display
-    const step1Price = document.getElementById('priceAmountStep1');
-    if (step1Price) step1Price.textContent = `${total} RON`;
-
-    // Update Step 2 price display
-    const step2Price = document.getElementById('priceAmountStep2');
-    if (step2Price) step2Price.textContent = `${total} RON`;
-
-    // Update Step 4 price display
-    const step4Price = document.getElementById('priceAmountStep4');
-    if (step4Price) step4Price.textContent = `${total} RON`;
-
-    // Show price displays only when we have valid dates
-    const arrival = document.getElementById('cabinArrivalInput')?.value;
-    const departure = document.getElementById('cabinDepartureInput')?.value;
-    const hasValidDates = arrival && departure;
-
-    const step1Display = document.getElementById('priceDisplayStep1');
-    if (step1Display) step1Display.style.display = hasValidDates ? 'block' : 'none';
-
-    const step2Display = document.getElementById('priceDisplayStep2');
-    if (step2Display) step2Display.style.display = hasValidDates ? 'block' : 'none';
-
-    const step4Display = document.getElementById('priceDisplayStep4');
-    if (step4Display) step4Display.style.display = hasValidDates ? 'block' : 'none';
-} */
-
 // --- 3. ÎNCĂRCARE DATE DE PE SERVER LA START ---
 async function incarcatDateOcupare() {
     try {
-        const response = await fetch(`${backendUrl}/zile_ocupate`);
+        const response = await fetch(`${backendUrl}/api/zile_ocupate`);
         if (response.ok) {
             const rezervariConfirmate = await response.json();
             rezervariConfirmate.forEach(rez => {
@@ -331,33 +311,6 @@ async function incarcatDateOcupare() {
     }
 }
 
-// --- 4. CALCUL PREȚ ---
-// function calculeazaNopti(start, end) {
-//     if (!start || !end) return 0;
-//     const diff = new Date(end) - new Date(start);
-//     const zile = Math.ceil(diff / (1000 * 60 * 60 * 24));
-//     return zile > 0 ? zile : 0;
-// }
-
-// function calculeazaPretMancare() {
-//     const adulti = parseInt(document.getElementById('adultiMStep1').value) || 0;
-//     const copii = parseInt(document.getElementById('copiiMStep1').value) || 0;
-//     const persoane = adulti + copii;
-
-//     if (persoane > MAX_PERSOANE_MANCARE) {
-//         document.getElementById('adultiMStep1').value = Math.max(1, MAX_PERSOANE_MANCARE - copii);
-//     }
-
-//     const pretEstimatiText = limbaCurenta === 'en' ? 'Estimated Price:' : 'Preț estimat:';
-//     document.getElementById('pretMancareAfisajStep1').innerText = `${pretEstimatiText} ${persoane * PRET_MENIU_PERSOANA} RON`;
-//     updateTotalDisplay('adultiMStep1', 'copiiMStep1', 'totalPeopleMStep1');
-// }
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     document.getElementById('adultiMStep1')?.addEventListener('input', calculeazaPretMancare);
-//     document.getElementById('copiiMStep1')?.addEventListener('input', calculeazaPretMancare);
-// });
-
 // --- 5. COMUNICARE BACKEND (FORMULARE FINALIZARE) ---
 document.getElementById('formMancareStep2')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -379,7 +332,7 @@ document.getElementById('formMancareStep2')?.addEventListener('submit', async (e
     };
 
     try {
-        const res = await fetch(`${backendUrl}/rezervari_mancare`, {
+        const res = await fetch(`${backendUrl}/api/rezervari_mancare`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         if (res.ok) {
@@ -390,7 +343,7 @@ document.getElementById('formMancareStep2')?.addEventListener('submit', async (e
 
             // Delete draft after successful submission
             if (WIZARD_STATE.mealDraftId) {
-                await fetch(`${backendUrl}/reservations/draft/${WIZARD_STATE.mealDraftId}`, {
+                await fetch(`${backendUrl}/api/reservations/draft/${WIZARD_STATE.mealDraftId}`, {
                     method: 'DELETE'
                 }).catch(err => console.error('Failed to delete draft:', err));
             }
@@ -400,7 +353,6 @@ document.getElementById('formMancareStep2')?.addEventListener('submit', async (e
             showMealStep(1);
             WIZARD_STATE.mealFormDirty = false;
             WIZARD_STATE.mealDraftId = null;
-            // calculeazaPretMancare();
         } else {
             const data = await res.json();
             alert('Eroare: ' + (data.error || 'Date incorecte.'));
@@ -416,7 +368,6 @@ document.getElementById('btnToday')?.addEventListener('click', function(e) {
         const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
         document.getElementById('dataMStep1').value = dateStr;
         showMealStep(1);
-        // calculeazaPretMancare();
     }
 });
 
@@ -427,5 +378,4 @@ document.getElementById('btnTomorrow')?.addEventListener('click', function(e) {
     const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
     document.getElementById('dataMStep1').value = dateStr;
     showMealStep(1);
-    // calculeazaPretMancare();
 });

@@ -67,4 +67,17 @@ const AccomodationController = {
     }
 };
 
+const createReservationWithTransaction = async (req, res) => {
+    try {
+        db.run("BEGIN TRANSACTION");
+        const id = await accomodationModel.createReservation(req.body);
+        // await draftModel.deleteDraft(...); // You can perform multiple actions here
+        db.run("COMMIT");
+        res.status(201).json({ id });
+    } catch (err) {
+        db.run("ROLLBACK");
+        res.status(500).json({ error: err.message });
+    }
+};
+
 module.exports = AccomodationController;

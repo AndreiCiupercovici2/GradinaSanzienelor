@@ -1,7 +1,7 @@
-export const backendUrl = '/api';
 export const MEAL_MAX_PERSONS = 15;
 export const ACCOMMODATION_MAX_PERSONS = 15;
 export const MAX_ROOMS = 3;
+export const backendUrl = 'http://localhost:3000';
 
 export const WIZARD_STATE = {
     currentReservationType: null,

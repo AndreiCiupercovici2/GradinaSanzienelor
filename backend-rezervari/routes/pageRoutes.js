@@ -4,11 +4,17 @@ const path = require('path');
 
 // Define valid pages
 const validPages = ['meal', 'accomodation', 'contact', 'punct-gastronomic', 'admin'];
-const pageFilePath = (page) => path.join(__dirname, '..', 'public', 'Pages', `${page}.html`);
+
+const getFilePath = (page) => {
+    if (page == 'index') {
+        return path.join(__dirname, '..', 'index.html');
+    }
+    return path.join(__dirname, '..', 'src', 'Pages', `${page}.html`);
+}
 
 // Principal route for serving pages
 router.get('/', (req, res) => {
-    res.sendFile(pageFilePath('index'), (err) => {
+    res.sendFile(getFilePath('index'), (err) => {
         if (err) {
             console.error('Error sending index.html:', err);
             res.status(500).send('Internal Server Error');
@@ -18,7 +24,7 @@ router.get('/', (req, res) => {
 
 validPages.forEach((page) => {
     router.get(`/${page}`, (req, res) => {
-        res.sendFile(pageFilePath(page), (err) => {
+        res.sendFile(getFilePath(page), (err) => {
             if (err) {
                 console.error(`Error sending ${page}.html:`, err);
                 res.status(500).send('Internal Server Error');
@@ -30,7 +36,7 @@ validPages.forEach((page) => {
 // Clean URL routes (without .html extension)
 validPages.forEach((page) => {
     router.get(`/${page}`, (req, res) => {
-        res.sendFile(pageFilePath(page), (err) => {
+        res.sendFile(getFilePath(page), (err) => {
             if (err) {
                 console.error(`Error sending ${page}.html:`, err);
                 res.status(500).send('Internal Server Error');
@@ -45,7 +51,7 @@ router.get('/:page.html', (req, res) => {
     const allPages = ['index', ...validPages];
 
     if (allPages.includes(page)) {
-        res.sendFile(pageFilePath(page), (err) => {
+        res.sendFile(getFilePath(page), (err) => {
             if (err) {
                 console.error(`Error sending ${page}.html:`, err);
                 res.status(500).send('Internal Server Error');

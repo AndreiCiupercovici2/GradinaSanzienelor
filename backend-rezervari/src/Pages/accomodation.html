@@ -6,23 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="titlu_cazare"></title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="../css/flatpickr.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" 
+          integrity="sha256-GzSkJVLJbxDk36qko2cnawOGiqz/Y8GsQv/jMTUrx1Q=" 
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
     <header class="main-header">
         <div class="logo-container">
-            <img src="images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
+            <img src="/images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
         </div>
         
         <nav class="main-nav">
             <ul>
                 <li><a href="/" data-i18n="nav_home"></a></li>
-                <li><a href="/punct-gastronomic" data-i18n="nav_punct_gastronomic"></a></li>
-                <li><a href="/meal" data-i18n="nav_meal"></a></li>
-                <li><a href="/accomodation" data-i18n="nav_cabin"></a></li>
-                <li><a href="/contact" data-i18n="nav_contact"></a></li>
+                <li><a href="punctGastronomic" data-i18n="nav_punct_gastronomic"></a></li>
+                <li><a href="meal" data-i18n="nav_meal"></a></li>
+                <li><a href="accomodation" data-i18n="nav_cabin"></a></li>
+                <li><a href="contact" data-i18n="nav_contact"></a></li>
             </ul>
         </nav>
 
@@ -38,37 +41,37 @@
     <section class="hero-slideshow" id="heroSlideshow">
         <div class="slideshow-container">
             <div class="slide fade" data-slide="1">
-                <img src="images/slide-1.webp" alt="Slide 1">
+                <img src="/images/slide-1.webp" alt="Slide 1">
             </div>
             <div class="slide fade" data-slide="2">
-                <img src="images/slide-2.webp" alt="Slide 2">
+                <img src="/images/slide-2.webp" alt="Slide 2">
             </div>
             <div class="slide fade" data-slide="3">
-                <img src="images/slide-3.webp" alt="Slide 3">
+                <img src="/images/slide-3.webp" alt="Slide 3">
             </div>
             <div class="slide fade" data-slide="4">
-                <img src="images/slide-4.webp" alt="Slide 4">
+                <img src="/images/slide-4.webp" alt="Slide 4">
             </div>
             <div class="slide fade" data-slide="5">
-                <img src="images/slide-5.webp" alt="Slide 5">
+                <img src="/images/slide-5.webp" alt="Slide 5">
             </div>
             <div class="slide fade" data-slide="6">
-                <img src="images/slide-6.webp" alt="Slide 6">
+                <img src="/images/slide-6.webp" alt="Slide 6">
             </div>
             <div class="slide fade" data-slide="7">
-                <img src="images/slide-7.webp" alt="Slide 7">
+                <img src="/images/slide-7.webp" alt="Slide 7">
             </div>
             <div class="slide fade" data-slide="8">
-                <img src="images/slide-8.webp" alt="Slide 8">
+                <img src="/images/slide-8.webp" alt="Slide 8">
             </div>
             <div class="slide fade" data-slide="9">
-                <img src="images/slide-9.webp" alt="Slide 9">
+                <img src="/images/slide-9.webp" alt="Slide 9">
             </div>
             <div class="slide fade" data-slide="10">
-                <img src="images/slide-10.webp" alt="Slide 10">
+                <img src="/images/slide-10.webp" alt="Slide 10">
             </div>
             <div class="slide fade" data-slide="11">
-                <img src="images/slide-11.webp" alt="Slide 11">
+                <img src="/images/slide-11.webp" alt="Slide 11">
             </div>
 
             <!-- Navigation Arrows -->
@@ -86,15 +89,6 @@
         </div>
     </section>
 
-    <div class="lang-selector">
-            <button id="ro-btn">🇷🇴 RO</button>
-            <button id="en-btn">🇬🇧 EN</button>
-    </div>
-
-    <div class="menu-selector">
-        <button onclick="arataSectiune('cabana')" id="btnCabana" data-i18n="nav_cabana">Cazare</button>
-    </div>
-
     <!-- Resume Draft Banner for Cabin -->
     <div id="resumeBannerCabana" class="resume-banner" style="display: none;">
         <p data-i18n="draft_exists_message">Ai o rezervare de cazare în curs de finalizare.</p>
@@ -102,7 +96,7 @@
             Rezervarea</button>
     </div>
 
-    <div id="sectiuneCabana" class="form-container cabin-container" style="display: none;">
+    <div id="sectiuneCabana" class="form-container cabin-container" style="display: flex;">
         <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în
             cabană.</p>
         <div id="notificationTodayCabana" class="notification notification-warning" style="display: flex;"
@@ -133,12 +127,6 @@
 
         <!-- STEP 1: Travel Information -->
         <div id="step1ContainerCabin" class="step-container">
-
-            <!-- Dynamic Price Display for Step 1 -->
-            <!-- <div id="priceDisplayStep1" class="cabin-price-display" style="display: none;">
-                <span class="price-label">Total Price:</span>
-                <span id="priceAmountStep1" class="price-amount-step">0 RON</span>
-            </div> -->
 
             <!-- Section A: Dates card -->
             <div class="cabin-dates-card">
@@ -213,12 +201,6 @@
         <div id="step2ContainerCabin" class="step-container" style="display:none;">
             <h3 class="cabin-card-title" data-i18n="cabin_extras_title">Choose Your Extras</h3>
 
-            <!-- Dynamic Price Display for Step 2
-            <div id="priceDisplayStep2" class="cabin-price-display">
-                <span class="price-label">Total Price:</span>
-                <span id="priceAmountStep2" class="price-amount-step">0 RON</span>
-            </div> -->
-
             <!-- Hot Tub Extra -->
             <div class="extra-item-card" id="hotTubCard">
                 <div class="extra-slideshow-panel" id="hotTubSlideshow">
@@ -240,10 +222,6 @@
                     <p class="extra-description">Unwind in our private outdoor hot tub overlooking the forest. Perfect
                         for romantic evenings or after a day of exploring the mountains. Available throughout your
                         entire stay.</p>
-                    <!-- <div class="extra-price-tag">
-                        <span class="price-amount">200 RON</span>
-                        <span class="price-unit">/ stay</span>
-                    </div> -->
                     <button id="hotTubToggle" class="extra-toggle-btn">+ Add Hot Tub</button>
                 </div>
             </div>
@@ -269,10 +247,6 @@
                     <p class="extra-description">Savor authentic local cuisine prepared by our in-house chef. Enjoy a
                         full breakfast and a three-course dinner using seasonal ingredients from our garden. A true
                         farm-to-table experience.</p>
-                    <!-- <div class="extra-price-tag">
-                        <span class="price-amount">70 RON</span>
-                        <span class="price-unit">/ person / night</span>
-                    </div> -->
                     <button id="mealToggle" class="extra-toggle-btn">+ Add Meal Plan</button>
                 </div>
             </div>
@@ -607,9 +581,7 @@
         </div>
     </div>
 
-    <script type="module" src="../js/vendor/flatpickr.min.js"></script>
-    <script type="module" src="../js/vendor/ro.js"></script>
-    <script type="module" src="../js/app.js"></script>
+    <script type="module" src="/js/app.js"></script>
 </body>
 
 </html>

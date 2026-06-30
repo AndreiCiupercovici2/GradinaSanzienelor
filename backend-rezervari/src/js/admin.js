@@ -24,7 +24,7 @@ async function schimbaStatus(id, tip, decizie) {
     if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decizie}?`)) return;
 
     try {
-        const response = await fetch(`${backendUrl}/admin/decizie`, {
+        const response = await fetch(`${backendUrl}/api/admin/decizie`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, tipRezervare: tip, decizie: decizie })
@@ -44,7 +44,7 @@ async function schimbaStatus(id, tip, decizie) {
 }
 
 async function incarcaRezervariMancare() {
-    const res = await fetch(`${backendUrl}/admin/mancare`);
+    const res = await fetch(`${backendUrl}/api/admin/mancare`);
     const rezervari = await res.json();
     const tabel = document.getElementById('tabelMancare');
     tabel.innerHTML = '';
@@ -62,7 +62,7 @@ async function incarcaRezervariMancare() {
 }
 
 async function incarcaRezervariCabana() {
-    const res = await fetch(`${backendUrl}/admin/cabana`);
+    const res = await fetch(`${backendUrl}/api/admin/cabana`);
     const rezervari = await res.json();
     const tabel = document.getElementById('tabelCabana');
     tabel.innerHTML = '';

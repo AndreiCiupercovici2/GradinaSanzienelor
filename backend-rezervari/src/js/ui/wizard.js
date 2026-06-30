@@ -2,6 +2,10 @@ import { WIZARD_STATE, APP_GLOBALS, backendUrl } from '../core/state.js';
 import { isToday, isAfter10Am, syncCabinOrMealFormToState } from '../utils/helpers.js';
 import { saveMealDraft, saveCabinDraft, submitCabinBooking, submitMealBooking } from '../api/api.js';
 
+import flatpickr from 'flatpickr';
+import { Romanian } from 'flatpickr/dist/l10n/ro.js';
+import 'flatpickr/dist/flatpickr.min.css';
+
 export async function handleCabinSubmission() {
     if (!validateCabinStep3()) return;
     syncCabinOrMealFormToState();
@@ -66,102 +70,74 @@ export function handleDepartureChange(dates) {
     }
 }
 
-// --- CORE WIZARD FUNCTIONS ---
-export function showSection(type) {
-    const mealEl = document.getElementById('mealSection');
-    const cabinEl = document.getElementById('cabinSection');
-    
-    if (mealEl) mealEl.style.display = type === 'meal' ? 'block' : 'none';
-    if (cabinEl) cabinEl.style.display = type === 'cabin' ? 'flex' : 'none';
+export async function showSection(type) {
+    const cabinEl = document.getElementById('sectiuneCabana');
+    const mealEl = document.getElementById('sectiuneMancare');
 
-    const mealBtn = document.getElementById('mealBtn');
-    const cabinBtn = document.getElementById('cabinBtn');
-    if (mealBtn) mealBtn.classList.toggle('active', type === 'meal');
-    if (cabinBtn) cabinBtn.classList.toggle('active', type === 'cabin');
-
-    const todayDisabled = isToday(new Date().toISOString().split('T')[0]) && isAfter10Am();
-    
-    if (type === 'meal') {
-        const notifMeal = document.getElementById('notificationTodayMeal');
-        if (notifMeal) notifMeal.style.display = todayDisabled ? 'block' : 'none';
-        const btnToday = document.getElementById('btnToday');
-        if (btnToday) {
-            btnToday.disabled = todayDisabled;
-            if (todayDisabled) {
-                btnToday.style.opacity = '0.5';
-                btnToday.style.cursor = 'not-allowed';
-            }
-        }
-    } else {
-        const notifCabin = document.getElementById('notificationTodayCabin');
-        if (notifCabin) notifCabin.style.display = todayDisabled ? 'block' : 'none';
+    if (cabinEl) {
+        cabinEl.style.display = 'flex';
+    }
+    if (mealEl) {
+        mealEl.style.display = 'flex';
     }
 
-    const commonSettings = {
-        dateFormat: "Y-m-d",
-        inline: true,
-        disableMobile: "true",
-        locale: APP_GLOBALS.currentLanguage === 'ro' ? flatpickr.l10ns.ro : 'en'
-    };
-
-    if (type === 'meal' && !APP_GLOBALS.calendarMealInstance) {
-        APP_GLOBALS.calendarMealInstance = flatpickr("#mealCalendar", {
-            ...commonSettings,
-            minDate: "today",
-            onChange: function (selectedDates, dateStr) {
-                if (selectedDates.length > 0) {
-                    document.getElementById('dataMStep1').value = dateStr;
-                    showMealStep(1);
-                }
-            }
-        });
-
-        const calendarWrapperMeal = document.querySelector('#mealSection .calendar-wrapper');
-        if (calendarWrapperMeal) calendarWrapperMeal.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    if (type === 'cabin' && !APP_GLOBALS.cabinArrivalFP) {
-        if (typeof flatpickr === 'undefined') {
-            console.error('CRITICAL: Flatpickr library is not loaded!');
+    if (type === 'sectiuneCabana') {
+        const arrivalInput = document.getElementById('cabinArrivalInput');
+        const departureInput = document.getElementById('cabinDepartureInput');
+        if (!arrivalInput || !departureInput) {
+            console.error('Elementele calendarului lipsesc din HTML!');
             return;
         }
 
-        const arrivalInput = document.getElementById('cabinArrivalInput');
-        const departureInput = document.getElementById('cabinDepartureInput');
+        if (!arrivalInput.dataset.fpBound) {
+            arrivalInput.dataset.fpBound = 'true';
+            arrivalInput.addEventListener('click', () => {
+                if (!APP_GLOBALS.cabinArrivalFP) {
+                    APP_GLOBALS.cabinArrivalFP = flatpickr(arrivalInput, {
+                        mode: 'single',
+                        minDate: 'today',
+                        dateFormat: "Y-m-d",
+                        locale: APP_GLOBALS.currentLanguage === 'ro' ? Romanian : 'en',
+                        onChange: handleArrivalChange
+                    });
+                    APP_GLOBALS.cabinArrivalFP.open();
+                }
+            });
+        }
 
-        APP_GLOBALS.cabinArrivalFP = flatpickr(arrivalInput, {
-            mode: 'single',
-            minDate: 'today',
-            disable: APP_GLOBALS.fullyBookedDates,
-            dateFormat: "Y-m-d",
-            locale: APP_GLOBALS.currentLanguage === 'ro' ? flatpickr.l10ns.ro : 'en',
-            focusInput: false,
-            allowInput: false,
-            clickOpens: true,
-            onChange: handleArrivalChange,
-            onOpen: (dates, dateStr, instance) => { instance.calendarContainer.style.zIndex = '99999'; }
-        });
-
-        APP_GLOBALS.cabinDepartureFP = flatpickr(departureInput, {
-            mode: 'single',
-            dateFormat: "Y-m-d",
-            locale: APP_GLOBALS.currentLanguage === 'ro' ? flatpickr.l10ns.ro : 'en',
-            focusInput: false,
-            allowInput: false,
-            clickOpens: true,
-            onChange: handleDepartureChange,
-            onOpen: (dates, dateStr, instance) => { instance.calendarContainer.style.zIndex = '99999'; }
-        });
-
-        const cabinDatesCard = document.querySelector('#cabinSection .cabin-dates-card');
-        if (cabinDatesCard) cabinDatesCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!departureInput.dataset.fpBound) {
+            departureInput.dataset.fpBound = 'true';
+            departureInput.addEventListener('click', () => {
+                if (!APP_GLOBALS.cabinDepartureFP) {
+                    APP_GLOBALS.cabinDepartureFP = flatpickr(departureInput, {
+                        mode: 'single',
+                        dateFormat: "Y-m-d",
+                        locale: APP_GLOBALS.currentLanguage === 'ro' ? Romanian : 'en',
+                        onChange: handleDepartureChange
+                    });
+                    APP_GLOBALS.cabinDepartureFP.open();
+                }
+            });
+        }
     }
 
-    // Scroll if already initialized
-    if (type === 'meal' && APP_GLOBALS.calendarMealInstance) {
-        document.querySelector('#mealSection .calendar-wrapper')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else if (type === 'cabin' && APP_GLOBALS.cabinArrivalFP) {
-        document.querySelector('#cabinSection .cabin-dates-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (type === 'sectiuneMancare') {
+        const arrivalInputMeal = document.getElementById('mealArrivalInput');
+        if (arrivalInputMeal && !arrivalInputMeal.dataset.fpBound) {
+            arrivalInputMeal.dataset.fpBound = 'true';
+            arrivalInputMeal.addEventListener('click', () => {
+                if (!APP_GLOBALS.calendarMealInstance) {
+                    APP_GLOBALS.calendarMealInstance = flatpickr(arrivalInputMeal, {
+                        mode: 'single',
+                        minDate: 'today',
+                        dateFormat: "Y-m-d",
+                        locale: APP_GLOBALS.currentLanguage === 'ro' ? Romanian : 'en',
+                        onChange: handleArrivalChange
+                    });
+                    APP_GLOBALS.calendarMealInstance.open();
+                }
+            });
+        }
     }
 }
 
@@ -177,7 +153,7 @@ export function showMealStep(stepNumber) {
             if (i === stepNumber) stepIndicator.classList.add('active');
         }
     });
-    document.getElementById('mealSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('sectiuneMancare')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function showCabinStep(stepNumber) {
@@ -192,7 +168,7 @@ export function showCabinStep(stepNumber) {
             if (i === stepNumber) stepIndicator.classList.add('active');
         }
     });
-    document.getElementById('cabinSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('sectiuneCabana')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Validation 
@@ -289,7 +265,7 @@ export function updateAdultsOptions(rooms) {
 // Submissions
 
 
-export async function submitCabinBooking() {
+export async function processCabinBooking() {
     const prefix = document.getElementById('cabinPhonePrefix')?.value || '';
     const phone = prefix + document.getElementById('cabinPhone').value.trim();
     const payload = {
@@ -311,13 +287,13 @@ export async function submitCabinBooking() {
     };
 
     try {
-        const res = await fetch(`${backendUrl}/rezervari_cabana`, {
+        const res = await fetch(`${backendUrl}/api/cabinReservations`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         if (res.ok) {
             WIZARD_STATE.cabinFormDirty = false;
             if (WIZARD_STATE.cabinDraftId) {
-                await fetch(`${backendUrl}/reservations/draft/${WIZARD_STATE.cabinDraftId}`, { method: 'DELETE' });
+                await fetch(`${backendUrl}/api/reservations/draft/${WIZARD_STATE.cabinDraftId}`, { method: 'DELETE' });
             }
             showCabinStep(4);
         } else {
@@ -381,7 +357,7 @@ export function initWizardEventListeners() {
     document.getElementById('sendBookingBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!validateCabinStep3()) return;
-        await submitCabinBooking();
+        await processCabinBooking();
     });
     
     // Listeners for triggers

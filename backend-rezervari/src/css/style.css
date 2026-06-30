@@ -10,7 +10,6 @@ body {
 /* Content wrapper for non-hero sections */
 body > .lang-selector,
 body > h1,
-body > .menu-selector,
 body > .form-container,
 body > .resume-banner {
     max-width: 600px;
@@ -244,40 +243,6 @@ h2 {
     cursor: pointer;
 }
 
-/* --- Selector Secțiuni (Meniu Principal Minimal) --- */
-.menu-selector {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 35px;
-}
-
-.menu-selector button {
-    background-color: #6c757d; /* Gri neutru pentru butonul neactiv */
-    color: white;
-    flex: 1;
-    padding: 14px;
-    font-size: 16px;
-    border-radius: 6px;
-    transition: background-color 0.2s, transform 0.1s;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.menu-selector button:hover {
-    background-color: #5a6268;
-}
-
-/* Stil pentru butonul selectat activ */
-.menu-selector button.active {
-    background-color: #007bff; /* Albastru pentru evidențiere */
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-}
-
-.menu-selector button.active:hover {
-    background-color: #0069d9;
-}
-
 /* --- Containere și Formulare --- */
 .form-container {
     background: white;
@@ -352,6 +317,8 @@ h2 {
 }
 
 .notification {
+    display: flex;
+    justify-content: center;
     padding: 12px 15px;
     border-radius: 4px;
     font-size: 14px;
@@ -359,9 +326,12 @@ h2 {
     width: 100%;
     max-width: 500px;
     box-sizing: border-box;
+    text-align: center;
 }
 
 .notification-warning {
+    display: flex;
+    justify-content: center;
     background-color: #fff3cd;
     border: 1px solid #ffc107;
     border-left: 5px solid #ffc107;
@@ -370,7 +340,7 @@ h2 {
     max-width: 100%;
     box-sizing: border-box;
     margin: 0 0 15px 0;
-    text-align: center;
+    text-align: center !important;
     padding: 12px 20px;
 }
 
@@ -498,6 +468,19 @@ input#calendarCabana {
     display: none !important;
 }
 
+.logo {
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+}
+.logo-container {
+    display: flex;
+    justify-content: flex-start;
+    max-width: 100px;
+    max-height: 100px;
+}
+
 /* --- Responsive Design --- */
 @media (max-width: 600px) {
     body {
@@ -532,17 +515,6 @@ input#calendarCabana {
     .notification {
         font-size: 13px;
         padding: 10px 12px;
-    }
-
-    .menu-selector {
-        gap: 10px;
-        margin-bottom: 25px;
-        padding: 0 10px;
-    }
-
-    .menu-selector button {
-        padding: 12px;
-        font-size: 14px;
     }
 
     .section-description {
