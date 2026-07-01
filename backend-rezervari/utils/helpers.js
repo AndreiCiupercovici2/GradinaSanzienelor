@@ -26,7 +26,6 @@ const messages = {
         data_error: 'Eroare la preluarea datelor.',
         update_success: (decision) => `Rezervare ${decision} cu succes.`,
         invalid_adults: 'Adulți trebuie să fie cel puțin 1.',
-        invalid_infants: 'Copii nu pot fi negativi.',
         invalid_pets: 'Animale de companie nu pot fi negative.',
         invalid_rooms: 'Camere necesare trebuie să fie între 1 și 3.',
         invalid_meal_max_persons: 'Maxim 15 persoane permise pentru mese.',
@@ -59,7 +58,6 @@ const messages = {
         data_error: 'Error retrieving data.',
         update_success: (decision) => `Reservation ${decision} successfully.`,
         invalid_adults: 'Adults must be at least 1.',
-        invalid_infants: 'Infants cannot be negative.',
         invalid_pets: 'Pets cannot be negative.',
         invalid_rooms: 'Rooms needed must be between 1 and 3.',
         invalid_meal_max_persons: 'Maximum 15 people allowed for meals.',
@@ -208,13 +206,6 @@ const validateReservationInput = (data, lang, isFood = false) => {
         if (adults < 1) errors.push(t('invalid_adults', lang));
     }
 
-    const infants = parseInt(data.infants, 10) || 0;
-    if (!isValidInteger(data.infants) && data.infants !== undefined && data.infants !== null && data.infants !== '') {
-        errors.push(t('invalid_integer', lang));
-    } else if (infants < 0) {
-        errors.push(t('invalid_infants', lang));
-    }
-
     const pets = parseInt(data.pets, 10) || 0;
     if (!isValidInteger(data.pets) && data.pets !== undefined && data.pets !== null && data.pets !== '') {
         errors.push(t('invalid_integer', lang));
@@ -227,11 +218,6 @@ const validateReservationInput = (data, lang, isFood = false) => {
             errors.push(t('invalid_reservation_date', lang));
         } else if (!isDateNotInPast(data.reservation_date)) {
             errors.push(t('invalid_date_past', lang));
-        }
-
-        const totalPeople = (parseInt(data.adults, 10) || 0) + (parseInt(data.infants, 10) || 0);
-        if (totalPeople > MAX_MEAL_CAPACITY) {
-            errors.push(t('invalid_meal_max_persons', lang));
         }
 
         if (isToday(data.reservation_date) && isAfter10Am()) {

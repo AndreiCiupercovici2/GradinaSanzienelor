@@ -31,7 +31,6 @@ const AccomodationController = {
         const start_date = bodyData.start_date;
         const end_date = bodyData.end_date;
         const adults = bodyData.adults;
-        const infants = bodyData.infants || 0;
         const pets = bodyData.pets || 0;
         const rooms_needed = bodyData.rooms_needed;
         const wants_meal = bodyData.wants_meal;
@@ -51,10 +50,6 @@ const AccomodationController = {
         }
 
         if (!isValidInteger(adults)) {
-            return res.status(400).json({ errors: t('invalid_integer', lang) });
-        }
-
-        if (!isValidInteger(infants) && infants !== undefined && infants !== null && infants !== '') {
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
@@ -86,7 +81,6 @@ const AccomodationController = {
             start_date: start_date,
             end_date: end_date,
             adults: parseInt(adults, 10),
-            infants: parseInt(infants, 10) || 0,
             pets: parseInt(pets, 10) || 0,
             rooms_needed: parseInt(rooms_needed, 10),
             wants_meal: wants_meal ? true : false,
@@ -104,7 +98,7 @@ const AccomodationController = {
         const sanitizedFirstName = sanitizeName(first_name);
         const sanitizedLastName = sanitizeName(last_name);
 
-        const totalGuests = mappedData.adults + mappedData.infants;
+        const totalGuests = mappedData.adults;
         if (totalGuests < MIN_CABIN_CAPACITY || totalGuests > MAX_CABIN_CAPACITY) {
             return res.status(400).json({ errors: t('invalid_persons_count', lang) });
         }
@@ -123,7 +117,6 @@ const AccomodationController = {
                 start_date: start_date,
                 end_date: end_date,
                 adults: mappedData.adults,
-                infants: mappedData.infants,
                 pets: mappedData.pets,
                 rooms_needed: mappedData.rooms_needed,
                 wants_meal: mappedData.wants_meal ? 1 : 0,

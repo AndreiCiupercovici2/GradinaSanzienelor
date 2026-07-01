@@ -4,7 +4,7 @@ const mealModel = {
     checkAvailability: async (date) => {
         return new Promise((resolve, reject) => {
             const sql = `
-            SELECT COALESCE(SUM(adults + COALESCE(infants, 0)), 0) as total_guests
+            SELECT adults
             FROM meal_reservations
             WHERE status = 'confirmed'
             AND reservation_date = ?`;
@@ -13,7 +13,7 @@ const mealModel = {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row ? row.total_guests || 0 : 0);
+                    resolve(row ? row.adults : 0);
                 }
             });
         });
@@ -23,7 +23,7 @@ const mealModel = {
         return new Promise((resolve, reject) => {
             const sqlInsert = `
             INSERT INTO meal_reservations
-            (first_name, last_name, email, phone, reservation_date, adults, infants, pets, wants_cabin, newsletter, created_at, updated_at)
+            (first_name, last_name, email, phone, reservation_date, adults, pets, wants_cabin, newsletter, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
@@ -33,7 +33,6 @@ const mealModel = {
                 reservationData.phone,
                 reservationData.reservation_date,
                 reservationData.adults,
-                reservationData.infants || 0,
                 reservationData.pets || 0,
                 reservationData.wants_cabin ? 1 : 0,
                 reservationData.newsletter ? 1 : 0,
@@ -54,7 +53,7 @@ const mealModel = {
     getReservedDates: async () => {
         return new Promise((resolve, reject) => {
             const sql = `
-            SELECT reservation_date, adults, infants, pets
+            SELECT reservation_date, adults, pets
             FROM meal_reservations
             WHERE status = 'confirmed'`;
 

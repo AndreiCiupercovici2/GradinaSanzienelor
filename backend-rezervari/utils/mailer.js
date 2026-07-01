@@ -15,14 +15,12 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
         let emailContent = `Ai o rezervare nouă pentru: ${reservationType}\n\n`;
 
         const adults = parseInt(reservationDetails.adults) || 1;
-        const infants = parseInt(reservationDetails.infants) || 0;
         const pets = parseInt(reservationDetails.pets) || 0;
-        const totalPeople = adults + infants;
 
         emailContent += `\nCompunerea grupului:\n`;
         emailContent += `- Adulți: ${adults}\n`;
         emailContent += `- Animale de companie: ${pets}\n`;
-        emailContent += `Persoane total: ${totalPeople}\n`;
+        emailContent += `Persoane total: ${adults}\n`;
 
         if (reservationType === 'cabin') {
             emailContent += `\nData început: ${reservationDetails.start_date}\n`;

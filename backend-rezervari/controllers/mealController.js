@@ -27,7 +27,6 @@ const MealController = {
         const phone = bodyData.phone;
         const reservation_date = bodyData.reservation_date;
         const adults = bodyData.adults;
-        const infants = bodyData.infants || 0;
         const pets = bodyData.pets || 0;
         const newsletter = bodyData.newsletter;
 
@@ -47,10 +46,6 @@ const MealController = {
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
-        if (!isValidInteger(infants) && infants !== undefined && infants !== null && infants !== '') {
-            return res.status(400).json({ errors: t('invalid_integer', lang) });
-        }
-
         if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
@@ -66,7 +61,6 @@ const MealController = {
             phone: phone,
             reservation_date: reservation_date,
             adults: parseInt(adults, 10),
-            infants: parseInt(infants, 10) || 0,
             pets: parseInt(pets, 10) || 0,
             wants_cabin: false,
             newsletter: newsletter ? true : false,
@@ -82,7 +76,7 @@ const MealController = {
         const sanitizedFirstName = sanitizeName(first_name);
         const sanitizedLastName = sanitizeName(last_name);
 
-        const totalGuests = mappedData.adults + mappedData.infants;
+        const totalGuests = mappedData.adults;
         if (totalGuests < 1 || totalGuests > MAX_MEAL_CAPACITY) {
             return res.status(400).json({ errors: t('invalid_meal_max_persons', lang) });
         }
@@ -100,7 +94,6 @@ const MealController = {
                 phone: sanitizeText(phone),
                 reservation_date: reservation_date,
                 adults: mappedData.adults,
-                infants: mappedData.infants,
                 pets: mappedData.pets,
                 wants_cabin: 0,
                 newsletter: mappedData.newsletter ? 1 : 0,

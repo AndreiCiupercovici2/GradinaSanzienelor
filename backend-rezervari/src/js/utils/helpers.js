@@ -38,7 +38,3 @@ export function getLocaleConfig() {
     }
     return { locale: 'en' };
 }
-
-export function calculateTotalPeople(adults, infants) {
-    return (parseInt(adults) || 0) + (parseInt(infants) || 0);
-}

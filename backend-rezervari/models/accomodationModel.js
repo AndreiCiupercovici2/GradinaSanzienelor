@@ -4,14 +4,14 @@ const accomodationModel = {
     checkAvailability: (startDate, endDate) => {
         return new Promise((resolve, reject) => {
             const sql = `
-                SELECT COALESCE(SUM(adults + COALESCE(infants, 0)), 0) as total_guests
+                SELECT adults
                 FROM cabin_reservations
                 WHERE status = 'confirmed'
                 AND NOT (end_date <= ? OR start_date >= ?)`;
 
             db.get(sql, [startDate, endDate], (err, row) => {
                 if (err) reject(err);
-                else resolve(row ? (row.total_guests || 0) : 0);
+                else resolve(row ? row.adults : 0);
             });
         });
     },
@@ -21,8 +21,8 @@ const accomodationModel = {
             const sql = `
                 INSERT INTO cabin_reservations (
                     first_name, last_name, email, phone, start_date, end_date,
-                    adults, infants, pets, rooms_needed, wants_meal, wants_hottub, newsletter, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    adults, pets, rooms_needed, wants_meal, wants_hottub, newsletter, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 data.first_name,
@@ -32,7 +32,6 @@ const accomodationModel = {
                 data.start_date,
                 data.end_date,
                 data.adults,
-                data.infants || 0,
                 data.pets || 0,
                 data.rooms_needed,
                 data.wants_meal ? 1 : 0,
@@ -52,7 +51,7 @@ const accomodationModel = {
     getAvailability: () => {
         return new Promise((resolve, reject) => {
             const sql = `
-                SELECT start_date, end_date, adults, infants, pets
+                SELECT start_date, end_date, adults, pets
                 FROM cabin_reservations
                 WHERE status = 'confirmed'`;
 

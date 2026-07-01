@@ -3,7 +3,7 @@ const backendUrl = '/api';
 // Format a UTC registration date for display
 function formatDate(dateUTC) {
     if (!dateUTC) return '-';
-    return new Date(dateUTC + 'Z').toLocaleString('ro-RO');
+    return new Date(dateUTC).toLocaleString('ro-RO');
 }
 
 // Build approve / reject buttons when status is 'pending'
@@ -108,7 +108,7 @@ async function loadCabinReservations() {
         reservations.forEach(rez => {
             table.innerHTML += `
                 <tr>
-                    <td style="color:#888; font-size:12px;">${formatDate(rez.CREATED_AT)}</td>
+                    <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
                     <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
                     <td>${rez.start_date} - ${rez.end_date}</td>
                     <td>${rez.adults} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
