@@ -1,5 +1,5 @@
 // --- SLIDESHOW FUNCTIONALITY ---
-let currentSlide = 1;
+let currentSlide = parseInt(localStorage.getItem('currentSlide')) || 1;
 let slideShowInterval = null;
 const SLIDESHOW_INTERVAL = 7000; // 7 seconds
 const TOTAL_SLIDES = 11;
@@ -24,6 +24,8 @@ function showSlide(n) {
 
     if (currentSlideElement) currentSlideElement.classList.add('active');
     if (currentDot) currentDot.classList.add('active');
+
+    localStorage.setItem('currentSlide', currentSlide);
 }
 
 function nextSlide() {
