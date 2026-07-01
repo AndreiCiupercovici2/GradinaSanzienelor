@@ -14,6 +14,7 @@ export default defineConfig({
         contact: resolve(__dirname, 'src/Pages/contact.html'),
         punctGastronomic: resolve(__dirname, 'src/Pages/punctGastronomic.html'),
         meal: resolve(__dirname, 'src/Pages/meal.html'),
+        admin: resolve(__dirname, 'src/Pages/admin.html')
       }
     }
   },
@@ -32,6 +33,8 @@ export default defineConfig({
             req.url = '/Pages/punctGastronomic.html';
           } else if (req.url === '/') {
             req.url = '/index.html'; 
+          } else if (req.url === '/admin') {
+            req.url = '/Pages/admin.html';
           }
           next();
         });

@@ -1,35 +1,112 @@
 const db = require('../db');
 
-/**
- * Migrate database schema to allow NULL values for email and phone in reservation_drafts table
- * This fixes the issue where anonymous drafts (without email/phone) fail to save
- */
+function initializeTables() {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run(`
+                CREATE TABLE IF NOT EXISTS cabin_reservations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL,
+                    start_date TEXT NOT NULL,
+                    end_date TEXT NOT NULL,
+                    adults INTEGER NOT NULL,
+                    pets INTEGER,
+                    rooms_needed INTEGER,
+                    wants_meal INTEGER DEFAULT 0,
+                    wants_hottub INTEGER DEFAULT 0,
+                    newsletter INTEGER DEFAULT 0,
+                    status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `, (err) => {
+                if (err) return reject(err);
+            });
+
+            db.run(`
+                CREATE TABLE IF NOT EXISTS meal_reservations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL,
+                    reservation_date TEXT NOT NULL,
+                    adults INTEGER NOT NULL,
+                    wants_cabin INTEGER DEFAULT 0,
+                    newsletter INTEGER DEFAULT 0,
+                    status TEXT DEFAULT 'pending',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `, (err) => {
+                if (err) return reject(err);
+            });
+
+            db.run(`
+                CREATE TABLE IF NOT EXISTS reservation_drafts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reservation_type TEXT NOT NULL,
+                    email TEXT,
+                    phone TEXT,
+                    current_step INTEGER NOT NULL DEFAULT 1,
+                    form_data TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP NOT NULL
+                )
+            `, (err) => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+    });
+}
+
 function migrateReservationDraftsSchema() {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
-            // Check if email column is NOT NULL
-            db.all("PRAGMA table_info(reservation_drafts)", (err, rows) => {
+            db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='reservation_drafts'", (err, row) => {
                 if (err) {
                     return reject(err);
                 }
 
-                const emailColumn = rows.find(col => col.name === 'email');
-                const phoneColumn = rows.find(col => col.name === 'phone');
-
-                // If both email and phone already allow NULL, no migration needed
-                if (emailColumn && !emailColumn.notnull && phoneColumn && !phoneColumn.notnull) {
-                    console.log('Database schema is already correct - email and phone allow NULL values');
-                    return resolve();
+                if (!row) {
+                    return db.run(`
+                        CREATE TABLE reservation_drafts (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            reservation_type TEXT NOT NULL,
+                            email TEXT,
+                            phone TEXT,
+                            current_step INTEGER NOT NULL DEFAULT 1,
+                            form_data TEXT NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            expires_at TIMESTAMP NOT NULL
+                        )
+                    `, (err) => {
+                        if (err) return reject(err);
+                        resolve();
+                    });
                 }
 
-                console.log('Migrating reservation_drafts table to allow NULL email and phone...');
+                db.all("PRAGMA table_info(reservation_drafts)", (err, rows) => {
+                    if (err) {
+                        return reject(err);
+                    }
 
-                // SQLite doesn't support direct ALTER COLUMN, so we need to recreate the table
-                db.run('BEGIN TRANSACTION', (err) => {
-                    if (err) return reject(err);
+                    const emailColumn = rows.find(col => col.name === 'email');
+                    const phoneColumn = rows.find(col => col.name === 'phone');
 
-                    // Create new table with correct schema
-                    db.run(`
+                    if (emailColumn && !emailColumn.notnull && phoneColumn && !phoneColumn.notnull) {
+                        return resolve();
+                    }
+
+                    db.run('BEGIN TRANSACTION', (err) => {
+                        if (err) return reject(err);
+                        db.run(`
                         CREATE TABLE reservation_drafts_new (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             reservation_type TEXT NOT NULL,
@@ -42,37 +119,32 @@ function migrateReservationDraftsSchema() {
                             expires_at TIMESTAMP NOT NULL
                         )
                     `, (err) => {
-                        if (err) {
-                            return db.run('ROLLBACK', () => reject(err));
-                        }
-
-                        // Copy data from old table to new table
-                        db.run(`
+                            if (err) {
+                                return db.run('ROLLBACK', () => reject(err));
+                            }
+                            db.run(`
                             INSERT INTO reservation_drafts_new
                             (id, reservation_type, email, phone, current_step, form_data, created_at, updated_at, expires_at)
                             SELECT id, reservation_type, email, phone, current_step, form_data, created_at, updated_at, expires_at
                             FROM reservation_drafts
                         `, (err) => {
-                            if (err) {
-                                return db.run('ROLLBACK', () => reject(err));
-                            }
-
-                            // Drop old table
-                            db.run('DROP TABLE reservation_drafts', (err) => {
                                 if (err) {
                                     return db.run('ROLLBACK', () => reject(err));
                                 }
-
-                                // Rename new table
-                                db.run('ALTER TABLE reservation_drafts_new RENAME TO reservation_drafts', (err) => {
+                                db.run('DROP TABLE reservation_drafts', (err) => {
                                     if (err) {
                                         return db.run('ROLLBACK', () => reject(err));
                                     }
+                                    db.run('ALTER TABLE reservation_drafts_new RENAME TO reservation_drafts', (err) => {
+                                        if (err) {
+                                            return db.run('ROLLBACK', () => reject(err));
+                                        }
 
-                                    db.run('COMMIT', (err) => {
-                                        if (err) return reject(err);
-                                        console.log('Database migration completed successfully');
-                                        resolve();
+                                        db.run('COMMIT', (err) => {
+                                            if (err) return reject(err);
+                                            console.log('Database migration completed successfully');
+                                            resolve();
+                                        });
                                     });
                                 });
                             });
@@ -84,4 +156,4 @@ function migrateReservationDraftsSchema() {
     });
 }
 
-module.exports = { migrateReservationDraftsSchema };
+module.exports = { initializeTables, migrateReservationDraftsSchema };

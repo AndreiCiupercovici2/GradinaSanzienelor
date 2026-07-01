@@ -36,7 +36,34 @@ export async function handleCabinSubmission() {
 }
 
 export async function handleMealSubmission() {
+    const prefix = document.getElementById('mealPhonePrefix')?.value || '';
+    const phone = prefix + document.getElementById('mealPhone').value.trim();
+    const payload = {
+        first_name: document.getElementById('mealFirstName').value.trim(),
+        last_name: document.getElementById('mealLastName').value.trim(),
+        email: document.getElementById('mealEmail').value.trim(),
+        phone: phone,
+        reservation_date: document.getElementById('mealArrivalInput').value,
+        adults: parseInt(document.getElementById('mealAdultsInput').value) || 1,
+        wants_cabin: WIZARD_STATE.mealExtras?.cabin || false,
+        pets: document.getElementById('mealPetsInput').value || ''
+    };
 
+    try {
+        const res = await fetch(`${backendUrl}/api/meal_reservations`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            WIZARD_STATE.mealFormDirty = false;
+            if (WIZARD_STATE.mealDraftId) {
+                await fetch(`${backendUrl}/api/reservations/draft/${WIZARD_STATE.mealDraftId}`, { method: 'DELETE' });
+            }
+            showMealStep(4);
+        } else {
+            const data = await res.json();
+            alert('Error: ' + (data.error || 'Something went wrong.'));
+        }
+    } catch (err) { alert('Cannot reach the server. Please try again.'); }
 }
 
 export function handleArrivalChange(dates) {
@@ -171,19 +198,35 @@ export function showCabinStep(stepNumber) {
 }
 
 export function validateMealStep1() {
-    if (!document.getElementById('mealArrivalInput')?.value && !document.getElementById('dateMStep1')?.value) {
+    if (!document.getElementById('mealArrivalInput')?.value) {
         alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.');
         return false;
     }
     return true;
 }
 
-export function validateMealStep2() {
+export function validateMealStep3() {
+    const firstName = document.getElementById('mealFirstName')?.value.trim();
+    const lastName = document.getElementById('mealLastName')?.value.trim();
+    const email = document.getElementById('mealEmail')?.value.trim();
+    const phone = document.getElementById('mealPhone')?.value.trim();
+    if (!firstName || !lastName || !email) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
+        return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        return false;
+    }
+    if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
+        return false;
+    }
     return true;
 }
 
 export function validateCabinStep1() {
-    if (!document.getElementById('cabinArrivalInput').value || !document.getElementById('cabinDepartureInput').value) {
+    if (!document.getElementById('cabinArrivalInput')?.value || !document.getElementById('cabinDepartureInput')?.value) {
         alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please select arrival and departure dates.' : 'Vă rugăm selectați datele de sosire și plecare.');
         return false;
     }
@@ -195,15 +238,40 @@ export function validateCabinStep1() {
 }
 
 export function validateCabinStep3() {
-    const firstName = document.getElementById('cabinFirstName').value.trim();
-    const lastName = document.getElementById('cabinLastName').value.trim();
-    const email = document.getElementById('cabinEmail').value.trim();
+    const firstName = document.getElementById('cabinFirstName')?.value.trim();
+    const lastName = document.getElementById('cabinLastName')?.value.trim();
+    const email = document.getElementById('cabinEmail')?.value.trim();
+    const phone = document.getElementById('cabinPhone')?.value.trim();
     if (!firstName || !lastName || !email) {
         alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
         return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        return false;
+    }
+    if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
+        return false;
+    }
+    return true;
+}
+
+export function validateMealStep2() {
+    const firstName = document.getElementById('mealFirstName')?.value.trim();
+    const lastName = document.getElementById('mealLastName')?.value.trim();
+    const email = document.getElementById('mealEmail')?.value.trim();
+    const phone = document.getElementById('mealPhone')?.value.trim();
+    if (!firstName || !lastName || !email) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
+        return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        return false;
+    }
+    if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
+        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
         return false;
     }
     return true;
@@ -263,6 +331,54 @@ export function updateAdultsOptions(rooms) {
     select.value = Math.min(current, max);
 }
 
+export function updateRoomsOptions(adults) {
+    const select = document.getElementById('cabinRoomsSelect');
+    if (!select) return;
+    const maxRooms = Math.min(3, Math.ceil(adults / 1));
+    const current = parseInt(select.value) || 1;
+    select.innerHTML = '';
+    for (let i = 1; i <= maxRooms; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        select.appendChild(opt);
+    }
+    select.value = Math.min(current, maxRooms);
+}
+
+export function toggleMealExtras() {
+    const mealExtras = document.getElementById('mealToggle');
+    if (mealExtras) {
+        const isVisible = mealExtras.style.display === 'block';
+        mealExtras.style.display = isVisible ? 'none' : 'block';
+        WIZARD_STATE.cabinExtras.meal = !isVisible;
+    }
+}
+
+export function toggleHotTubExtras() {
+    const hotTubExtras = document.getElementById('hotTubToggle');
+    if (hotTubExtras) {
+        const isVisible = hotTubExtras.style.display === 'block';
+        hotTubExtras.style.display = isVisible ? 'none' : 'block';
+        WIZARD_STATE.cabinExtras.hotTub = !isVisible;
+    }
+}
+
+export function toggleCabinExtras() {
+    const extrasSection = document.getElementById('cabinToggle');
+    if (extrasSection) {
+        const isVisible = extrasSection.style.display === 'block';
+        extrasSection.style.display = isVisible ? 'none' : 'block';
+    }
+}
+
+export function toggleNewsletter() {
+    const newsletterCheckbox = document.getElementById('newsletter');
+    if (newsletterCheckbox) {
+        WIZARD_STATE.cabinFormData.newsletter = newsletterCheckbox.checked;
+    }
+}
+
 export async function processCabinBooking() {
     const prefix = document.getElementById('cabinPhonePrefix')?.value || '';
     const phone = prefix + document.getElementById('cabinPhone').value.trim();
@@ -305,6 +421,7 @@ export function resetCabinForm() {
     APP_GLOBALS.cabinNights = 1;
 
     updateAdultsOptions(1);
+    updateRoomsOptions(1);
     updateNightsDisplay();
     updateCabinSummary();
 }
@@ -320,15 +437,27 @@ export async function loadAndRestoreMealDraft(email, phone) {
         const draft = data.draft;
         const formData = draft.form_data;
 
-        if (formData.reservation_date) document.getElementById('dateMStep1').value = formData.reservation_date;
-        if (formData.time) document.getElementById('timeMStep1').value = formData.time;
-        if (formData.adults !== undefined) document.getElementById('adultsMStep1').value = formData.adults;
-        if (formData.infants !== undefined) document.getElementById('childrenMStep1').value = formData.infants;
-        if (formData.pets !== undefined) document.getElementById('petsMStep1').value = formData.pets;
+        if (formData.reservation_date) document.getElementById('mealArrivalInput').value = formData.reservation_date;
+        if (formData.adults !== undefined) document.getElementById('mealAdultsInput').value = formData.adults;
+        if (formData.pets !== undefined) document.getElementById('mealPetsInput').value = formData.pets;
 
-        if (formData.name) document.getElementById('nameMStep2').value = formData.name;
-        if (formData.email) document.getElementById('emailMStep2').value = formData.email;
-        if (formData.phone) document.getElementById('phoneMStep2').value = formData.phone;
+        if (formData.first_name) document.getElementById('mealFirstName').value = formData.first_name;
+        if (formData.last_name) document.getElementById('mealLastName').value = formData.last_name;
+        if (formData.email) document.getElementById('mealEmail').value = formData.email;
+
+        if (formData.phone) {
+            const storedPhone = formData.phone;
+            if (storedPhone.startsWith('+40')) {
+                document.getElementById('mealPhonePrefix').value = '+40';
+                document.getElementById('mealPhone').value = storedPhone.slice(3);
+            } else if (storedPhone.startsWith('+')) {
+                const prefixEnd = storedPhone.indexOf('-') > -1 ? storedPhone.indexOf('-') : 3;
+                document.getElementById('mealPhonePrefix').value = storedPhone.slice(0, prefixEnd);
+                document.getElementById('mealPhone').value = storedPhone.slice(prefixEnd);
+            }
+        }
+
+        if (formData.wants_cabin !== undefined) WIZARD_STATE.mealExtras.cabin = formData.wants_cabin;
 
         WIZARD_STATE.mealDraftId = draft.id;
 
@@ -407,6 +536,7 @@ export function initWizardEventListeners() {
         }
     });
 
+    // ===== CABIN-SPECIFIC EVENT LISTENERS =====
     document.getElementById('nightsDecBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
         if (APP_GLOBALS.cabinNights > 1) {
@@ -421,7 +551,9 @@ export function initWizardEventListeners() {
         updateNightsDisplay();
     });
 
-    document.getElementById('continueToExtrasBtn')?.addEventListener('click', function (e) {
+    // Step 1 to Step 2: Cabin workflow
+    const cabinContinueBtn = document.querySelector('#step1ContainerCabin #continueToExtrasBtn');
+    cabinContinueBtn?.addEventListener('click', function (e) {
         e.preventDefault();
         if (validateCabinStep1()) {
             WIZARD_STATE.cabinFormDirty = true;
@@ -430,77 +562,119 @@ export function initWizardEventListeners() {
         }
     });
 
-    document.getElementById('continueToPersonalBtn')?.addEventListener('click', function (e) {
+    // Step 2 to Step 3: Cabin workflow
+    const cabinPersonalBtn = document.querySelector('#step2ContainerCabin #continueToPersonalBtn');
+    cabinPersonalBtn?.addEventListener('click', function (e) {
         e.preventDefault();
         updateCabinSummary();
         saveCabinDraft(2);
         showCabinStep(3);
     });
 
-    document.getElementById('sendBookingBtn')?.addEventListener('click', async (e) => {
+    // Back to Step 1: Cabin workflow
+    const cabinBackBtn = document.querySelector('#step2ContainerCabin #backToTravelBtn');
+    cabinBackBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showCabinStep(1);
+    });
+
+    // Back to Step 2: Cabin workflow
+    const cabinBackExtrasBtn = document.querySelector('#step3ContainerCabin #backToExtrasBtn');
+    cabinBackExtrasBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showCabinStep(2);
+    });
+
+    // Submit Cabin Booking (Step 3 to Step 4)
+    const cabinSendBtn = document.querySelector('#step3ContainerCabin #sendBookingBtn');
+    cabinSendBtn?.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!validateCabinStep3()) return;
         await processCabinBooking();
     });
 
+    // Cabin Extras Toggles
+    document.getElementById('hotTubToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isAdded = WIZARD_STATE.cabinExtras.hotTub;
+        WIZARD_STATE.cabinExtras.hotTub = !isAdded;
+        this.textContent = !isAdded ? '- Remove Hot Tub' : '+ Add Hot Tub';
+    });
+
+    document.getElementById('mealToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isAdded = WIZARD_STATE.cabinExtras.meal;
+        WIZARD_STATE.cabinExtras.meal = !isAdded;
+        this.textContent = !isAdded ? '- Remove Meal Plan' : '+ Add Meal Plan';
+    });
+
+    // ===== MEAL-SPECIFIC EVENT LISTENERS =====
+
+    // Step 1 to Step 2: Meal workflow
+    const mealContinueBtn = document.querySelector('#step1ContainerMeal #continueToExtrasBtn');
+    mealContinueBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (validateMealStep1()) {
+            WIZARD_STATE.mealFormDirty = true;
+            saveMealDraft(1);
+            showMealStep(2);
+        }
+    });
+
+    // Step 2 to Step 3: Meal workflow
+    const mealPersonalBtn = document.querySelector('#step2ContainerMeal #continueToPersonalBtn');
+    mealPersonalBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        saveMealDraft(2);
+        showMealStep(3);
+    });
+
+    // Back to Step 1: Meal workflow
+    const mealBackBtn = document.querySelector('#step2ContainerMeal #backToTravelBtn');
+    mealBackBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showMealStep(1);
+    });
+
+    // Back to Step 2: Meal workflow
+    const mealBackExtrasBtn = document.querySelector('#step3ContainerMeal #backToExtrasBtn');
+    mealBackExtrasBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showMealStep(2);
+    });
+
+    // Submit Meal Booking (Step 3 to Step 4)
+    const mealSendBtn = document.querySelector('#step3ContainerMeal #sendBookingBtn');
+    mealSendBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!validateMealStep2()) return;
+        await handleMealSubmission();
+    });
+
+    // Meal Extras Toggle
+    document.getElementById('cabinToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isMealSection = document.getElementById('mealSection');
+        if (isMealSection) {
+            const isAdded = WIZARD_STATE.mealExtras?.cabin || false;
+            WIZARD_STATE.mealExtras = { cabin: !isAdded };
+            this.textContent = !isAdded ? '- Remove Cabin' : '+ Add Cabin';
+        }
+    });
+
+    // ===== SHARED CALENDAR EVENT LISTENERS =====
     document.addEventListener('click', function (e) {
         if (e.target.id === 'cabinArrivalInput' && APP_GLOBALS.cabinArrivalFP) APP_GLOBALS.cabinArrivalFP.open();
         if (e.target.id === 'cabinDepartureInput' && APP_GLOBALS.cabinDepartureFP) APP_GLOBALS.cabinDepartureFP.open();
     });
 
-    document.getElementById('formMealStep2')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        if (!validateMealStep2()) return;
-
-        const adults = parseInt(document.getElementById('adultsMStep1').value) || 0;
-        const children = parseInt(document.getElementById('childrenMStep1').value) || 0;
-        const payload = {
-            name: document.getElementById('nameMStep2').value,
-            email: document.getElementById('emailMStep2').value,
-            phone: document.getElementById('phoneMStep2').value || null,
-            reservation_date: document.getElementById('dateMStep1').value,
-            time: document.getElementById('timeMStep1').value,
-            adults: adults,
-            infants: children,
-            pets: parseInt(document.getElementById('petsMStep1').value) || 0,
-            number_of_persons: adults + children
-        };
-
-        try {
-            const res = await fetch(`${backendUrl}/api/meal_reservations`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
-            if (res.ok) {
-                const confirmMsg = APP_GLOBALS.currentLanguage === 'en'
-                    ? 'Meal request submitted for approval. An administrator will contact you to confirm details.'
-                    : 'Cererea de masă trimisă pentru aprobare. Un administrator vă va contacta pentru a confirma detaliile.';
-                alert(confirmMsg);
-
-                if (WIZARD_STATE.mealDraftId) {
-                    await fetch(`${backendUrl}/api/reservations/draft/${WIZARD_STATE.mealDraftId}`, {
-                        method: 'DELETE'
-                    }).catch(err => console.error('Failed to delete draft:', err));
-                }
-
-                document.getElementById('formMealStep2').reset();
-                document.getElementById('formMealStep1').reset();
-                showMealStep(1);
-                WIZARD_STATE.mealFormDirty = false;
-                WIZARD_STATE.mealDraftId = null;
-            } else {
-                const data = await res.json();
-                alert('Eroare: ' + (data.error || 'Date incorecte.'));
-            }
-        } catch (err) { alert('Nu se poate contacta serverul.'); }
-    });
-
+    // ===== MEAL QUICK DATE BUTTONS =====
     document.getElementById('btnToday')?.addEventListener('click', function(e) {
         e.preventDefault();
         if (!this.disabled) {
             const today = new Date();
             const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            document.getElementById('dateMStep1').value = dateStr;
+            document.getElementById('mealArrivalInput').value = dateStr;
             showMealStep(1);
         }
     });
@@ -510,7 +684,7 @@ export function initWizardEventListeners() {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
-        document.getElementById('dateMStep1').value = dateStr;
+        document.getElementById('mealArrivalInput').value = dateStr;
         showMealStep(1);
     });
 }

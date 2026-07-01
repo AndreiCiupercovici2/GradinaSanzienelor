@@ -15,10 +15,15 @@ export const WIZARD_STATE = {
         arrivalDate: '',
         departureDate: '',
         adults: 1,
+        rooms_needed: 1,
         children: 0,
         wantsHotTub: false,
         wantsMeal: false,
         newsletter: false
+    },
+    cabinExtras: {
+        meal: false,
+        hotTub: false
     },
     mealFormData: {
         firstName: '',
@@ -30,6 +35,9 @@ export const WIZARD_STATE = {
         children: 0,
         wantsCabin: false,
         newsletter: false
+    },
+    mealExtras: {
+        cabin: false
     },
     mealStep: 1, // current step 1-4
     mealFormDirty: false,

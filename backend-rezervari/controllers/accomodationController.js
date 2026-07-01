@@ -1,6 +1,6 @@
 const AccomodationModel = require('../models/accomodationModel');
 
-const { getLanguage, t, validateReservationInput, sanitizeText, sendConfirmationEmail } = require('../utils/helpers');
+const { getLanguage, t, validateReservationInput, sanitizeText} = require('../utils/helpers');
 
 const MAX_CABIN_CAPACITY = 8;
 const MIN_CABIN_CAPACITY = 1;
@@ -46,7 +46,7 @@ const AccomodationController = {
             const insertedId = await AccomodationModel.createReservation(dbData);
 
             // Send confirmation email
-            await sendConfirmationEmail(bodyData, 'cabin');
+            // await sendConfirmationEmail(bodyData, 'cabin');
             return res.status(201).json({ message: t('reservation_success', lang), reservationId: insertedId });
         } catch (error) {
             console.error('Error creating reservation:', error);
@@ -70,7 +70,7 @@ const AccomodationController = {
 const createReservationWithTransaction = async (req, res) => {
     try {
         db.run("BEGIN TRANSACTION");
-        const id = await accomodationModel.createReservation(req.body);
+        const id = await AccomodationModel.createReservation(req.body);
         // await draftModel.deleteDraft(...); // You can perform multiple actions here
         db.run("COMMIT");
         res.status(201).json({ id });

@@ -10,8 +10,8 @@ function formatDate(dateUTC) {
 function generateButtons(id, reservationType, currentStatus) {
     if (currentStatus === 'pending') {
         return `
-            <button style="background:green; color:white; border:none; padding:5px; cursor:pointer;" onclick="changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
-            <button style="background:red; color:white; border:none; padding:5px; cursor:pointer;" onclick="changeStatus(${id}, '${reservationType}', 'reject')">❌ Respinge</button>
+            <button style="background:green; color:white; border:none; padding:5px; cursor:pointer;" onclick="window.changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
+            <button style="background:red; color:white; border:none; padding:5px; cursor:pointer;" onclick="window.changeStatus(${id}, '${reservationType}', 'reject')">❌ Respinge</button>
         `;
     }
     // Already confirmed or cancelled — show text only
@@ -44,40 +44,87 @@ async function changeStatus(id, reservationType, decision) {
 }
 
 async function loadMealReservations() {
-    const res = await fetch(`${backendUrl}/admin/meal`);
-    const reservations = await res.json();
-    const table = document.getElementById('mealTable');
-    table.innerHTML = '';
+    try {
+        const res = await fetch(`${backendUrl}/admin/meal`);
 
-    reservations.forEach(rez => {
-        table.innerHTML += `
-            <tr>
-                <td style="color:#888; font-size:12px;">${formatDate(rez.order_date)}</td>
-                <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
-                <td><strong>${rez.reservation_date}</strong> <br> Ora: ${rez.time}</td>
-                <td>${rez.number_of_persons}</td>
-                <td>${generateButtons(rez.id, 'meal', rez.status)}</td>
-            </tr>`;
-    });
+        // Check if response was successful
+        if (!res.ok) {
+            console.error('Error fetching meal reservations:', res.status);
+            alert('Nu s-au putut încărca rezervările de mâncare.');
+            return;
+        }
+
+        const reservations = await res.json();
+
+        // Validate that reservations is an array
+        if (!Array.isArray(reservations)) {
+            console.error('API returned non-array data for meal reservations:', reservations);
+            alert('Format de date invalid de la server.');
+            return;
+        }
+
+        const table = document.getElementById('mealTable');
+        table.innerHTML = '';
+
+        reservations.forEach(rez => {
+            table.innerHTML += `
+                <tr>
+                    <td style="color:#888; font-size:12px;">${formatDate(rez.order_date)}</td>
+                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
+                    <td><strong>${rez.reservation_date}</strong> <br> Ora: ${rez.time}</td>
+                    <td>${rez.number_of_persons}</td>
+                    <td>${generateButtons(rez.id, 'meal', rez.status)}</td>
+                </tr>`;
+        });
+    } catch (error) {
+        console.error('Exception in loadMealReservations:', error);
+        alert('A apărut o eroare la încărcarea rezervărilor de mâncare.');
+    }
 }
 
 async function loadCabinReservations() {
-    const res = await fetch(`${backendUrl}/admin/cabin`);
-    const reservations = await res.json();
-    const table = document.getElementById('cabinTable');
-    table.innerHTML = '';
+    try {
+        const res = await fetch(`${backendUrl}/admin/cabin`);
 
-    reservations.forEach(rez => {
-        table.innerHTML += `
-            <tr>
-                <td style="color:#888; font-size:12px;">${formatDate(rez.reservation_date)}</td>
-                <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
-                <td>${rez.start_date} - ${rez.end_date}</td>
-                <td>${rez.number_of_persons} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
-                <td>${generateButtons(rez.id, 'cabin', rez.status)}</td>
-            </tr>`;
-    });
+        // Check if response was successful
+        if (!res.ok) {
+            console.error('Error fetching cabin reservations:', res.status);
+            alert('Nu s-au putut încărca rezervările de cabană.');
+            return;
+        }
+
+        const reservations = await res.json();
+
+        // Validate that reservations is an array
+        if (!Array.isArray(reservations)) {
+            console.error('API returned non-array data for cabin reservations:', reservations);
+            alert('Format de date invalid de la server.');
+            return;
+        }
+
+        const table = document.getElementById('cabinTable');
+        table.innerHTML = '';
+
+        reservations.forEach(rez => {
+            table.innerHTML += `
+                <tr>
+                    <td style="color:#888; font-size:12px;">${formatDate(rez.reservation_date)}</td>
+                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
+                    <td>${rez.start_date} - ${rez.end_date}</td>
+                    <td>${rez.adults} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
+                    <td>${generateButtons(rez.id, 'cabin', rez.status)}</td>
+                </tr>`;
+        });
+    } catch (error) {
+        console.error('Exception in loadCabinReservations:', error);
+        alert('A apărut o eroare la încărcarea rezervărilor de cabană.');
+    }
 }
+
+// Export to global scope so inline onclick handlers can access them
+window.changeStatus = changeStatus;
+window.loadMealReservations = loadMealReservations;
+window.loadCabinReservations = loadCabinReservations;
 
 // Auto-refresh every 30 seconds
 setInterval(() => {

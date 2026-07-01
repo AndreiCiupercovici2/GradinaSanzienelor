@@ -16,10 +16,13 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
 db.run('PRAGMA foreign_keys = ON');
 
 function runMigrations() {
-    const { migrateReservationDraftsSchema } = require('./utils/dbMigration');
-    migrateReservationDraftsSchema().catch((err) => {
-        console.error('Migration error:', err);
-    });
+    const { initializeTables, migrateReservationDraftsSchema } = require('./utils/dbMigration');
+
+    initializeTables()
+        .then(() => migrateReservationDraftsSchema())
+        .catch((err) => {
+            console.error('Migration error:', err);
+        });
 }
 
 module.exports = db;

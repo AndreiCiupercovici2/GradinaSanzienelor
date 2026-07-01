@@ -8,7 +8,7 @@ const mealModel = {
             const sql = `
             SELECT adults FROM meal_reservations
             WHERE status = 'confirmed'
-            AND NOT (start_date >= ?)`;
+            AND NOT (reservation_date >= ?)`;
 
             db.getDbConnection(sql, [date], (err, row) => {
                 if (err) {
@@ -26,7 +26,7 @@ const mealModel = {
                 db.run("BEGIN TRANSACTION");
 
                 const sqlInsert = `
-            INSERT INTO meal_reservations (first_name, last_name, email, phone, start_date, adults, wants_cabin, newsletter)
+            INSERT INTO meal_reservations (first_name, last_name, email, phone, reservation_date, adults, wants_cabin, newsletter)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
                 db.run(sqlInsert, [
@@ -34,7 +34,7 @@ const mealModel = {
                     reservationData.last_name,
                     reservationData.email,
                     reservationData.phone,
-                    reservationData.start_date,
+                    reservationData.reservation_date,
                     reservationData.adults,
                     reservationData.wants_cabin,
                     reservationData.newsletter
@@ -58,7 +58,7 @@ const mealModel = {
     getReservedDates: async () => {
         return new Promise((resolve, reject) => {
             const sql = `
-            SELECT start_date, adults
+            SELECT reservation_date, adults
             FROM meal_reservations
             WHERE status = 'confirmed'`;
             db.all(sql, [], (err, rows) => {
