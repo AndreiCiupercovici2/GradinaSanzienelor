@@ -131,11 +131,11 @@ export function handleArrivalChange(dates) {
     if (dates.length > 0) {
         const dep = new Date(dates[0]);
         dep.setDate(dep.getDate() + APP_GLOBALS.cabinNights);
+        const dateStr = `${dep.getFullYear()}-${String(dep.getMonth() + 1).padStart(2, '0')}-${String(dep.getDate()).padStart(2, '0')}`;
+        document.getElementById('cabinDepartureInput').value = dateStr;
 
         if (APP_GLOBALS.cabinDepartureFP) {
             APP_GLOBALS.cabinDepartureFP.setDate(dep, true);
-            const dateStr = `${dep.getFullYear()}-${String(dep.getMonth() + 1).padStart(2, '0')}-${String(dep.getDate()).padStart(2, '0')}`;
-            document.getElementById('cabinDepartureInput').value = dateStr;
             APP_GLOBALS.cabinDepartureFP.set('minDate', new Date(dates[0].getTime() + 24 * 60 * 60 * 1000));
         }
         updateNightsDisplay();
@@ -154,6 +154,33 @@ export function handleDepartureChange(dates) {
             updateNightsDisplay(false);
             updateCabinSummary();
         }
+    }
+}
+
+async function fetchCabinOccupancy() {
+    try {
+        const resp = await fetch(`${backendUrl}/api/occupied_days`);
+        if (!resp.ok) return { full: new Set(), partial: new Set() };
+        const reservations = await resp.json();
+        const adultsPerDay = {};
+        for (const r of reservations) {
+            const cur = new Date(r.start_date + 'T00:00:00');
+            const end = new Date(r.end_date + 'T00:00:00');
+            while (cur < end) {
+                const key = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
+                adultsPerDay[key] = (adultsPerDay[key] || 0) + (r.adults || 0);
+                cur.setDate(cur.getDate() + 1);
+            }
+        }
+        const full = new Set();
+        const partial = new Set();
+        for (const [date, adults] of Object.entries(adultsPerDay)) {
+            if (adults >= 8) full.add(date);
+            else if (adults > 0) partial.add(date);
+        }
+        return { full, partial };
+    } catch {
+        return { full: new Set(), partial: new Set() };
     }
 }
 
@@ -178,13 +205,33 @@ export async function showSection(type) {
 
         if (!arrivalInput.dataset.fpBound) {
             arrivalInput.dataset.fpBound = 'true';
-            arrivalInput.addEventListener('click', () => {
+            arrivalInput.addEventListener('click', async () => {
                 if (!APP_GLOBALS.cabinArrivalFP) {
+                    const { full, partial } = await fetchCabinOccupancy();
+                    const lang = APP_GLOBALS.currentLanguage;
                     APP_GLOBALS.cabinArrivalFP = flatpickr(arrivalInput, {
                         mode: 'single',
                         minDate: 'today',
                         dateFormat: "Y-m-d",
-                        locale: APP_GLOBALS.currentLanguage === 'ro' ? Romanian : 'en',
+                        locale: lang === 'ro' ? Romanian : 'en',
+                        disable: [d => {
+                            const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                            if (full.has(key)) return true;
+                            const today = new Date();
+                            return d.getFullYear() === today.getFullYear() &&
+                                d.getMonth() === today.getMonth() &&
+                                d.getDate() === today.getDate() &&
+                                isAfter10Am();
+                        }],
+                        onDayCreate(dObj, dStr, fp, dayElem) {
+                            const key = `${dayElem.dateObj.getFullYear()}-${String(dayElem.dateObj.getMonth()+1).padStart(2,'0')}-${String(dayElem.dateObj.getDate()).padStart(2,'0')}`;
+                            if (partial.has(key)) {
+                                dayElem.classList.add('fp-partial-occupancy');
+                                dayElem.title = lang === 'ro'
+                                    ? 'Cabana este parțial ocupată în această noapte'
+                                    : 'Cabin is partially occupied this night';
+                            }
+                        },
                         onChange: handleArrivalChange
                     });
                     APP_GLOBALS.cabinArrivalFP.open();
@@ -194,12 +241,23 @@ export async function showSection(type) {
 
         if (!departureInput.dataset.fpBound) {
             departureInput.dataset.fpBound = 'true';
-            departureInput.addEventListener('click', () => {
+            departureInput.addEventListener('click', async () => {
                 if (!APP_GLOBALS.cabinDepartureFP) {
+                    const { partial } = await fetchCabinOccupancy();
+                    const lang = APP_GLOBALS.currentLanguage;
                     APP_GLOBALS.cabinDepartureFP = flatpickr(departureInput, {
                         mode: 'single',
                         dateFormat: "Y-m-d",
-                        locale: APP_GLOBALS.currentLanguage === 'ro' ? Romanian : 'en',
+                        locale: lang === 'ro' ? Romanian : 'en',
+                        onDayCreate(dObj, dStr, fp, dayElem) {
+                            const key = `${dayElem.dateObj.getFullYear()}-${String(dayElem.dateObj.getMonth()+1).padStart(2,'0')}-${String(dayElem.dateObj.getDate()).padStart(2,'0')}`;
+                            if (partial.has(key)) {
+                                dayElem.classList.add('fp-partial-occupancy');
+                                dayElem.title = lang === 'ro'
+                                    ? 'Cabana este parțial ocupată în această noapte'
+                                    : 'Cabin is partially occupied this night';
+                            }
+                        },
                         onChange: handleDepartureChange
                     });
                     APP_GLOBALS.cabinDepartureFP.open();
@@ -259,11 +317,39 @@ export function showCabinStep(stepNumber) {
 }
 
 export function validateMealStep1() {
+    const lang = APP_GLOBALS.currentLanguage;
     const arrivalEl = document.getElementById('mealArrivalInput');
+    const adultsEl  = document.getElementById('mealAdultsInput');
+    const petsEl    = document.getElementById('mealPetsInput');
+
     if (!arrivalEl?.value) {
         markError(arrivalEl);
-        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.', 'warning');
+        showToast(lang === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.', 'warning');
         return false;
+    }
+    if (isToday(arrivalEl.value) && isAfter10Am()) {
+        markError(arrivalEl);
+        showToast(lang === 'en' ? 'Same-day requests are no longer accepted. Please call.' : 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.', 'warning');
+        return false;
+    }
+    const adults = parseInt(adultsEl?.value, 10);
+    if (!adultsEl?.value || isNaN(adults) || adults < 1) {
+        markError(adultsEl);
+        showToast(lang === 'en' ? 'Adults must be at least 1.' : 'Adulți trebuie să fie cel puțin 1.', 'warning');
+        return false;
+    }
+    if (adults > 15) {
+        markError(adultsEl);
+        showToast(lang === 'en' ? 'Maximum 15 people allowed for meals.' : 'Maxim 15 persoane permise pentru mese.', 'warning');
+        return false;
+    }
+    if (petsEl?.value !== '' && petsEl?.value !== undefined) {
+        const pets = parseInt(petsEl.value, 10);
+        if (isNaN(pets) || pets < 0) {
+            markError(petsEl);
+            showToast(lang === 'en' ? 'Pets cannot be negative.' : 'Animale de companie nu pot fi negative.', 'warning');
+            return false;
+        }
     }
     return true;
 }
@@ -297,19 +383,65 @@ export function validateMealStep3() {
     return true;
 }
 
-export function validateCabinStep1() {
+export async function validateCabinStep1() {
+    const lang        = APP_GLOBALS.currentLanguage;
     const arrivalEl   = document.getElementById('cabinArrivalInput');
     const departureEl = document.getElementById('cabinDepartureInput');
+    const petsEl      = document.getElementById('cabinPetsInput');
+
     if (!arrivalEl?.value || !departureEl?.value) {
         if (!arrivalEl?.value)   markError(arrivalEl);
         if (!departureEl?.value) markError(departureEl);
-        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please select arrival and departure dates.' : 'Vă rugăm selectați datele de sosire și plecare.', 'warning');
+        showToast(lang === 'en' ? 'Please select arrival and departure dates.' : 'Vă rugăm selectați datele de sosire și plecare.', 'warning');
         return false;
     }
     if (APP_GLOBALS.cabinNights < 1) {
-        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Minimum 1 night required.' : 'Minim 1 noapte obligatorie.', 'warning');
+        showToast(lang === 'en' ? 'Minimum 1 night required.' : 'Minim 1 noapte obligatorie.', 'warning');
         return false;
     }
+    if (isToday(arrivalEl.value) && isAfter10Am()) {
+        markError(arrivalEl);
+        showToast(lang === 'en' ? 'Same-day requests are no longer accepted. Please call.' : 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.', 'warning');
+        return false;
+    }
+    const adults = parseInt(document.getElementById('cabinAdultsSelect')?.value, 10);
+    if (isNaN(adults) || adults < 1) {
+        showToast(lang === 'en' ? 'Adults must be at least 1.' : 'Adulți trebuie să fie cel puțin 1.', 'warning');
+        return false;
+    }
+    if (adults > 8) {
+        showToast(lang === 'en' ? 'Number of people must be between 1 and 8.' : 'Numărul de persoane trebuie să fie între 1 și 8.', 'warning');
+        return false;
+    }
+    if (petsEl?.value !== '' && petsEl?.value !== undefined) {
+        const pets = parseInt(petsEl.value, 10);
+        if (isNaN(pets) || pets < 0) {
+            markError(petsEl);
+            showToast(lang === 'en' ? 'Pets cannot be negative.' : 'Animale de companie nu pot fi negative.', 'warning');
+            return false;
+        }
+    }
+
+    try {
+        const resp = await fetch(`${backendUrl}/api/occupied_days`);
+        if (resp.ok) {
+            const reservations = await resp.json();
+            const start = new Date(arrivalEl.value);
+            const end   = new Date(departureEl.value);
+            const existingAdults = reservations
+                .filter(r => new Date(r.end_date) > start && new Date(r.start_date) < end)
+                .reduce((sum, r) => sum + (r.adults || 0), 0);
+            if (existingAdults + adults > 8) {
+                markError(arrivalEl);
+                markError(departureEl);
+                showToast(lang === 'en' ? 'Cabin has no available spots for this period.' : 'Cabana nu mai are locuri disponibile în perioada selectată.', 'error');
+                return false;
+            }
+        }
+    } catch {
+        // network error — let the server validate on submit
+    }
+
     return true;
 }
 
@@ -379,11 +511,11 @@ export function updateNightsDisplay(shouldUpdateDeparture = true) {
         const arrivalDate = new Date(APP_GLOBALS.cabinArrivalFP.selectedDates[0]);
         const dep = new Date(arrivalDate);
         dep.setDate(dep.getDate() + APP_GLOBALS.cabinNights);
+        const dateStr = `${dep.getFullYear()}-${String(dep.getMonth() + 1).padStart(2, '0')}-${String(dep.getDate()).padStart(2, '0')}`;
+        document.getElementById('cabinDepartureInput').value = dateStr;
 
         if (APP_GLOBALS.cabinDepartureFP) {
             APP_GLOBALS.cabinDepartureFP.setDate(dep, true);
-            const dateStr = `${dep.getFullYear()}-${String(dep.getMonth() + 1).padStart(2, '0')}-${String(dep.getDate()).padStart(2, '0')}`;
-            document.getElementById('cabinDepartureInput').value = dateStr;
         }
     }
     updateCabinSummary();
@@ -647,9 +779,9 @@ export function initWizardEventListeners() {
 
     // Step 1 to Step 2: Cabin workflow
     const cabinContinueBtn = document.querySelector('#step1ContainerCabin #continueToExtrasBtn');
-    cabinContinueBtn?.addEventListener('click', function (e) {
+    cabinContinueBtn?.addEventListener('click', async function (e) {
         e.preventDefault();
-        if (validateCabinStep1()) {
+        if (await validateCabinStep1()) {
             WIZARD_STATE.cabinFormDirty = true;
             saveCabinDraft(1);
             showCabinStep(2);

@@ -462,6 +462,18 @@ button[type="submit"]:hover {
     position: static !important;
 }
 
+.flatpickr-day.fp-partial-occupancy {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+.flatpickr-day.fp-partial-occupancy:hover,
+.flatpickr-day.fp-partial-occupancy:focus {
+    background-color: #ffc107;
+    border-color: #e0a800;
+    color: #fff;
+}
+
 /* Hide original calendar inputs */
 input#calendarMeal,
 input#calendarCabin {
