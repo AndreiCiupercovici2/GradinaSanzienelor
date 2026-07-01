@@ -29,7 +29,7 @@ async function changeStatus(id, reservationType, decision) {
     if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decision}?`)) return;
 
     try {
-        const response = await fetch(`${backendUrl}/admin/decision`, {
+        const response = await fetch(`${backendUrl}/portalIntern/decision`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, reservationType: reservationType, decision: decision })
@@ -182,7 +182,7 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
 
 async function loadMealReservations() {
     try {
-        const res = await fetch(`${backendUrl}/admin/meal`);
+        const res = await fetch(`${backendUrl}/portalIntern/meal`);
 
         // Check if response was successful
         if (!res.ok) {
@@ -229,7 +229,7 @@ async function loadMealReservations() {
 
 async function loadCabinReservations() {
     try {
-        const res = await fetch(`${backendUrl}/admin/cabin`);
+        const res = await fetch(`${backendUrl}/portalIntern/cabin`);
 
         // Check if response was successful
         if (!res.ok) {

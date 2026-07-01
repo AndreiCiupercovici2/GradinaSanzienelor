@@ -34,7 +34,7 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
             emailContent += `Ora: ${reservationDetails.time}\n`;
         }
 
-        emailContent += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/admin.html`;
+        emailContent += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/portalIntern.html`;
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,

@@ -14,6 +14,7 @@ const {
 
 const MealController = {
     createReservation: async (req, res) => {
+        console.log('Received request body:', req.body);
         const lang = getLanguage(req);
 
         if (!req.body || typeof req.body !== 'object') {
@@ -32,30 +33,37 @@ const MealController = {
         const wants_cabin = bodyData.wants_cabin;
 
         if (typeof first_name !== 'string' || typeof last_name !== 'string') {
+            console.log('Invalid first_name or last_name:', { first_name, last_name });
             return res.status(400).json({ errors: t('invalid_name', lang) });
         }
 
         if (typeof email !== 'string' || typeof phone !== 'string') {
+            console.log('Invalid email or phone:', { email, phone });
             return res.status(400).json({ errors: t('invalid_email', lang) });
         }
 
         if (typeof wants_cabin !== 'boolean' && wants_cabin !== undefined && wants_cabin !== null) {
+            console.log('Invalid wants_cabin value:', wants_cabin);
             return res.status(400).json({ errors: t('invalid_input_size', lang) });
         }
 
         if (typeof reservation_date !== 'string') {
+            console.log('Invalid reservation_date value:', reservation_date);
             return res.status(400).json({ errors: t('invalid_reservation_date', lang) });
         }
 
         if (!isValidInteger(adults)) {
+            console.log('Invalid adults value:', adults);
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
         if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
+            console.log('Invalid pets value:', pets);
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
         if (newsletter !== undefined && newsletter !== null && !isValidBoolean(newsletter)) {
+            console.log('Invalid newsletter value:', newsletter);
             return res.status(400).json({ errors: t('invalid_input_size', lang) });
         }
 
@@ -88,6 +96,7 @@ const MealController = {
 
         try {
             const existingGuests = await MealModel.checkAvailability(mappedData.reservation_date);
+            console.log(`Total capacity= ${MAX_MEAL_CAPACITY}, Existing guests for ${mappedData.reservation_date}:`, existingGuests);
             if (existingGuests + totalGuests > MAX_MEAL_CAPACITY) {
                 return res.status(400).json({ errors: t('no_availability', lang) });
             }

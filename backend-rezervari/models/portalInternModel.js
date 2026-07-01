@@ -1,6 +1,6 @@
 const db = require('../db');
 
-const AdminModel = {
+const portalInternModel = {
     getAllCabinReservations: () => {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM cabin_reservations ORDER BY start_date DESC`, [], (err, rows) => {
@@ -61,4 +61,4 @@ const AdminModel = {
     }    
 }
 
-module.exports = AdminModel;
+module.exports = portalInternModel;

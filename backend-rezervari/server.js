@@ -7,7 +7,7 @@ require('./db');
 require('./jobs/cronJobs');
 
 //Import modular routes
-const adminRoutes = require('./routes/adminRoutes');
+const portalInternRoutes = require('./routes/portalInternRoutes');
 const accomodationRoutes = require('./routes/accomodationRoutes');
 const mealRoutes = require('./routes/mealRoutes');
 const draftRoutes = require('./routes/draftRoutes');
@@ -23,7 +23,7 @@ app.use(express.static('src'));
 app.use('/flatpickr', express.static('node_modules/flatpickr'));
 
 // Routes
-app.use('/api', adminRoutes);
+app.use('/api', portalInternRoutes);
 app.use('/api', accomodationRoutes);
 app.use('/api', mealRoutes);
 app.use('/api/reservations', draftRoutes);

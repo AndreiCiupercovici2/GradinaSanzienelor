@@ -45,12 +45,13 @@ export async function submitMealBooking(payload) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to submit meal booking');
-    }
-    return await res.json();
+    }).then(async (res) => {
+        if(!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.errors || 'Failed to submit meal booking');
+        }
+        return res.json();
+    })
 }
 
 export async function loadOccupiedDates() {

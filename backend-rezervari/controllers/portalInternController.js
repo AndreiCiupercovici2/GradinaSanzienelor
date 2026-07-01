@@ -1,13 +1,12 @@
-const AdminModel = require('../models/adminModel');
+const portalInternModel = require('../models/portalInternModel');
 const { getLanguage, t } = require('../utils/helpers');
 
-const AdminController = {
+const PortalInternController = {
 
-    // ENDPOINT: GET /api/admin/cabin
     getAllCabinReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {
-            const rows = await AdminModel.getAllCabinReservations();
+            const rows = await portalInternModel.getAllCabinReservations();
             res.json(rows);
         } catch (error) {
             console.error('Error fetching cabin reservations:', error);
@@ -15,11 +14,10 @@ const AdminController = {
         }
     },
 
-    // ENDPOINT: GET /api/admin/meal
     getAllMealReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {
-            const rows = await AdminModel.getAllMealReservations();
+            const rows = await portalInternModel.getAllMealReservations();
             res.json(rows);
         } catch (error) {
             console.error('Error fetching meal reservations:', error);
@@ -27,11 +25,10 @@ const AdminController = {
         }
     },
 
-    // ENDPOINT: GET /api/admin/drafts
     getActiveDrafts: async (req, res) => {
         const lang = getLanguage(req);
         try {
-            const rows = await AdminModel.getActiveDrafts();
+            const rows = await portalInternModel.getActiveDrafts();
             res.json(rows);
         } catch (error) {
             console.error('Error fetching active drafts:', error);
@@ -39,11 +36,10 @@ const AdminController = {
         }
     },
 
-        // ENDPOINT: GET /api/admin/reservations
     getAdminReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {
-            const rows = await AdminModel.getReservations();
+            const rows = await portalInternModel.getReservations();
             res.json(rows);
         } catch (error) {
             console.error('Error fetching reservations:', error);
@@ -51,12 +47,10 @@ const AdminController = {
         }
     },
 
-    // ENDPOINT: POST /api/admin/decision
     handleDecision: async (req, res) => {
         const lang = getLanguage(req);
         const { id, reservationType, decision } = req.body;
 
-        // Validations
         if (!['cabin', 'meal'].includes(reservationType)) {
             return res.status(400).json({ errors: t('invalid_reservation_type', lang) });
         }
@@ -71,7 +65,7 @@ const AdminController = {
         const newStatus = decision === 'confirm' ? 'confirmed' : 'rejected';
 
         try {
-            const changes = await AdminModel.updateReservationStatus(table, id, newStatus);
+            const changes = await portalInternModel.updateReservationStatus(table, id, newStatus);
             if (changes === 0) {
                 return res.status(404).json({ errors: t('reservation_not_found', lang) });
             }
@@ -83,4 +77,4 @@ const AdminController = {
     }
 }
 
-module.exports = AdminController;
+module.exports = PortalInternController;

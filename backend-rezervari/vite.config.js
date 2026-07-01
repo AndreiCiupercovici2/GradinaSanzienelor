@@ -14,7 +14,9 @@ export default defineConfig({
         contact: resolve(__dirname, 'src/Pages/contact.html'),
         punctGastronomic: resolve(__dirname, 'src/Pages/punctGastronomic.html'),
         meal: resolve(__dirname, 'src/Pages/meal.html'),
-        admin: resolve(__dirname, 'src/Pages/admin.html')
+        portalIntern: resolve(__dirname, 'src/Pages/portalIntern.html'),
+        terms: resolve(__dirname, 'src/Pages/terms.html'),
+        privacy: resolve(__dirname, 'src/Pages/privacy.html')
       }
     }
   },
@@ -33,8 +35,8 @@ export default defineConfig({
             req.url = '/Pages/punctGastronomic.html';
           } else if (req.url === '/') {
             req.url = '/index.html'; 
-          } else if (req.url === '/admin') {
-            req.url = '/Pages/admin.html';
+          } else if (req.url === '/portalIntern') {
+            req.url = '/Pages/portalIntern.html';
           } else if (req.url === '/terms') {
             req.url = '/Pages/terms.html';
           } else if (req.url === '/privacy') {
