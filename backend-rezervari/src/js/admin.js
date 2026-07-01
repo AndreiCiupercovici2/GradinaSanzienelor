@@ -1,21 +1,26 @@
 const backendUrl = '/api';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css';
+import { calculateNights, formatDate } from './utils/helpers.js';
+
+let cabinReservationsData = [];
+let mealReservationsData = [];
+let cabinCalendar;
+let mealCalendar;
+
+const TOTAL_CABIN_ROOMS = 3;
 
 // Format a UTC registration date for display
-function formatDate(dateUTC) {
-    if (!dateUTC) return '-';
-    return new Date(dateUTC).toLocaleString('ro-RO');
-}
 
 // Build approve / reject buttons when status is 'pending'
 function generateButtons(id, reservationType, currentStatus) {
     if (currentStatus === 'pending') {
         return `
-            <button style="background:green; color:white; border:none; padding:5px; cursor:pointer;" onclick="window.changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
-            <button style="background:red; color:white; border:none; padding:5px; cursor:pointer;" onclick="window.changeStatus(${id}, '${reservationType}', 'reject')">❌ Respinge</button>
+            <button class="btn-approve" onclick="window.changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
+            <button class="btn-reject" onclick="window.changeStatus(${id}, '${reservationType}', 'rejected')">❌ Respinge</button>
         `;
     }
-    // Already confirmed or cancelled — show text only
-    return `<strong>${currentStatus.toUpperCase()}</strong>`;
+    return `<strong class="status-text status-${currentStatus}">${currentStatus.toUpperCase()}</strong>`;
 }
 
 
@@ -43,6 +48,138 @@ async function changeStatus(id, reservationType, decision) {
     }
 }
 
+mealCalendar = flatpickr("#mealAdminCalendarBtn", {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    minDate: "today",
+
+    // Se execută pentru fiecare zi randată în calendar
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const cellDate = new Date(dayElem.dateObj);
+        cellDate.setHours(0, 0, 0, 0);
+
+        if (cellDate < today) {
+            return;
+        }
+
+        const y = dayElem.dateObj.getFullYear();
+        const m = String(dayElem.dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dayElem.dateObj.getDate()).padStart(2, '0');
+        const currentCellDate = `${y}-${m}-${d}`;
+
+        const activeRez = mealReservationsData.filter(rez => {
+            return rez.status === 'confirmed' && rez.reservation_date === currentCellDate;
+        });
+
+        if (activeRez.length > 0) {
+            dayElem.classList.add("cal-meal-booked"); // Maro
+        } else {
+            dayElem.classList.add("cal-meal-free"); // Verde
+        }
+    },
+
+    // Se execută când dai click pe o dată
+    onChange: function (selectedDates, dateStr, instance) {
+        const detailsContainer = document.getElementById('mealDetails');
+        if (!detailsContainer) return;
+
+        // Afișăm containerul (în caz că l-am ascuns inițial)
+        detailsContainer.style.display = 'block';
+
+        const activeRez = mealReservationsData.filter(rez => {
+            return rez.status === 'confirmed' && rez.reservation_date === dateStr;
+        });
+
+        if (activeRez.length === 0) {
+            detailsContainer.innerHTML = `<p style="color: #28a745;"><strong>${dateStr}</strong>: Nu există rezervări de masă confirmate.</p>`;
+        } else {
+            let html = `<p><strong>Rezervări de masă confirmate în data de ${dateStr}:</strong></p><ul>`;
+            activeRez.forEach(rez => {
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> - Adulți: ${rez.adults}, Animale: ${rez.pets}</li>`;
+            });
+            html += `</ul>`;
+            detailsContainer.innerHTML = html;
+        }
+    }
+});
+
+cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+
+    minDate: "today",
+
+    // Se execută pentru fiecare zi randată în calendar
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const cellDate = new Date(dayElem.dateObj);
+        cellDate.setHours(0, 0, 0, 0);
+
+        if (cellDate < today) {
+            return;
+        }
+
+        const y = dayElem.dateObj.getFullYear();
+        const m = String(dayElem.dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dayElem.dateObj.getDate()).padStart(2, '0');
+        const currentCellDate = `${y}-${m}-${d}`;
+
+        const activeRez = cabinReservationsData.filter(rez => {
+            // Decupăm strict partea de YYYY-MM-DD din baza de date
+            const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
+            const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
+
+            return rez.status === 'confirmed' &&
+                currentCellDate >= safeStart &&
+                currentCellDate <= safeEnd;
+        });
+
+        const roomsBooked = activeRez.reduce((sum, r) => sum + parseInt(r.rooms_needed || 1), 0);
+
+        if (roomsBooked >= TOTAL_CABIN_ROOMS) {
+            dayElem.classList.add("cal-fully-booked"); // Maro
+        } else if (roomsBooked > 0) {
+            dayElem.classList.add("cal-partially-booked"); // Galben
+        } else {
+            dayElem.classList.add("cal-free"); // Verde
+        }
+    },
+
+    // Se execută când dai click pe o dată
+    onChange: function (selectedDates, dateStr, instance) {
+        const detailsContainer = document.getElementById('cabinDetails');
+        if (!detailsContainer) return;
+
+        // Afișăm containerul (în caz că l-am ascuns inițial)
+        detailsContainer.style.display = 'block';
+
+        const activeRez = cabinReservationsData.filter(rez => {
+            const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
+            const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
+
+            return rez.status === 'confirmed' &&
+                dateStr >= safeStart &&
+                dateStr <= safeEnd;
+        });
+
+        if (activeRez.length === 0) {
+            detailsContainer.innerHTML = `<p style="color: #28a745;"><strong>${dateStr}</strong>: Cabana este complet liberă.</p>`;
+        } else {
+            let html = `<p><strong>Cazări active în data de ${dateStr} - până la ${activeRez[0].end_date}</strong></p><ul>`;
+            activeRez.forEach(rez => {
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - ${calculateNights(rez.start_date, rez.end_date)} nopți</li>`;
+            });
+            html += `</ul>`;
+            detailsContainer.innerHTML = html;
+        }
+    }
+});
+
 async function loadMealReservations() {
     try {
         const res = await fetch(`${backendUrl}/admin/meal`);
@@ -63,6 +200,11 @@ async function loadMealReservations() {
             return;
         }
 
+        mealReservationsData = reservations;
+        if (mealCalendar) {
+            mealCalendar.redraw();
+        }
+
         const table = document.getElementById('mealTable');
         table.innerHTML = '';
 
@@ -70,10 +212,13 @@ async function loadMealReservations() {
             table.innerHTML += `
                 <tr>
                     <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
-                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
+                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone}</small><br> <small>${rez.email}</small></td>
                     <td><strong>${rez.reservation_date}</strong></td>
                     <td>${rez.adults}</td>
-                    <td>${generateButtons(rez.id, 'meal', rez.status)}</td>
+                    <td>${rez.pets}</td>
+                    <td>${rez.wants_cabin ? 'Da' : 'Nu'}</td>
+                    <td>${rez.newsletter ? 'Da' : 'Nu'}</td>
+                    <td class="status">${generateButtons(rez.id, 'meal', rez.status)}</td>
                 </tr>`;
         });
     } catch (error) {
@@ -102,6 +247,12 @@ async function loadCabinReservations() {
             return;
         }
 
+        cabinReservationsData = reservations;
+
+        if (cabinCalendar) {
+            cabinCalendar.redraw();
+        }
+
         const table = document.getElementById('cabinTable');
         table.innerHTML = '';
 
@@ -109,10 +260,14 @@ async function loadCabinReservations() {
             table.innerHTML += `
                 <tr>
                     <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
-                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
-                    <td>${rez.start_date} - ${rez.end_date}</td>
+                    <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone}</small><br> <small>${rez.email}</small></td>
+                    <td>${rez.start_date} - ${rez.end_date}<br>${calculateNights(rez.start_date, rez.end_date)} nopți</td>
                     <td>${rez.adults} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
-                    <td>${generateButtons(rez.id, 'cabin', rez.status)}</td>
+                    <td>${rez.rooms_needed}</td>
+                    <td>${rez.wants_hottub ? 'Da' : 'Nu'}</td>
+                    <td>${rez.pets}</td>
+                    <td>${rez.newsletter ? 'Da' : 'Nu'}</td>
+                    <td class="status">${generateButtons(rez.id, 'cabin', rez.status)}</td>
                 </tr>`;
         });
     } catch (error) {

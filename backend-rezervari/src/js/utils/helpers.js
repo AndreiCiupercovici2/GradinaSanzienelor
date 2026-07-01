@@ -38,3 +38,15 @@ export function getLocaleConfig() {
     }
     return { locale: 'en' };
 }
+
+export function formatDate(dateUTC) {
+    if (!dateUTC) return '-';
+    return new Date(dateUTC).toLocaleString('ro-RO');
+}
+
+export function calculateNights(arrivalDate, departureDate) {
+    const arrival = new Date(arrivalDate);
+    const departure = new Date(departureDate);
+    const diffTime = Math.abs(departure - arrival);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}

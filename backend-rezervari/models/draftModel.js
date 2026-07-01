@@ -101,7 +101,6 @@ const draftModel = {
             const sql = `DELETE FROM reservation_drafts WHERE id = ?`;
             db.run(sql, [id], function (err) {
                 if (err) return reject(err);
-                // this.changes returns the number of rows deleted
                 resolve(this.changes); 
             });
         });

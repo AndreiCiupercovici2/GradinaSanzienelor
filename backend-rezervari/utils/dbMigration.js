@@ -35,6 +35,7 @@ function initializeTables() {
                     phone TEXT NOT NULL,
                     reservation_date TEXT NOT NULL,
                     adults INTEGER NOT NULL,
+                    pets INTEGER,
                     wants_cabin INTEGER DEFAULT 0,
                     newsletter INTEGER DEFAULT 0,
                     status TEXT DEFAULT 'pending',

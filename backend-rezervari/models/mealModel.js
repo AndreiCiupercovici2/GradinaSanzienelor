@@ -24,7 +24,7 @@ const mealModel = {
             const sqlInsert = `
             INSERT INTO meal_reservations
             (first_name, last_name, email, phone, reservation_date, adults, pets, wants_cabin, newsletter, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 reservationData.first_name,
@@ -34,8 +34,8 @@ const mealModel = {
                 reservationData.reservation_date,
                 reservationData.adults,
                 reservationData.pets || 0,
-                reservationData.wants_cabin ? 1 : 0,
-                reservationData.newsletter ? 1 : 0,
+                reservationData.wants_cabin ? true : false,
+                reservationData.newsletter ? true : false,
                 reservationData.created_at || new Date().toISOString(),
                 reservationData.updated_at || new Date().toISOString()
             ];

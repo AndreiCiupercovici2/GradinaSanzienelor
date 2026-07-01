@@ -29,6 +29,7 @@ const MealController = {
         const adults = bodyData.adults;
         const pets = bodyData.pets || 0;
         const newsletter = bodyData.newsletter;
+        const wants_cabin = bodyData.wants_cabin;
 
         if (typeof first_name !== 'string' || typeof last_name !== 'string') {
             return res.status(400).json({ errors: t('invalid_name', lang) });
@@ -36,6 +37,10 @@ const MealController = {
 
         if (typeof email !== 'string' || typeof phone !== 'string') {
             return res.status(400).json({ errors: t('invalid_email', lang) });
+        }
+
+        if (typeof wants_cabin !== 'boolean' && wants_cabin !== undefined && wants_cabin !== null) {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
         }
 
         if (typeof reservation_date !== 'string') {
@@ -62,7 +67,7 @@ const MealController = {
             reservation_date: reservation_date,
             adults: parseInt(adults, 10),
             pets: parseInt(pets, 10) || 0,
-            wants_cabin: false,
+            wants_cabin: wants_cabin ? true : false,
             newsletter: newsletter ? true : false,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -95,8 +100,8 @@ const MealController = {
                 reservation_date: reservation_date,
                 adults: mappedData.adults,
                 pets: mappedData.pets,
-                wants_cabin: 0,
-                newsletter: mappedData.newsletter ? 1 : 0,
+                wants_cabin: mappedData.wants_cabin ? true : false,
+                newsletter: mappedData.newsletter ? true : false,
                 created_at: mappedData.created_at,
                 updated_at: mappedData.updated_at
             };

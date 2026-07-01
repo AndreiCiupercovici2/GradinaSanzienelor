@@ -119,9 +119,9 @@ const AccomodationController = {
                 adults: mappedData.adults,
                 pets: mappedData.pets,
                 rooms_needed: mappedData.rooms_needed,
-                wants_meal: mappedData.wants_meal ? 1 : 0,
-                wants_hottub: mappedData.wants_hottub ? 1 : 0,
-                newsletter: mappedData.newsletter ? 1 : 0,
+                wants_meal: mappedData.wants_meal ? true : false,
+                wants_hottub: mappedData.wants_hottub ? true : false,
+                newsletter: mappedData.newsletter ? true : false,
                 created_at: mappedData.created_at,
                 updated_at: mappedData.updated_at
             };

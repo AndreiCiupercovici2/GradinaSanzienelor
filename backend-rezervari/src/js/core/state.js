@@ -34,7 +34,8 @@ export const WIZARD_STATE = {
         adults: 1,
         children: 0,
         wantsCabin: false,
-        newsletter: false
+        newsletter: false,
+        reservationDate: ''
     },
     mealExtras: {
         cabin: false
@@ -53,5 +54,6 @@ export const APP_GLOBALS = {
     calendarMealInstance: null,
     cabinArrivalFP: null,
     cabinDepartureFP: null,
-    currentLanguage: window.currentLanguage || 'ro'
+    currentLanguage: window.currentLanguage || 'ro',
+    mealReservationFP: null
 };

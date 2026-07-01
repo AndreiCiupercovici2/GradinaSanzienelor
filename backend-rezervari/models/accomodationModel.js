@@ -34,9 +34,9 @@ const accomodationModel = {
                 data.adults,
                 data.pets || 0,
                 data.rooms_needed,
-                data.wants_meal ? 1 : 0,
-                data.wants_hottub ? 1 : 0,
-                data.newsletter ? 1 : 0,
+                data.wants_meal ? true : false,
+                data.wants_hottub ? true : false,
+                data.newsletter ? true : false,
                 data.created_at || new Date().toISOString(),
                 data.updated_at || new Date().toISOString()
             ];
