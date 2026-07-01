@@ -546,9 +546,10 @@ export function updateAdultsOptions(rooms) {
     const select = document.getElementById('cabinAdultsSelect');
     if (!select) return;
     const max = rooms * 3;
-    const current = parseInt(select.value) || 1;
+    const current = max-2;
     select.innerHTML = '';
-    for (let i = 1; i <= max; i++) {
+    for (let i = current; i <= max; i++) {
+        if( i == 9 ) continue;
         const opt = document.createElement('option');
         opt.value = i;
         opt.textContent = i;
