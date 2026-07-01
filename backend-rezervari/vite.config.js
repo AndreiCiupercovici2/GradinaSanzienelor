@@ -35,6 +35,10 @@ export default defineConfig({
             req.url = '/index.html'; 
           } else if (req.url === '/admin') {
             req.url = '/Pages/admin.html';
+          } else if (req.url === '/terms') {
+            req.url = '/Pages/terms.html';
+          } else if (req.url === '/privacy') {
+            req.url = '/Pages/privacy.html';
           }
           next();
         });

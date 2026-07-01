@@ -1,5 +1,5 @@
 import { initExtrasSlideshow, initHeroSlideshow } from './ui/slideshow.js';
-import { changeLanguage, applyTranslations } from './core/translations.js';
+import { changeLanguage, applyTranslations, formatLegalLinks } from './core/translations.js';
 import { APP_GLOBALS } from './core/state.js';
 import { initWizardEventListeners, showSection, showCabinStep, showMealStep } from './ui/wizard.js';
 import { loadOccupiedDates } from './api/api.js';
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     applyTranslations();
+    formatLegalLinks();
 
     document.getElementById('ro-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('ro'); });
     document.getElementById('en-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('en'); });

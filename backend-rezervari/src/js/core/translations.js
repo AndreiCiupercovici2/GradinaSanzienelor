@@ -74,8 +74,33 @@ const translations = {
         nav_gastronomic_point: "Ce este un Punct Gastronomic?",
         nav_contact: "Contact",
         nav_meal: "Rezervări Masă",
-        nav_cabin: "Rezervări Cazare"
-
+        nav_cabin: "Rezervări Cazare",
+        legal_note: "Confirmând rezervarea, sunteți de acord cu {/terms} și {/privacy}.",
+        terms_and_conditions: "Termeni și Condiții",
+        privacy_policy: "Politica de Confidențialitate",
+        back_button: "Înapoi",
+        send_booking_button: "Trimite Rezervarea pentru Confirmare",
+        booking_summary: "Rezumat Rezervare",
+        confirmation_label: "Confirmare",
+        confirmation_message: "Rezervarea dvs. a fost trimisă.",
+        booking_request_submitted: "Cererea de Rezervare a fost Trimisa",
+        confirmation_message_details: "Vă mulțumim pentru cererea de rezervare. Gazda noastră va examina personal detaliile și vă va contacta în 24 de ore pentru a confirma rezervarea. Așteptăm cu nerăbdare să vă primim la Grădina Sânzienelor!",
+        confirmation_sub_message: "Vă rugăm să verificați email-ul pentru un rezumat al cererii dvs.",
+        make_another_booking: "Fă o Altă Rezervare",
+        extras_title: "Extra Servicii",
+        extras_subtitle: "Selectați serviciile suplimentare pe care doriți să le adăugați la rezervarea dvs.",
+        extras_hottub: "Ciubăr Privat",
+        extras_meal_plan: "Plan Gastronomic",
+        extras_hottub_description: "Relaxați-vă sub stele în ciubărul nostru privat cu apă fierbinte. Disponibil tot anul, ciubărul poate găzdui până la 6 oaspeți și este inclus pentru întreaga sejur.",
+        extras_meal_plan_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
+        terms_and_conditions: "Termeni și Condiții",
+        privacy_policy: "Politica de Confidențialitate",
+        newsletter_agree: "Sunt de acord să primesc informații",
+        newsletter_tooltip: "În viitor, aș dori să primesc buletine de informații și oferte de călătorie prin email. Acest consimțământ poate fi retras oricând.",
+        extras_cabin: "Cabana",
+        extras_cabin_description: "Bucurați-vă de un sejur confortabil în cabana noastră, înconjurată de natură. Cabana este dotată cu facilități moderne și oferă un refugiu confortabil pentru escapada dvs.",
+        terms_title: "Termeni și Condiții",
+        privacy_title: "Politica de Confidențialitate"
     },
     en: {
         main_title: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -154,7 +179,33 @@ const translations = {
         nav_meal: "Meal Reservations",
         nav_cabin: "Accommodation Reservations",
         punct_gastronomic_title: "What is a Local Gastronomic Point?",
-        contact_title: "Contact"     
+        contact_title: "Contact",
+        legal_note: "By confirming the booking you agree to the {/terms} and {/privacy}.",
+        terms_and_conditions: "Terms and Conditions",
+        privacy_policy: "Privacy Policy",
+        back_button: "Back",
+        send_booking_button: "Send Booking for Confirmation",
+        booking_summary: "Booking Summary",
+        confirmation_label: "Confirmation",
+        confirmation_message: "Your booking has been submitted.",
+        booking_request_submitted: "Booking Request Submitted",
+        confirmation_message_details: "Thank you for your booking request. Our host will personally review your details and contact you within 24 hours to confirm your reservation. We look forward to welcoming you to Grădina Sânzienelor!",
+        confirmation_sub_message: "Please check your email for a summary of your request.",
+        make_another_booking: "Make Another Booking",
+        extras_title: "Extra Services",
+        extras_subtitle: "Select the additional services you would like to add to your reservation.",
+        extras_hottub: "Private Hot Tub",
+        extras_meal_plan: "Gastronomic Meal Plan",
+        extras_hottub_description: "Relax under the stars in our private outdoor hot tub. Available year-round, the hot tub accommodates up to 6 guests and is included for your entire stay.",
+        extras_meal_plan_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night.",
+        terms_and_conditions: "Terms and Conditions",
+        privacy_policy: "Privacy Policy",
+        newsletter_agree: "I agree to receive information",
+        newsletter_tooltip: "In the future, I would like to receive newsletters with current information and travel offers by email. This consent can be withdrawn at any time.",
+        extras_cabin: "Cabin",
+        extras_cabin_description: "Enjoy a cozy stay in our cabin, surrounded by nature. The cabin is equipped with modern amenities and provides a comfortable retreat for your getaway.",
+        terms_title: "Terms and Conditions",
+        privacy_title: "Privacy Policy"     
     }
 }
 
@@ -201,3 +252,16 @@ export function changeLanguage(newLanguage) {
     //     updateCabinSummary();
     // }
 }
+
+export function formatLegalLinks() {
+    const noteElement = document.querySelector('.legal-note');
+    if (!noteElement) return;
+
+    let currentText = noteElement.textContent;
+    const termsHtml = `<a href="/terms" class="legal-link" id="termsLink" data-i18n="terms_and_conditions">${translations[currentLanguage].terms_and_conditions}</a>`;
+    const privacyHtml = `<a href="/privacy" class="legal-link" id="privacyLink" data-i18n="privacy_policy">${translations[currentLanguage].privacy_policy}</a>`;
+
+    currentText = currentText.replace('{/terms}', termsHtml).replace('{/privacy}', privacyHtml);
+    noteElement.innerHTML = currentText;
+}
+
