@@ -1,66 +1,63 @@
-const getDbConnection = require('../db');
-
 const db = require('../db');
 
 const mealModel = {
-    checkAvailability: async (date, mealType) => {
-        return new Promise(async (resolve, reject) => {
+    checkAvailability: async (date) => {
+        return new Promise((resolve, reject) => {
             const sql = `
-            SELECT adults FROM meal_reservations
+            SELECT COALESCE(SUM(adults + COALESCE(infants, 0)), 0) as total_guests
+            FROM meal_reservations
             WHERE status = 'confirmed'
-            AND NOT (reservation_date >= ?)`;
+            AND reservation_date = ?`;
 
-            db.getDbConnection(sql, [date], (err, row) => {
+            db.get(sql, [date], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row ? row.adults || 0 : 0);
+                    resolve(row ? row.total_guests || 0 : 0);
                 }
             });
         });
     },
 
     createReservation: async (reservationData) => {
-        return new Promise(async (resolve, reject) => {
-            db.serialize(() => {
-                db.run("BEGIN TRANSACTION");
+        return new Promise((resolve, reject) => {
+            const sqlInsert = `
+            INSERT INTO meal_reservations
+            (first_name, last_name, email, phone, reservation_date, adults, infants, pets, wants_cabin, newsletter, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-                const sqlInsert = `
-            INSERT INTO meal_reservations (first_name, last_name, email, phone, reservation_date, adults, wants_cabin, newsletter)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            const params = [
+                reservationData.first_name,
+                reservationData.last_name,
+                reservationData.email,
+                reservationData.phone,
+                reservationData.reservation_date,
+                reservationData.adults,
+                reservationData.infants || 0,
+                reservationData.pets || 0,
+                reservationData.wants_cabin ? 1 : 0,
+                reservationData.newsletter ? 1 : 0,
+                reservationData.created_at || new Date().toISOString(),
+                reservationData.updated_at || new Date().toISOString()
+            ];
 
-                db.run(sqlInsert, [
-                    reservationData.first_name,
-                    reservationData.last_name,
-                    reservationData.email,
-                    reservationData.phone,
-                    reservationData.reservation_date,
-                    reservationData.adults,
-                    reservationData.wants_cabin,
-                    reservationData.newsletter
-                ], function(err) {
-                    if (err) {
-                        db.run("ROLLBACK");
-                        reject(err);
-                    } 
-                    const insertId = this.lastID;
-                    db.run("COMMIT", (commitErr) => {
-                        if (commitErr) {
-                            db.run("ROLLBACK");
-                            return reject(commitErr);
-                        }
-                        resolve(insertId);
-                    });
-                });
+            db.run(sqlInsert, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
             });
         });
     },
+
     getReservedDates: async () => {
         return new Promise((resolve, reject) => {
             const sql = `
-            SELECT reservation_date, adults
+            SELECT reservation_date, adults, infants, pets
             FROM meal_reservations
             WHERE status = 'confirmed'`;
+
             db.all(sql, [], (err, rows) => {
                 if (err) {
                     reject(err);
@@ -70,6 +67,6 @@ const mealModel = {
             });
         });
     }
-}
+};
 
 module.exports = mealModel;

@@ -1,82 +1,155 @@
 const AccomodationModel = require('../models/accomodationModel');
 
-const { getLanguage, t, validateReservationInput, sanitizeText} = require('../utils/helpers');
-
-const MAX_CABIN_CAPACITY = 8;
-const MIN_CABIN_CAPACITY = 1;
+const {
+    getLanguage,
+    t,
+    validateReservationInput,
+    sanitizeText,
+    sanitizeName,
+    MAX_CABIN_CAPACITY,
+    MIN_CABIN_CAPACITY,
+    MAX_ROOMS,
+    MIN_ROOMS,
+    isValidInteger,
+    isValidBoolean,
+    containsMaliciousPatterns
+} = require('../utils/helpers');
 
 const AccomodationController = {
-
-    // ENDPOINT: POST /api/accomodation/reservation
     createReservation: async (req, res) => {
         const lang = getLanguage(req);
-        const bodyData = req.body;
 
-        // Validate input data
-        const validationErrors = validateReservationInput(bodyData, lang, false);
+        if (!req.body || typeof req.body !== 'object') {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
+
+        const bodyData = req.body;
+        const first_name = bodyData.first_name;
+        const last_name = bodyData.last_name;
+        const email = bodyData.email;
+        const phone = bodyData.phone;
+        const start_date = bodyData.start_date;
+        const end_date = bodyData.end_date;
+        const adults = bodyData.adults;
+        const infants = bodyData.infants || 0;
+        const pets = bodyData.pets || 0;
+        const rooms_needed = bodyData.rooms_needed;
+        const wants_meal = bodyData.wants_meal;
+        const wants_hottub = bodyData.wants_hottub;
+        const newsletter = bodyData.newsletter;
+
+        if (typeof first_name !== 'string' || typeof last_name !== 'string') {
+            return res.status(400).json({ errors: t('invalid_name', lang) });
+        }
+
+        if (typeof email !== 'string' || typeof phone !== 'string') {
+            return res.status(400).json({ errors: t('invalid_email', lang) });
+        }
+
+        if (typeof start_date !== 'string' || typeof end_date !== 'string') {
+            return res.status(400).json({ errors: t('invalid_start_date', lang) });
+        }
+
+        if (!isValidInteger(adults)) {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (!isValidInteger(infants) && infants !== undefined && infants !== null && infants !== '') {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (!isValidInteger(rooms_needed)) {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (wants_meal !== undefined && wants_meal !== null && !isValidBoolean(wants_meal)) {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
+
+        if (wants_hottub !== undefined && wants_hottub !== null && !isValidBoolean(wants_hottub)) {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
+
+        if (newsletter !== undefined && newsletter !== null && !isValidBoolean(newsletter)) {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
+
+        const mappedData = {
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            phone: phone,
+            start_date: start_date,
+            end_date: end_date,
+            adults: parseInt(adults, 10),
+            infants: parseInt(infants, 10) || 0,
+            pets: parseInt(pets, 10) || 0,
+            rooms_needed: parseInt(rooms_needed, 10),
+            wants_meal: wants_meal ? true : false,
+            wants_hottub: wants_hottub ? true : false,
+            newsletter: newsletter ? true : false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        const validationErrors = validateReservationInput(mappedData, lang, false);
         if (validationErrors) {
             return res.status(400).json({ errors: validationErrors.join(', ') });
         }
 
-        // Sanitize input data
-        let finalName = bodyData.first_name.trim() + ' ' + bodyData.last_name.trim();
-        finalName = sanitizeText(finalName);
+        const sanitizedFirstName = sanitizeName(first_name);
+        const sanitizedLastName = sanitizeName(last_name);
 
-        // Validate capacity 
-        const totalGuests = parseInt(bodyData.adults) || 1;
+        const totalGuests = mappedData.adults + mappedData.infants;
         if (totalGuests < MIN_CABIN_CAPACITY || totalGuests > MAX_CABIN_CAPACITY) {
-            return res.status(400).json({ errors: t('invalid_capacity', lang) });
+            return res.status(400).json({ errors: t('invalid_persons_count', lang) });
         }
 
         try {
-            // Check availability
-            const existingGuests = await AccomodationModel.checkAvailability(bodyData.start_date, bodyData.end_date);
+            const existingGuests = await AccomodationModel.checkAvailability(mappedData.start_date, mappedData.end_date);
             if (existingGuests + totalGuests > MAX_CABIN_CAPACITY) {
-                return res.status(400).json({ errors: t('no_availability', lang) });
+                return res.status(400).json({ errors: t('fully_booked', lang) });
             }
 
-            // Save in db
             const dbData = {
-                ...bodyData,
-                first_name: sanitizeText(bodyData.first_name.trim()),
-                last_name: sanitizeText(bodyData.last_name.trim()),
-                totalGuests: totalGuests
+                first_name: sanitizedFirstName,
+                last_name: sanitizedLastName,
+                email: sanitizeText(email),
+                phone: sanitizeText(phone),
+                start_date: start_date,
+                end_date: end_date,
+                adults: mappedData.adults,
+                infants: mappedData.infants,
+                pets: mappedData.pets,
+                rooms_needed: mappedData.rooms_needed,
+                wants_meal: mappedData.wants_meal ? 1 : 0,
+                wants_hottub: mappedData.wants_hottub ? 1 : 0,
+                newsletter: mappedData.newsletter ? 1 : 0,
+                created_at: mappedData.created_at,
+                updated_at: mappedData.updated_at
             };
 
             const insertedId = await AccomodationModel.createReservation(dbData);
-
-            // Send confirmation email
-            // await sendConfirmationEmail(bodyData, 'cabin');
-            return res.status(201).json({ message: t('reservation_success', lang), reservationId: insertedId });
+            return res.status(201).json({ message: t('cabin_success', lang), reservationId: insertedId });
         } catch (error) {
-            console.error('Error creating reservation:', error);
-            return res.status(500).json({ errors: t('server_error', lang) });
+            console.error('Error creating accommodation reservation:', error);
+            return res.status(500).json({ errors: t('save_error', lang) });
         }
     },
 
-    // ENDPOINT: GET /api/accomodation/availability
     getAvailability: async (req, res) => {
         const lang = getLanguage(req);
         try {
             const rows = await AccomodationModel.getAvailability();
-            res.json(rows);
+            return res.status(200).json(rows);
         } catch (error) {
-            console.error('Error fetching availability:', error);
-            res.status(500).json({ errors: t('server_error', lang) });
+            console.error('Error fetching accommodation availability:', error);
+            return res.status(500).json({ errors: t('availability_error', lang) });
         }
-    }
-};
-
-const createReservationWithTransaction = async (req, res) => {
-    try {
-        db.run("BEGIN TRANSACTION");
-        const id = await AccomodationModel.createReservation(req.body);
-        // await draftModel.deleteDraft(...); // You can perform multiple actions here
-        db.run("COMMIT");
-        res.status(201).json({ id });
-    } catch (err) {
-        db.run("ROLLBACK");
-        res.status(500).json({ error: err.message });
     }
 };
 

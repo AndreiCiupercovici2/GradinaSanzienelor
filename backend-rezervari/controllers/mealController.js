@@ -1,71 +1,118 @@
 const MealModel = require('../models/mealModel');
 
-const { getLanguage, t, validateReservationInput, sanitizeText, sendConfirmationEmail } = require('../utils/helpers');
-
-const MAX_MEAL_CAPACITY = 20;
+const {
+    getLanguage,
+    t,
+    validateReservationInput,
+    sanitizeText,
+    sanitizeName,
+    MAX_MEAL_CAPACITY,
+    isValidInteger,
+    isValidBoolean,
+    containsMaliciousPatterns
+} = require('../utils/helpers');
 
 const MealController = {
-
-    // ENDPOINT: POST /api/meal/reservation
     createReservation: async (req, res) => {
         const lang = getLanguage(req);
-        const bodyData = req.body;
 
-        // Map incoming fields to expected format
-        const nameParts = (bodyData.name || '').trim().split(/\s+/, 2);
-        const first_name = nameParts[0] || '';
-        const last_name = nameParts[1] || '';
+        if (!req.body || typeof req.body !== 'object') {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
+
+        const bodyData = req.body;
+        const first_name = bodyData.first_name;
+        const last_name = bodyData.last_name;
+        const email = bodyData.email;
+        const phone = bodyData.phone;
+        const reservation_date = bodyData.reservation_date;
+        const adults = bodyData.adults;
+        const infants = bodyData.infants || 0;
+        const pets = bodyData.pets || 0;
+        const newsletter = bodyData.newsletter;
+
+        if (typeof first_name !== 'string' || typeof last_name !== 'string') {
+            return res.status(400).json({ errors: t('invalid_name', lang) });
+        }
+
+        if (typeof email !== 'string' || typeof phone !== 'string') {
+            return res.status(400).json({ errors: t('invalid_email', lang) });
+        }
+
+        if (typeof reservation_date !== 'string') {
+            return res.status(400).json({ errors: t('invalid_reservation_date', lang) });
+        }
+
+        if (!isValidInteger(adults)) {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (!isValidInteger(infants) && infants !== undefined && infants !== null && infants !== '') {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
+            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        }
+
+        if (newsletter !== undefined && newsletter !== null && !isValidBoolean(newsletter)) {
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
+        }
 
         const mappedData = {
             first_name: first_name,
             last_name: last_name,
-            email: bodyData.email,
-            phone: bodyData.phone,
-            start_date: bodyData.reservation_date,
-            adults: bodyData.adults,
+            email: email,
+            phone: phone,
+            reservation_date: reservation_date,
+            adults: parseInt(adults, 10),
+            infants: parseInt(infants, 10) || 0,
+            pets: parseInt(pets, 10) || 0,
             wants_cabin: false,
-            newsletter: bodyData.newsletter || false
+            newsletter: newsletter ? true : false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         };
 
-        // Validate input data
         const validationErrors = validateReservationInput(mappedData, lang, true);
         if (validationErrors) {
             return res.status(400).json({ errors: validationErrors.join(', ') });
         }
 
-        // Sanitize input data
-        let finalName = first_name.trim() + ' ' + last_name.trim();
-        finalName = sanitizeText(finalName);
+        const sanitizedFirstName = sanitizeName(first_name);
+        const sanitizedLastName = sanitizeName(last_name);
 
-        // Validate capacity
-        const totalGuests = parseInt(mappedData.adults) || 1;
+        const totalGuests = mappedData.adults + mappedData.infants;
         if (totalGuests < 1 || totalGuests > MAX_MEAL_CAPACITY) {
-            return res.status(400).json({ errors: t('invalid_capacity', lang) });
+            return res.status(400).json({ errors: t('invalid_meal_max_persons', lang) });
         }
 
         try {
-            // Check availability
-            const existingGuests = await MealModel.checkAvailability(mappedData.start_date);
+            const existingGuests = await MealModel.checkAvailability(mappedData.reservation_date);
             if (existingGuests + totalGuests > MAX_MEAL_CAPACITY) {
                 return res.status(400).json({ errors: t('no_availability', lang) });
             }
 
-            // Save in db
             const dbData = {
-                ...mappedData,
-                first_name: sanitizeText(first_name.trim()),
-                last_name: sanitizeText(last_name.trim()),
-                totalGuests: totalGuests
+                first_name: sanitizedFirstName,
+                last_name: sanitizedLastName,
+                email: sanitizeText(email),
+                phone: sanitizeText(phone),
+                reservation_date: reservation_date,
+                adults: mappedData.adults,
+                infants: mappedData.infants,
+                pets: mappedData.pets,
+                wants_cabin: 0,
+                newsletter: mappedData.newsletter ? 1 : 0,
+                created_at: mappedData.created_at,
+                updated_at: mappedData.updated_at
             };
 
             const insertedId = await MealModel.createReservation(dbData);
-
-            // Send confirmation email
-            await sendConfirmationEmail(dbData, 'meal');
-            return res.status(201).json({ message: t('reservation_success', lang), reservationId: insertedId });
+            return res.status(201).json({ message: t('meal_success', lang), reservationId: insertedId });
         } catch (error) {
             console.error('Error creating meal reservation:', error);
-            return res.status(500).json({ errors: t('server_error', lang) });
+            return res.status(500).json({ errors: t('save_error', lang) });
         }
     },
 
@@ -76,7 +123,7 @@ const MealController = {
             return res.status(200).json({ reservedDates });
         } catch (error) {
             console.error('Error fetching meal availability:', error);
-            return res.status(500).json({ errors: t('server_error', lang) });
+            return res.status(500).json({ errors: t('availability_error', lang) });
         }
     }
 };

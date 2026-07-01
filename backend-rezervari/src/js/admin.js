@@ -69,10 +69,10 @@ async function loadMealReservations() {
         reservations.forEach(rez => {
             table.innerHTML += `
                 <tr>
-                    <td style="color:#888; font-size:12px;">${formatDate(rez.order_date)}</td>
+                    <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
                     <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
-                    <td><strong>${rez.reservation_date}</strong> <br> Ora: ${rez.time}</td>
-                    <td>${rez.number_of_persons}</td>
+                    <td><strong>${rez.reservation_date}</strong></td>
+                    <td>${rez.adults}</td>
                     <td>${generateButtons(rez.id, 'meal', rez.status)}</td>
                 </tr>`;
         });
@@ -108,7 +108,7 @@ async function loadCabinReservations() {
         reservations.forEach(rez => {
             table.innerHTML += `
                 <tr>
-                    <td style="color:#888; font-size:12px;">${formatDate(rez.reservation_date)}</td>
+                    <td style="color:#888; font-size:12px;">${formatDate(rez.CREATED_AT)}</td>
                     <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
                     <td>${rez.start_date} - ${rez.end_date}</td>
                     <td>${rez.adults} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
