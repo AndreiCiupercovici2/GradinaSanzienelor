@@ -1,4 +1,4 @@
-import { WIZARD_STATE, backendUrl } from '../core/state.js';
+import { WIZARD_STATE, APP_GLOBALS, backendUrl } from '../core/state.js';
 
 export async function saveMealDraft(step) {
     const res = await fetch(`${backendUrl}/api/reservations/draft`, {
@@ -27,13 +27,12 @@ export async function saveCabinDraft(step) {
     return await res.json();
 }
 
-export async function submitCabinBooking() {
+export async function submitCabinBooking(payload) {
     const res = await fetch(`${backendUrl}/api/cabinReservations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payload })
+        body: JSON.stringify(payload)
     });
-
     if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to submit accommodation booking');
@@ -41,16 +40,43 @@ export async function submitCabinBooking() {
     return await res.json();
 }
 
-export async function submitMealBooking() {
+export async function submitMealBooking(payload) {
     const res = await fetch(`${backendUrl}/api/mealReservations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payload })
+        body: JSON.stringify(payload)
     });
-
     if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to submit meal booking');
     }
     return await res.json();
+}
+
+export async function incarcatDateOcupare() {
+    try {
+        const response = await fetch(`${backendUrl}/api/zile_ocupate`);
+        if (response.ok) {
+            const rezervariConfirmate = await response.json();
+            rezervariConfirmate.forEach(rez => {
+                let startParts = rez.data_inceput.split('-');
+                let endParts = rez.data_sfarsit.split('-');
+                let startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 12, 0, 0);
+                let endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 12, 0, 0);
+
+                for (let d = new Date(startDate); d < endDate; d.setDate(d.getDate() + 1)) {
+                    let dateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+
+                    if (!APP_GLOBALS.dailyOccupancy[dateStr]) APP_GLOBALS.dailyOccupancy[dateStr] = 0;
+                    APP_GLOBALS.dailyOccupancy[dateStr] += rez.numar_persoane;
+
+                    if (APP_GLOBALS.dailyOccupancy[dateStr] >= 8) {
+                        APP_GLOBALS.fullyBookedDates.push(dateStr);
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.warn("Serverul nu a trimis zilele ocupate.");
+    }
 }

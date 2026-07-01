@@ -1,4 +1,6 @@
-import { WIZARD_STATE } from '../core/state.js';
+import { WIZARD_STATE, APP_GLOBALS } from '../core/state.js';
+import flatpickr from 'flatpickr';
+import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 
 export function isToday(dateStr) {
     const today = new Date();
@@ -28,4 +30,15 @@ export function syncCabinOrMealFormToState() {
     state.wantsHotTub = document.getElementById('wantsHotTub')?.checked;
     state.wantsCabin = document.getElementById('wantsCabin')?.checked;
     state.rooms = parseInt(document.getElementById('rooms')?.value) || 1;
+}
+
+export function getLocaleConfig() {
+    if (APP_GLOBALS.currentLanguage === 'ro' && typeof flatpickr !== 'undefined' && Romanian) {
+        return { locale: Romanian };
+    }
+    return { locale: 'en' };
+}
+
+export function calculateTotalPeople(adults, infants) {
+    return (parseInt(adults) || 0) + (parseInt(infants) || 0);
 }
