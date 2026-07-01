@@ -6,6 +6,67 @@ import flatpickr from 'flatpickr';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 import 'flatpickr/dist/flatpickr.min.css';
 
+// ─── UI Notification Helpers ──────────────────────────────────────────────────
+
+export function showToast(message, type = 'info') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const icons = { error: '✕', success: '✓', warning: '⚠', info: 'ℹ' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.innerHTML =
+        `<span class="toast-icon" aria-hidden="true">${icons[type] || icons.info}</span>` +
+        `<span class="toast-message">${message}</span>` +
+        `<button class="toast-close" aria-label="Close notification">&times;</button>`;
+
+    const dismiss = () => {
+        toast.classList.add('toast-fadeout');
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+    };
+    toast.querySelector('.toast-close').addEventListener('click', dismiss);
+    container.appendChild(toast);
+    setTimeout(dismiss, 4000);
+}
+
+export function showConfirmModal(message, onConfirm) {
+    const lang = APP_GLOBALS.currentLanguage;
+    const overlay = document.createElement('div');
+    overlay.id = 'confirm-modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML =
+        `<div class="confirm-modal">` +
+            `<div class="confirm-modal-title">${lang === 'en' ? 'Confirm Action' : 'Confirmare acțiune'}</div>` +
+            `<div class="confirm-modal-message">${message}</div>` +
+            `<div class="confirm-modal-actions">` +
+                `<button class="confirm-modal-cancel">${lang === 'en' ? 'Cancel' : 'Anulare'}</button>` +
+                `<button class="confirm-modal-confirm">${lang === 'en' ? 'Confirm' : 'Confirmare'}</button>` +
+            `</div>` +
+        `</div>`;
+
+    const close = () => overlay.remove();
+    overlay.querySelector('.confirm-modal-cancel').addEventListener('click', close);
+    overlay.querySelector('.confirm-modal-confirm').addEventListener('click', () => { close(); onConfirm(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.body.appendChild(overlay);
+}
+
+function markError(el) {
+    if (!el) return;
+    el.classList.add('input-error');
+    el.addEventListener('input',  () => el.classList.remove('input-error'), { once: true });
+    el.addEventListener('change', () => el.classList.remove('input-error'), { once: true });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function handleCabinSubmission() {
     if (!validateCabinStep3()) return;
     syncCabinOrMealFormToState();
@@ -31,7 +92,7 @@ export async function handleCabinSubmission() {
         await submitCabinBooking(backendPayload);
         showCabinStep(4);
     } catch (err) {
-        alert('Error submitting cabin booking: ' + err.message);
+        showToast('Error submitting cabin booking: ' + err.message, 'error');
     }
 }
 
@@ -61,9 +122,9 @@ export async function handleMealSubmission() {
             showMealStep(4);
         } else {
             const data = await res.json();
-            alert('Error: ' + (data.error || 'Something went wrong.'));
+            showToast('Error: ' + (data.error || 'Something went wrong.'), 'error');
         }
-    } catch (err) { alert('Cannot reach the server. Please try again.'); }
+    } catch (err) { showToast('Cannot reach the server. Please try again.', 'error'); }
 }
 
 export function handleArrivalChange(dates) {
@@ -198,80 +259,113 @@ export function showCabinStep(stepNumber) {
 }
 
 export function validateMealStep1() {
-    if (!document.getElementById('mealArrivalInput')?.value) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.');
+    const arrivalEl = document.getElementById('mealArrivalInput');
+    if (!arrivalEl?.value) {
+        markError(arrivalEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.', 'warning');
         return false;
     }
     return true;
 }
 
 export function validateMealStep3() {
-    const firstName = document.getElementById('mealFirstName')?.value.trim();
-    const lastName = document.getElementById('mealLastName')?.value.trim();
-    const email = document.getElementById('mealEmail')?.value.trim();
-    const phone = document.getElementById('mealPhone')?.value.trim();
+    const firstNameEl = document.getElementById('mealFirstName');
+    const lastNameEl  = document.getElementById('mealLastName');
+    const emailEl     = document.getElementById('mealEmail');
+    const phoneEl     = document.getElementById('mealPhone');
+    const firstName = firstNameEl?.value.trim();
+    const lastName  = lastNameEl?.value.trim();
+    const email     = emailEl?.value.trim();
+    const phone     = phoneEl?.value.trim();
     if (!firstName || !lastName || !email) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
+        if (!firstName) markError(firstNameEl);
+        if (!lastName)  markError(lastNameEl);
+        if (!email)     markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.', 'warning');
         return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.', 'warning');
         return false;
     }
     if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
+        markError(phoneEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.', 'warning');
         return false;
     }
     return true;
 }
 
 export function validateCabinStep1() {
-    if (!document.getElementById('cabinArrivalInput')?.value || !document.getElementById('cabinDepartureInput')?.value) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please select arrival and departure dates.' : 'Vă rugăm selectați datele de sosire și plecare.');
+    const arrivalEl   = document.getElementById('cabinArrivalInput');
+    const departureEl = document.getElementById('cabinDepartureInput');
+    if (!arrivalEl?.value || !departureEl?.value) {
+        if (!arrivalEl?.value)   markError(arrivalEl);
+        if (!departureEl?.value) markError(departureEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please select arrival and departure dates.' : 'Vă rugăm selectați datele de sosire și plecare.', 'warning');
         return false;
     }
     if (APP_GLOBALS.cabinNights < 1) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Minimum 1 night required.' : 'Minim 1 noapte obligatorie.');
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Minimum 1 night required.' : 'Minim 1 noapte obligatorie.', 'warning');
         return false;
     }
     return true;
 }
 
 export function validateCabinStep3() {
-    const firstName = document.getElementById('cabinFirstName')?.value.trim();
-    const lastName = document.getElementById('cabinLastName')?.value.trim();
-    const email = document.getElementById('cabinEmail')?.value.trim();
-    const phone = document.getElementById('cabinPhone')?.value.trim();
+    const firstNameEl = document.getElementById('cabinFirstName');
+    const lastNameEl  = document.getElementById('cabinLastName');
+    const emailEl     = document.getElementById('cabinEmail');
+    const phoneEl     = document.getElementById('cabinPhone');
+    const firstName = firstNameEl?.value.trim();
+    const lastName  = lastNameEl?.value.trim();
+    const email     = emailEl?.value.trim();
+    const phone     = phoneEl?.value.trim();
     if (!firstName || !lastName || !email) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
+        if (!firstName) markError(firstNameEl);
+        if (!lastName)  markError(lastNameEl);
+        if (!email)     markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.', 'warning');
         return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.', 'warning');
         return false;
     }
     if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
+        markError(phoneEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.', 'warning');
         return false;
     }
     return true;
 }
 
 export function validateMealStep2() {
-    const firstName = document.getElementById('mealFirstName')?.value.trim();
-    const lastName = document.getElementById('mealLastName')?.value.trim();
-    const email = document.getElementById('mealEmail')?.value.trim();
-    const phone = document.getElementById('mealPhone')?.value.trim();
+    const firstNameEl = document.getElementById('mealFirstName');
+    const lastNameEl  = document.getElementById('mealLastName');
+    const emailEl     = document.getElementById('mealEmail');
+    const phoneEl     = document.getElementById('mealPhone');
+    const firstName = firstNameEl?.value.trim();
+    const lastName  = lastNameEl?.value.trim();
+    const email     = emailEl?.value.trim();
+    const phone     = phoneEl?.value.trim();
     if (!firstName || !lastName || !email) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.');
+        if (!firstName) markError(firstNameEl);
+        if (!lastName)  markError(lastNameEl);
+        if (!email)     markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please fill in all required fields.' : 'Vă rugăm completați toate câmpurile obligatorii.', 'warning');
         return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.');
+        markError(emailEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid email address.' : 'Vă rugăm introduceți o adresă de email validă.', 'warning');
         return false;
     }
     if (!/^[0-9\s\-\+()]{6,}$/.test(phone)) {
-        alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.');
+        markError(phoneEl);
+        showToast(APP_GLOBALS.currentLanguage === 'en' ? 'Please enter a valid phone number.' : 'Vă rugăm introduceți un număr de telefon valid.', 'warning');
         return false;
     }
     return true;
@@ -407,9 +501,9 @@ export async function processCabinBooking() {
             showCabinStep(4);
         } else {
             const data = await res.json();
-            alert('Error: ' + (data.error || 'Something went wrong.'));
+            showToast('Error: ' + (data.error || 'Something went wrong.'), 'error');
         }
-    } catch (err) { alert('Cannot reach the server. Please try again.'); }
+    } catch (err) { showToast('Cannot reach the server. Please try again.', 'error'); }
 }
 
 export function resetCabinForm() {
@@ -668,6 +762,13 @@ export function initWizardEventListeners() {
         if (e.target.id === 'cabinDepartureInput' && APP_GLOBALS.cabinDepartureFP) APP_GLOBALS.cabinDepartureFP.open();
     });
 
+    // Rooms select change listener - update adults options
+    document.getElementById('cabinRoomsSelect')?.addEventListener('change', function(e) {
+        const rooms = parseInt(this.value) || 1;
+        updateAdultsOptions(rooms);
+        updateCabinSummary();
+    });
+
     // ===== MEAL QUICK DATE BUTTONS =====
     document.getElementById('btnToday')?.addEventListener('click', function(e) {
         e.preventDefault();
@@ -686,5 +787,17 @@ export function initWizardEventListeners() {
         const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
         document.getElementById('mealArrivalInput').value = dateStr;
         showMealStep(1);
+    });
+
+    document.getElementById('newBookingBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const msg = APP_GLOBALS.currentLanguage === 'en'
+            ? 'Are you sure you want to start a new booking? Unsaved changes will be lost.'
+            : 'Sigur doriți să începeți o rezervare nouă? Modificările nesalvate vor fi pierdute.';
+        showConfirmModal(msg, () => {
+            resetCabinForm();
+            showCabinStep(1);
+            showMealStep(1);
+        });
     });
 }
