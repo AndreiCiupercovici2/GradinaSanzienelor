@@ -2,7 +2,7 @@ import { initExtrasSlideshow, initHeroSlideshow } from './ui/slideshow.js';
 import { changeLanguage, applyTranslations } from './core/translations.js';
 import { APP_GLOBALS } from './core/state.js';
 import { initWizardEventListeners, showSection, showCabinStep, showMealStep } from './ui/wizard.js';
-import { incarcatDateOcupare } from './api/api.js';
+import { loadOccupiedDates } from './api/api.js';
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         initExtrasSlideshow('mealSlideshow');
         initExtrasSlideshow('cabinSlideshow');
         initWizardEventListeners();
-        await incarcatDateOcupare();
+        await loadOccupiedDates();
     } catch (err) {
         console.error('Initialization failed:', err);
     }
@@ -21,12 +21,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('ro-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('ro'); });
     document.getElementById('en-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('en'); });
 
-    if (document.getElementById('sectiuneCabana')) {
-        await showSection('sectiuneCabana');
+    if (document.getElementById('cabinSection')) {
+        await showSection('cabinSection');
         showCabinStep(1);
     }
-    if (document.getElementById('sectiuneMancare')) {
-        await showSection('sectiuneMancare');
+    if (document.getElementById('mealSection')) {
+        await showSection('mealSection');
         showMealStep(1);
     }
 });

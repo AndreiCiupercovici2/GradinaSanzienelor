@@ -43,10 +43,14 @@ const AdminModel = {
         });
     },
 
-    updateReservationStatus: (reservationId, newStatus) => {
+    updateReservationStatus: (table, id, newStatus) => {
         return new Promise((resolve, reject) => {
-            const sql = `UPDATE cabin_reservations SET status = ? WHERE id = ?`;
-            db.run(sql, [newStatus, reservationId], function (err) {
+            const allowed = ['cabin_reservations', 'meal_reservations'];
+            if (!allowed.includes(table)) {
+                return reject(new Error('Invalid table'));
+            }
+            const sql = `UPDATE ${table} SET status = ? WHERE id = ?`;
+            db.run(sql, [newStatus, id], function (err) {
                 if (err) {
                     reject(err);
                 } else {

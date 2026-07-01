@@ -16,7 +16,7 @@ export async function handleCabinSubmission() {
         first_name: payload.firstName,
         last_name: payload.lastName,
         email: payload.email,
-        telefon: payload.phonePrefix + payload.phone,
+        phone: payload.phonePrefix + payload.phone,
         start_date: payload.arrivalDate,
         end_date: payload.departureDate,
         adults: payload.adults,
@@ -70,8 +70,8 @@ export function handleDepartureChange(dates) {
 }
 
 export async function showSection(type) {
-    const cabinEl = document.getElementById('sectiuneCabana');
-    const mealEl = document.getElementById('sectiuneMancare');
+    const cabinEl = document.getElementById('cabinSection');
+    const mealEl = document.getElementById('mealSection');
 
     if (cabinEl) {
         cabinEl.style.display = 'flex';
@@ -80,7 +80,7 @@ export async function showSection(type) {
         mealEl.style.display = 'flex';
     }
 
-    if (type === 'sectiuneCabana') {
+    if (type === 'cabinSection') {
         const arrivalInput = document.getElementById('cabinArrivalInput');
         const departureInput = document.getElementById('cabinDepartureInput');
         if (!arrivalInput || !departureInput) {
@@ -120,7 +120,7 @@ export async function showSection(type) {
         }
     }
 
-    if (type === 'sectiuneMancare') {
+    if (type === 'mealSection') {
         const arrivalInputMeal = document.getElementById('mealArrivalInput');
         if (arrivalInputMeal && !arrivalInputMeal.dataset.fpBound) {
             arrivalInputMeal.dataset.fpBound = 'true';
@@ -152,7 +152,7 @@ export function showMealStep(stepNumber) {
             if (i === stepNumber) stepIndicator.classList.add('active');
         }
     });
-    document.getElementById('sectiuneMancare')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('mealSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function showCabinStep(stepNumber) {
@@ -167,11 +167,11 @@ export function showCabinStep(stepNumber) {
             if (i === stepNumber) stepIndicator.classList.add('active');
         }
     });
-    document.getElementById('sectiuneCabana')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('cabinSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function validateMealStep1() {
-    if (!document.getElementById('mealArrivalInput')?.value && !document.getElementById('dataMStep1')?.value) {
+    if (!document.getElementById('mealArrivalInput')?.value && !document.getElementById('dateMStep1')?.value) {
         alert(APP_GLOBALS.currentLanguage === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.');
         return false;
     }
@@ -270,22 +270,17 @@ export async function processCabinBooking() {
         first_name: document.getElementById('cabinFirstName').value.trim(),
         last_name: document.getElementById('cabinLastName').value.trim(),
         email: document.getElementById('cabinEmail').value.trim(),
-        telefon: phone,
         phone: phone,
-        data_inceput: document.getElementById('cabinArrivalInput').value,
         start_date: document.getElementById('cabinArrivalInput').value,
-        data_sfarsit: document.getElementById('cabinDepartureInput').value,
         end_date: document.getElementById('cabinDepartureInput').value,
         adults: parseInt(document.getElementById('cabinAdultsSelect').value) || 1,
         rooms_needed: parseInt(document.getElementById('cabinRoomsSelect').value) || 1,
-        vrea_meniu: WIZARD_STATE.cabinExtras.meal,
         wants_meal: WIZARD_STATE.cabinExtras.meal,
-        vrea_hottub: WIZARD_STATE.cabinExtras.hotTub,
         wants_hottub: WIZARD_STATE.cabinExtras.hotTub
     };
 
     try {
-        const res = await fetch(`${backendUrl}/api/cabinReservations`, {
+        const res = await fetch(`${backendUrl}/api/cabin_reservations`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         });
         if (res.ok) {
@@ -316,7 +311,7 @@ export function resetCabinForm() {
 
 export async function loadAndRestoreMealDraft(email, phone) {
     try {
-        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=mancare`);
+        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=meal`);
         if (!resp.ok) return false;
 
         const data = await resp.json();
@@ -325,21 +320,21 @@ export async function loadAndRestoreMealDraft(email, phone) {
         const draft = data.draft;
         const formData = draft.form_data;
 
-        if (formData.data_rezervare) document.getElementById('dataMStep1').value = formData.data_rezervare;
-        if (formData.ora) document.getElementById('oraMStep1').value = formData.ora;
-        if (formData.adults !== undefined) document.getElementById('adultiMStep1').value = formData.adults;
-        if (formData.infants !== undefined) document.getElementById('copiiMStep1').value = formData.infants;
-        if (formData.pets !== undefined) document.getElementById('animaleMStep1').value = formData.pets;
+        if (formData.reservation_date) document.getElementById('dateMStep1').value = formData.reservation_date;
+        if (formData.time) document.getElementById('timeMStep1').value = formData.time;
+        if (formData.adults !== undefined) document.getElementById('adultsMStep1').value = formData.adults;
+        if (formData.infants !== undefined) document.getElementById('childrenMStep1').value = formData.infants;
+        if (formData.pets !== undefined) document.getElementById('petsMStep1').value = formData.pets;
 
-        if (formData.nume) document.getElementById('numeMStep2').value = formData.nume;
+        if (formData.name) document.getElementById('nameMStep2').value = formData.name;
         if (formData.email) document.getElementById('emailMStep2').value = formData.email;
-        if (formData.telefon) document.getElementById('telefonMStep2').value = formData.telefon;
+        if (formData.phone) document.getElementById('phoneMStep2').value = formData.phone;
 
         WIZARD_STATE.mealDraftId = draft.id;
 
         showMealStep(draft.current_step);
 
-        document.getElementById('resumeBannerMancare').style.display = 'none';
+        document.getElementById('resumeBannerMeal').style.display = 'none';
 
         WIZARD_STATE.mealFormDirty = true;
 
@@ -352,7 +347,7 @@ export async function loadAndRestoreMealDraft(email, phone) {
 
 export async function loadAndRestoreCabinDraft(email, phone) {
     try {
-        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=cabana`);
+        const resp = await fetch(`${backendUrl}/api/reservations/draft?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&reservation_type=cabin`);
         if (!resp.ok) return false;
 
         const data = await resp.json();
@@ -361,21 +356,21 @@ export async function loadAndRestoreCabinDraft(email, phone) {
         const draft = data.draft;
         const formData = draft.form_data;
 
-        if (formData.data_inceput) document.getElementById('cabinArrivalInput').value = formData.data_inceput;
-        if (formData.data_sfarsit) document.getElementById('cabinDepartureInput').value = formData.data_sfarsit;
+        if (formData.start_date) document.getElementById('cabinArrivalInput').value = formData.start_date;
+        if (formData.end_date) document.getElementById('cabinDepartureInput').value = formData.end_date;
         if (formData.adults !== undefined) document.getElementById('cabinAdultsSelect').value = formData.adults;
         if (formData.rooms_needed !== undefined) document.getElementById('cabinRoomsSelect').value = formData.rooms_needed;
 
-        if (formData.vrea_meniu !== undefined) WIZARD_STATE.cabinExtras.meal = formData.vrea_meniu;
-        if (formData.vrea_hottub !== undefined) WIZARD_STATE.cabinExtras.hotTub = formData.vrea_hottub;
+        if (formData.wants_meal !== undefined) WIZARD_STATE.cabinExtras.meal = formData.wants_meal;
+        if (formData.wants_hottub !== undefined) WIZARD_STATE.cabinExtras.hotTub = formData.wants_hottub;
 
         if (formData.first_name) document.getElementById('cabinFirstName').value = formData.first_name;
         if (formData.last_name) document.getElementById('cabinLastName').value = formData.last_name;
         if (formData.email) document.getElementById('cabinEmail').value = formData.email;
         if (formData.salutation) document.getElementById('cabinSalutation').value = formData.salutation;
 
-        if (formData.telefon) {
-            const storedPhone = formData.telefon;
+        if (formData.phone) {
+            const storedPhone = formData.phone;
             if (storedPhone.startsWith('+40')) {
                 document.getElementById('cabinPhonePrefix').value = '+40';
                 document.getElementById('cabinPhone').value = storedPhone.slice(3);
@@ -394,7 +389,7 @@ export async function loadAndRestoreCabinDraft(email, phone) {
 
         showCabinStep(Math.min(draft.current_step, 4));
 
-        document.getElementById('resumeBannerCabana').style.display = 'none';
+        document.getElementById('resumeBannerCabin').style.display = 'none';
 
         WIZARD_STATE.cabinFormDirty = true;
 
@@ -453,27 +448,27 @@ export function initWizardEventListeners() {
         if (e.target.id === 'cabinDepartureInput' && APP_GLOBALS.cabinDepartureFP) APP_GLOBALS.cabinDepartureFP.open();
     });
 
-    document.getElementById('formMancareStep2')?.addEventListener('submit', async (e) => {
+    document.getElementById('formMealStep2')?.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         if (!validateMealStep2()) return;
 
-        const adulti = parseInt(document.getElementById('adultiMStep1').value) || 0;
-        const copii = parseInt(document.getElementById('copiiMStep1').value) || 0;
+        const adults = parseInt(document.getElementById('adultsMStep1').value) || 0;
+        const children = parseInt(document.getElementById('childrenMStep1').value) || 0;
         const payload = {
-            nume: document.getElementById('numeMStep2').value,
+            name: document.getElementById('nameMStep2').value,
             email: document.getElementById('emailMStep2').value,
-            telefon: document.getElementById('telefonMStep2').value || null,
-            data_rezervare: document.getElementById('dataMStep1').value,
-            ora: document.getElementById('oraMStep1').value,
-            adults: adulti,
-            infants: copii,
-            pets: parseInt(document.getElementById('animaleMStep1').value) || 0,
-            numar_persoane: adulti + copii
+            phone: document.getElementById('phoneMStep2').value || null,
+            reservation_date: document.getElementById('dateMStep1').value,
+            time: document.getElementById('timeMStep1').value,
+            adults: adults,
+            infants: children,
+            pets: parseInt(document.getElementById('petsMStep1').value) || 0,
+            number_of_persons: adults + children
         };
 
         try {
-            const res = await fetch(`${backendUrl}/api/rezervari_mancare`, {
+            const res = await fetch(`${backendUrl}/api/meal_reservations`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
             if (res.ok) {
@@ -488,8 +483,8 @@ export function initWizardEventListeners() {
                     }).catch(err => console.error('Failed to delete draft:', err));
                 }
 
-                document.getElementById('formMancareStep2').reset();
-                document.getElementById('formMancareStep1').reset();
+                document.getElementById('formMealStep2').reset();
+                document.getElementById('formMealStep1').reset();
                 showMealStep(1);
                 WIZARD_STATE.mealFormDirty = false;
                 WIZARD_STATE.mealDraftId = null;
@@ -505,7 +500,7 @@ export function initWizardEventListeners() {
         if (!this.disabled) {
             const today = new Date();
             const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            document.getElementById('dataMStep1').value = dateStr;
+            document.getElementById('dateMStep1').value = dateStr;
             showMealStep(1);
         }
     });
@@ -515,7 +510,7 @@ export function initWizardEventListeners() {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
-        document.getElementById('dataMStep1').value = dateStr;
+        document.getElementById('dateMStep1').value = dateStr;
         showMealStep(1);
     });
 }

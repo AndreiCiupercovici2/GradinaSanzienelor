@@ -4,11 +4,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-    background-color: #f9f9f9;
-}
-
-body {
-    background-color: #b2f387;
+    background-color: #8ddf9b;
 }
 
 /* Content wrapper for non-hero sections */
@@ -76,11 +72,11 @@ h2 {
 /* --- Hero Slideshow Section --- */
 .hero-slideshow {
     position: relative;
-    width: 70vw;
+    width: 90vw;
     height: calc(80vh - 100px); /* Adjust height based on header */
     overflow: hidden;
     background-color: #000;
-    margin: 0 calc(-35vw + 50%);
+    margin-left: 100px;
     margin-bottom: 40px;
 }
 
@@ -402,7 +398,7 @@ button[type="submit"]:hover {
 }
 
 /* --- Mesaje de Alertă și Preț --- */
-.pret-estimat {
+.price-estimated {
     font-size: 18px;
     font-weight: bold;
     color: #d9534f;
@@ -413,7 +409,7 @@ button[type="submit"]:hover {
     border-left: 5px solid #d9534f;
 }
 
-#warningCabana {
+#warningCabin {
     display: none;
     background-color: #fff3cd;
     color: #856404;
@@ -466,9 +462,9 @@ button[type="submit"]:hover {
     position: static !important;
 }
 
-/* Ascunde input-urile originale ale calendarelor */
-input#calendarMancare,
-input#calendarCabana {
+/* Hide original calendar inputs */
+input#calendarMeal,
+input#calendarCabin {
     display: none !important;
 }
 
@@ -536,13 +532,6 @@ input#calendarCabana {
         margin-right: 0;
     }
 
-    /* Hero slideshow responsive */
-    .hero-slideshow {
-        height: 100vh;
-        margin-bottom: 30px;
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-    }
 
     .dots-container {
         bottom: 60px;
@@ -727,6 +716,7 @@ input#calendarCabana {
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-bottom: 20px;
 }
 
 .btn-primary {
@@ -849,7 +839,7 @@ input#calendarCabana {
 
 /* Override max-width so cabin container is wider than the
    default 600 px applied by the body > .form-container rule */
-#sectiuneCabana, #sectiuneMancare {
+#cabinSection, #mealSection {
     max-width: 1000px;
     flex-direction: column;
 }
@@ -1510,13 +1500,13 @@ input#calendarCabana {
 
     /* Progress indicator: narrower labels fit 4 steps */
     #progressCabin .step-label,
-    #progressMancare .step-label {
+    #progressMeal .step-label {
         font-size: 10px;
         max-width: 72px;
     }
 
     #progressCabin .progress-line,
-    #progressMancare .progress-line {
+    #progressMeal .progress-line {
         width: 20px;
     }
 }

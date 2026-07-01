@@ -7,64 +7,64 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT ||
 
 const messages = {
     ro: {
-        num_persoane_invalid: `Numărul de persoane trebuie să fie între ${MIN_CABIN_CAPACITY} și ${MAX_CABIN_CAPACITY}.`,
+        invalid_persons_count: `Numărul de persoane trebuie să fie între ${MIN_CABIN_CAPACITY} și ${MAX_CABIN_CAPACITY}.`,
         availability_error: 'Eroare la verificarea disponibilității.',
         fully_booked: 'Cabana nu mai are locuri disponibile în perioada selectată.',
         save_error: 'Eroare la salvarea rezervării.',
         commit_error: 'Eroare la confirmare.',
         cabin_success: 'Cererea de rezervare a fost trimisă pentru aprobare.',
-        food_success: 'Cererea de masă trimisă pentru aprobare.',
+        meal_success: 'Cererea de masă trimisă pentru aprobare.',
         invalid_type: 'Tip rezervare invalid.',
         invalid_decision: 'Decizie invalidă.',
         invalid_id: 'ID invalid.',
         update_error: 'Eroare la actualizare.',
         not_found: 'Rezervare nu a fost găsită.',
         data_error: 'Eroare la preluarea datelor.',
-        update_success: (decizie) => `Rezervare ${decizie} cu succes.`,
+        update_success: (decision) => `Rezervare ${decision} cu succes.`,
         invalid_adults: 'Adulți trebuie să fie cel puțin 1.',
         invalid_infants: 'Copii nu pot fi negativi.',
         invalid_pets: 'Animale de companie nu pot fi negative.',
         invalid_rooms: 'Camere necesare trebuie să fie între 1 și 3.',
         invalid_meal_max_persons: 'Maxim 15 persoane permise pentru mese.',
         invalid_same_day_after_10am: 'Cererea pentru azi nu mai este acceptată. Vă rog sunați.',
-        invalid_nume: 'Nume invalid.',
+        invalid_name: 'Nume invalid.',
         invalid_email: 'Email invalid.',
-        invalid_telefon: 'Telefon invalid.',
-        invalid_data_rezervare: 'Data rezervare invalidă.',
-        invalid_ora: 'Ora invalidă.',
-        invalid_data_inceput: 'Data început invalidă.',
-        invalid_data_sfarsit: 'Data sfârșit invalidă.',
-        invalid_data_sfarsit_dupa_inceput: 'Data sfârșit trebuie după data început.'
+        invalid_phone: 'Telefon invalid.',
+        invalid_reservation_date: 'Data rezervare invalidă.',
+        invalid_time: 'Ora invalidă.',
+        invalid_start_date: 'Data început invalidă.',
+        invalid_end_date: 'Data sfârșit invalidă.',
+        invalid_end_before_start: 'Data sfârșit trebuie după data început.'
     },
     en: {
-        num_persoane_invalid: `Number of people must be between ${MIN_CABIN_CAPACITY} and ${MAX_CABIN_CAPACITY}.`,
+        invalid_persons_count: `Number of people must be between ${MIN_CABIN_CAPACITY} and ${MAX_CABIN_CAPACITY}.`,
         availability_error: 'Error checking availability.',
         fully_booked: 'Cabin has no available spots for this period.',
         save_error: 'Error saving reservation.',
         commit_error: 'Error confirming reservation.',
         cabin_success: 'Reservation request submitted for approval.',
-        food_success: 'Meal request submitted for approval.',
+        meal_success: 'Meal request submitted for approval.',
         invalid_type: 'Invalid reservation type.',
         invalid_decision: 'Invalid decision.',
         invalid_id: 'Invalid ID.',
         update_error: 'Error updating reservation.',
         not_found: 'Reservation not found.',
         data_error: 'Error retrieving data.',
-        update_success: (decizie) => `Reservation ${decizie} successfully.`,
+        update_success: (decision) => `Reservation ${decision} successfully.`,
         invalid_adults: 'Adults must be at least 1.',
         invalid_infants: 'Infants cannot be negative.',
         invalid_pets: 'Pets cannot be negative.',
         invalid_rooms: 'Rooms needed must be between 1 and 3.',
         invalid_meal_max_persons: 'Maximum 15 people allowed for meals.',
         invalid_same_day_after_10am: 'Same-day requests are no longer accepted. Please call.',
-        invalid_nume: 'Invalid name.',
+        invalid_name: 'Invalid name.',
         invalid_email: 'Invalid email.',
-        invalid_telefon: 'Invalid phone number.',
-        invalid_data_rezervare: 'Invalid reservation date.',
-        invalid_ora: 'Invalid time.',
-        invalid_data_inceput: 'Invalid start date.',
-        invalid_data_sfarsit: 'Invalid end date.',
-        invalid_data_sfarsit_dupa_inceput: 'End date must be after start date.'
+        invalid_phone: 'Invalid phone number.',
+        invalid_reservation_date: 'Invalid reservation date.',
+        invalid_time: 'Invalid time.',
+        invalid_start_date: 'Invalid start date.',
+        invalid_end_date: 'Invalid end date.',
+        invalid_end_before_start: 'End date must be after start date.'
     }
 };
 
@@ -100,17 +100,12 @@ const isAfter10Am = () => {
 const validateReservationInput = (data, lang, isFood = false) => {
     const errors = [];
 
-    // For non-food (cabin), accept either nume OR both first_name + last_name
-    if (isFood) {
-        if (!data.nume || !sanitizeText(data.nume)) errors.push(t('invalid_nume', lang));
-    } else {
-        const hasNume = data.nume && sanitizeText(data.nume);
-        const hasNames = data.first_name && sanitizeText(data.first_name) && data.last_name && sanitizeText(data.last_name);
-        if (!hasNume && !hasNames) errors.push(t('invalid_nume', lang));
-    }
+    // Check for name fields: first_name + last_name
+    const hasNames = data.first_name && sanitizeText(data.first_name) && data.last_name && sanitizeText(data.last_name);
+    if (!hasNames) errors.push(t('invalid_name', lang));
 
     if (!isValidEmail(data.email)) errors.push(t('invalid_email', lang));
-    if (!isValidPhoneNumber(data.telefon)) errors.push(t('invalid_telefon', lang));
+    if (!isValidPhoneNumber(data.phone)) errors.push(t('invalid_phone', lang));
 
     const adults = parseInt(data.adults) || 0;
     const infants = parseInt(data.infants) || 0;
@@ -122,19 +117,19 @@ const validateReservationInput = (data, lang, isFood = false) => {
     if (pets < 0) errors.push(t('invalid_pets', lang));
 
     if (isFood) {
-        if (!isValidDate(data.data_rezervare)) errors.push(t('invalid_data_rezervare', lang));
-        if (!data.ora) errors.push(t('invalid_ora', lang));
+        if (!isValidDate(data.start_date)) errors.push(t('invalid_reservation_date', lang));
+        if (!data.time) errors.push(t('invalid_time', lang));
         if (totalPeople > MAX_MEAL_CAPACITY) errors.push(t('invalid_meal_max_persons', lang));
-        if (isToday(data.data_rezervare) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
+        if (isToday(data.start_date) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
     } else {
-        if (!isValidDate(data.data_inceput)) errors.push(t('invalid_data_inceput', lang));
-        if (!isValidDate(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit', lang));
-        if (new Date(data.data_inceput) >= new Date(data.data_sfarsit)) errors.push(t('invalid_data_sfarsit_dupa_inceput', lang));
+        if (!isValidDate(data.start_date)) errors.push(t('invalid_start_date', lang));
+        if (!isValidDate(data.end_date)) errors.push(t('invalid_end_date', lang));
+        if (new Date(data.start_date) >= new Date(data.end_date)) errors.push(t('invalid_end_before_start', lang));
 
         const rooms = parseInt(data.rooms_needed) || 1;
         if (rooms < MIN_ROOMS || rooms > MAX_ROOMS) errors.push(t('invalid_rooms', lang));
 
-        if (isToday(data.data_inceput) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
+        if (isToday(data.start_date) && isAfter10Am()) errors.push(t('invalid_same_day_after_10am', lang));
     }
 
     return errors.length > 0 ? errors : null;

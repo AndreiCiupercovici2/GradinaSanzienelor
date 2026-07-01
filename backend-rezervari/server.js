@@ -26,7 +26,7 @@ app.use('/flatpickr', express.static('node_modules/flatpickr'));
 app.use('/api', adminRoutes);
 app.use('/api', accomodationRoutes);
 app.use('/api', mealRoutes);
-app.use('/api', draftRoutes);
+app.use('/api/reservations', draftRoutes);
 app.use('/', pageRoutes);
 
 

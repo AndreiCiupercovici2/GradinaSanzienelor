@@ -1,4 +1,4 @@
-const { getLanguage, t, isValidEmail, isValidPhoneNumber, sanitizeText } = require('../utils/helpers');
+const { getLanguage, t, isValidEmail, isValidPhoneNumber, sanitizeText, BASE_URL } = require('../utils/helpers');
 const { sendDraftReminderEmail } = require('../utils/mailer');
 const draftModel = require('../models/draftModel');
 
@@ -8,8 +8,8 @@ const handleGetDraft = async (req, res) => {
     const { email, phone, reservation_type } = req.query;
 
     if (email && !isValidEmail(email)) return res.status(400).json({ error: t('invalid_email', lang) });
-    if (phone && !isValidPhoneNumber(phone)) return res.status(400).json({ error: t('invalid_telefon', lang) });
-    if (!['mancare', 'cabana'].includes(reservation_type)) return res.status(400).json({ error: t('invalid_type', lang) });
+    if (phone && !isValidPhoneNumber(phone)) return res.status(400).json({ error: t('invalid_phone', lang) });
+    if (!['meal', 'cabin'].includes(reservation_type)) return res.status(400).json({ error: t('invalid_type', lang) });
 
     try {
         const draft = await draftModel.getActiveDraftByDetails(email || '', phone || '', reservation_type);
@@ -33,6 +33,36 @@ const handleGetDraft = async (req, res) => {
     }
 };
 
+const handleSaveDraft = async (req, res) => {
+    const lang = getLanguage(req);
+    const { email, phone, reservation_type, current_step, step_data } = req.body;
+
+    if (!['meal', 'cabin'].includes(reservation_type)) return res.status(400).json({ error: t('invalid_type', lang) });
+    if (isNaN(parseInt(current_step))) return res.status(400).json({ error: t('invalid_step', lang) });
+
+    try {
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        const formDataJson = JSON.stringify(step_data);
+
+        let existingDraft = null;
+        if (email && phone) {
+            existingDraft = await draftModel.findDraftByContact(email, phone, reservation_type);
+        }
+
+        let result;
+        if (existingDraft) {
+            result = await draftModel.updateExistingDraft(existingDraft.id, current_step, formDataJson, email || null, phone || null, expiresAt);
+        } else {
+            result = await draftModel.insertNewDraft(email || null, phone || null, reservation_type, current_step, formDataJson, expiresAt);
+        }
+
+        return res.status(201).json({ success: true, draftId: result.draftId, isNew: result.isNew });
+    } catch (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: t('save_error', lang) });
+    }
+};
+
 const handleDeleteDraft = async (req, res) => {
     const lang = getLanguage(req);
     const { id } = req.params;
@@ -51,8 +81,24 @@ const handleDeleteDraft = async (req, res) => {
 };
 
 const handleSendReminder = async (req, res) => {
-    const resumeLink = `${BASE_URL}?resume_draft=${draft.id}&email=${encodeURIComponent(draft.email)}&phone=${encodeURIComponent(draft.phone)}`;
-    await sendDraftReminderEmail(draft, clientName, reservationType, resumeLink);
+    const lang = getLanguage(req);
+    const { id } = req.params;
+
+    if (!id || isNaN(id)) return res.status(400).json({ error: t('invalid_id', lang) });
+
+    try {
+        const draft = await draftModel.getDraftById(id);
+        if (!draft) return res.status(404).json({ error: t('not_found', lang) });
+
+        const clientName = draft.email?.split('@')[0] || 'Client';
+        const resumeLink = `${BASE_URL}?resume_draft=${draft.id}&email=${encodeURIComponent(draft.email)}&phone=${encodeURIComponent(draft.phone)}`;
+
+        await sendDraftReminderEmail(draft, clientName, draft.reservation_type, resumeLink);
+        return res.json({ success: true, message: 'Reminder email sent successfully.' });
+    } catch (err) {
+        console.error('Error sending reminder:', err);
+        return res.status(500).json({ error: t('update_error', lang) });
+    }
 };
 
 const handleMarkCompleted = async (req, res) => {
@@ -74,6 +120,7 @@ const handleMarkCompleted = async (req, res) => {
 
 module.exports = {
     handleGetDraft,
+    handleSaveDraft,
     handleDeleteDraft,
     handleSendReminder,
     handleMarkCompleted

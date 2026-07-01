@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; }
         h1, h2 { color: #333; }
-        .tabel-container {
+        .table-container {
             overflow-x: auto;
             margin-bottom: 40px;
             background: white;
@@ -23,7 +23,7 @@
         /* Status styles */
         .status-text { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
         .status-draft { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; }
-        .data-mica { color: #888; font-size: 12px; }
+        .date-small { color: #888; font-size: 12px; }
 
         /* Button styles */
         button { margin: 2px; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
@@ -45,7 +45,7 @@
     <p>Aici poți aproba sau respinge cererile de rezervare primite de la clienți.</p>
 
     <h2>1. Rezervări Mâncare</h2>
-    <div class="tabel-container">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
@@ -56,13 +56,13 @@
                     <th>Acțiuni / Status</th>
                 </tr>
             </thead>
-            <tbody id="tabelMancare">
+            <tbody id="mealTable">
                 </tbody>
         </table>
     </div>
 
     <h2>2. Rezervări Cabană</h2>
-    <div class="tabel-container">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
@@ -73,7 +73,7 @@
                     <th>Acțiuni / Status</th>
                 </tr>
             </thead>
-            <tbody id="tabelCabana">
+            <tbody id="cabinTable">
                 </tbody>
         </table>
     </div>

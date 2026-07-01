@@ -9,40 +9,40 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendConfirmationEmail = async (detaliiRezervare, tipRezervare) => {
+const sendConfirmationEmail = async (reservationDetails, reservationType) => {
     try {
-        const emailText = detaliiRezervare.email || 'Nu a lăsat email';
-        let continutEmail = `Ai o rezervare nouă pentru: ${tipRezervare}\n\n`;
+        const emailText = reservationDetails.email || 'Nu a lăsat email';
+        let emailContent = `Ai o rezervare nouă pentru: ${reservationType}\n\n`;
 
-        const adults = parseInt(detaliiRezervare.adults) || 1;
-        const infants = parseInt(detaliiRezervare.infants) || 0;
-        const pets = parseInt(detaliiRezervare.pets) || 0;
+        const adults = parseInt(reservationDetails.adults) || 1;
+        const infants = parseInt(reservationDetails.infants) || 0;
+        const pets = parseInt(reservationDetails.pets) || 0;
         const totalPeople = adults + infants;
 
-        continutEmail += `\nCompunerea grupului:\n`;
-        continutEmail += `- Adulți: ${adults}\n`;
-        continutEmail += `- Animale de companie: ${pets}\n`;
-        continutEmail += `Persoane total: ${totalPeople}\n`;
+        emailContent += `\nCompunerea grupului:\n`;
+        emailContent += `- Adulți: ${adults}\n`;
+        emailContent += `- Animale de companie: ${pets}\n`;
+        emailContent += `Persoane total: ${totalPeople}\n`;
 
-        if (tipRezervare === 'cabana') {
-            continutEmail += `\nData început: ${detaliiRezervare.data_inceput}\n`;
-            continutEmail += `Data sfârșit: ${detaliiRezervare.data_sfarsit}\n`;
-            continutEmail += `Camere necesare: ${detaliiRezervare.rooms_needed || 1}\n`;
-            continutEmail += `Vrea meniu: ${detaliiRezervare.vrea_meniu ? 'Da' : 'Nu'}\n`;
-            continutEmail += `Vrea ciubăr: ${detaliiRezervare.vrea_hottub ? 'Da' : 'Nu'}\n`;
-            continutEmail += `Consimțământ newsletter: ${detaliiRezervare.newsletter ? 'Da' : 'Nu'}\n`;
+        if (reservationType === 'cabin') {
+            emailContent += `\nData început: ${reservationDetails.start_date}\n`;
+            emailContent += `Data sfârșit: ${reservationDetails.end_date}\n`;
+            emailContent += `Camere necesare: ${reservationDetails.rooms_needed || 1}\n`;
+            emailContent += `Vrea meniu: ${reservationDetails.wants_meal ? 'Da' : 'Nu'}\n`;
+            emailContent += `Vrea ciubăr: ${reservationDetails.wants_hottub ? 'Da' : 'Nu'}\n`;
+            emailContent += `Consimțământ newsletter: ${reservationDetails.newsletter ? 'Da' : 'Nu'}\n`;
         } else {
-            continutEmail += `\nData: ${detaliiRezervare.data_rezervare}\n`;
-            continutEmail += `Ora: ${detaliiRezervare.ora}\n`;
+            emailContent += `\nData: ${reservationDetails.reservation_date}\n`;
+            emailContent += `Ora: ${reservationDetails.time}\n`;
         }
 
-        continutEmail += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/admin.html`;
+        emailContent += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/admin.html`;
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
-            subject: `Nouă rezervare - ${tipRezervare}`,
-            text: continutEmail
+            subject: `Nouă rezervare - ${reservationType}`,
+            text: emailContent
         });
     } catch (error) {
         console.error('Email sending failed:', error);

@@ -1,40 +1,40 @@
 const backendUrl = '/api';
 
-// Funcție pentru formatarea datei de înregistrare
-function formateazaData(dataUTC) {
-    if (!dataUTC) return '-';
-    return new Date(dataUTC + 'Z').toLocaleString('ro-RO');
+// Format a UTC registration date for display
+function formatDate(dateUTC) {
+    if (!dateUTC) return '-';
+    return new Date(dateUTC + 'Z').toLocaleString('ro-RO');
 }
 
-// Helper pentru a genera butoanele de decizie dacă e "in asteptare"
-function genereazaButoane(id, tip, statusActual) {
-    if (statusActual === 'in asteptare') {
+// Build approve / reject buttons when status is 'pending'
+function generateButtons(id, reservationType, currentStatus) {
+    if (currentStatus === 'pending') {
         return `
-            <button style="background:green; color:white; border:none; padding:5px; cursor:pointer;" onclick="schimbaStatus(${id}, '${tip}', 'confirmat')">✔️ Aprobă</button>
-            <button style="background:red; color:white; border:none; padding:5px; cursor:pointer;" onclick="schimbaStatus(${id}, '${tip}', 'anulat')">❌ Respinge</button>
+            <button style="background:green; color:white; border:none; padding:5px; cursor:pointer;" onclick="changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
+            <button style="background:red; color:white; border:none; padding:5px; cursor:pointer;" onclick="changeStatus(${id}, '${reservationType}', 'reject')">❌ Respinge</button>
         `;
     }
-    // Dacă e deja confirmat sau anulat, arătăm doar textul
-    return `<strong>${statusActual.toUpperCase()}</strong>`;
+    // Already confirmed or cancelled — show text only
+    return `<strong>${currentStatus.toUpperCase()}</strong>`;
 }
 
 
-// Funcția apelată de butoanele Aprobă / Respinge
-async function schimbaStatus(id, tip, decizie) {
-    if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decizie}?`)) return;
+// Called by the Approve / Reject buttons
+async function changeStatus(id, reservationType, decision) {
+    if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decision}?`)) return;
 
     try {
-        const response = await fetch(`${backendUrl}/api/admin/decizie`, {
+        const response = await fetch(`${backendUrl}/admin/decision`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id, tipRezervare: tip, decizie: decizie })
+            body: JSON.stringify({ id: id, reservationType: reservationType, decision: decision })
         });
 
         if (response.ok) {
             alert('Status actualizat cu succes!');
-            // Reîncărcăm tabelele pentru a vedea noul status
-            incarcaRezervariCabana();
-            incarcaRezervariMancare();
+            // Reload tables to reflect the new status
+            loadMealReservations();
+            loadCabinReservations();
         } else {
             alert('A apărut o eroare la actualizare.');
         }
@@ -43,48 +43,48 @@ async function schimbaStatus(id, tip, decizie) {
     }
 }
 
-async function incarcaRezervariMancare() {
-    const res = await fetch(`${backendUrl}/api/admin/mancare`);
-    const rezervari = await res.json();
-    const tabel = document.getElementById('tabelMancare');
-    tabel.innerHTML = '';
+async function loadMealReservations() {
+    const res = await fetch(`${backendUrl}/admin/meal`);
+    const reservations = await res.json();
+    const table = document.getElementById('mealTable');
+    table.innerHTML = '';
 
-    rezervari.forEach(rez => {
-        tabel.innerHTML += `
+    reservations.forEach(rez => {
+        table.innerHTML += `
             <tr>
-                <td style="color:#888; font-size:12px;">${formateazaData(rez.data_comanda)}</td>
-                <td>${rez.nume} <br> <small>${rez.telefon || 'Fără tel.'}</small></td>
-                <td><strong>${rez.data_rezervare}</strong> <br> Ora: ${rez.ora}</td>
-                <td>${rez.numar_persoane}</td>
-                <td>${genereazaButoane(rez.id, 'mancare', rez.status)}</td>
+                <td style="color:#888; font-size:12px;">${formatDate(rez.order_date)}</td>
+                <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
+                <td><strong>${rez.reservation_date}</strong> <br> Ora: ${rez.time}</td>
+                <td>${rez.number_of_persons}</td>
+                <td>${generateButtons(rez.id, 'meal', rez.status)}</td>
             </tr>`;
     });
 }
 
-async function incarcaRezervariCabana() {
-    const res = await fetch(`${backendUrl}/api/admin/cabana`);
-    const rezervari = await res.json();
-    const tabel = document.getElementById('tabelCabana');
-    tabel.innerHTML = '';
+async function loadCabinReservations() {
+    const res = await fetch(`${backendUrl}/admin/cabin`);
+    const reservations = await res.json();
+    const table = document.getElementById('cabinTable');
+    table.innerHTML = '';
 
-    rezervari.forEach(rez => {
-        tabel.innerHTML += `
+    reservations.forEach(rez => {
+        table.innerHTML += `
             <tr>
-                <td style="color:#888; font-size:12px;">${formateazaData(rez.data_rezervare)}</td>
-                <td>${rez.nume} <br> <small>${rez.telefon || 'Fără tel.'}</small></td>
-                <td>${rez.data_inceput} - ${rez.data_sfarsit}</td>
-                <td>${rez.numar_persoane} <br> Meniu: ${rez.vrea_meniu ? 'Da' : 'Nu'}</td>
-                <td>${genereazaButoane(rez.id, 'cabana', rez.status)}</td>
+                <td style="color:#888; font-size:12px;">${formatDate(rez.reservation_date)}</td>
+                <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone || 'Fără tel.'}</small></td>
+                <td>${rez.start_date} - ${rez.end_date}</td>
+                <td>${rez.number_of_persons} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
+                <td>${generateButtons(rez.id, 'cabin', rez.status)}</td>
             </tr>`;
     });
 }
 
 // Auto-refresh every 30 seconds
 setInterval(() => {
-    incarcaRezervariMancare();
-    incarcaRezervariCabana();
+    loadMealReservations();
+    loadCabinReservations();
 }, 30000);
 
 // Initial load
-incarcaRezervariMancare();
-incarcaRezervariCabana();
+loadMealReservations();
+loadCabinReservations();

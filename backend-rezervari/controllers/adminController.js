@@ -3,7 +3,7 @@ const { getLanguage, t } = require('../utils/helpers');
 
 const AdminController = {
 
-    // ENDPOINT: GET /api/admin/cabin-reservations
+    // ENDPOINT: GET /api/admin/cabin
     getAllCabinReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {
@@ -15,7 +15,7 @@ const AdminController = {
         }
     },
 
-    // ENDPOINT: GET /api/admin/meal-reservations
+    // ENDPOINT: GET /api/admin/meal
     getAllMealReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {
@@ -27,7 +27,7 @@ const AdminController = {
         }
     },
 
-    // ENDPOINT: GET /api/admin/active-drafts
+    // ENDPOINT: GET /api/admin/drafts
     getActiveDrafts: async (req, res) => {
         const lang = getLanguage(req);
         try {
@@ -68,9 +68,10 @@ const AdminController = {
         }
 
         const table = reservationType === 'cabin' ? 'cabin_reservations' : 'meal_reservations';
+        const newStatus = decision === 'confirm' ? 'confirmed' : 'rejected';
 
         try {
-            const changes = await AdminModel.updateReservationStatus(table, id, decision);
+            const changes = await AdminModel.updateReservationStatus(table, id, newStatus);
             if (changes === 0) {
                 return res.status(404).json({ errors: t('reservation_not_found', lang) });
             }

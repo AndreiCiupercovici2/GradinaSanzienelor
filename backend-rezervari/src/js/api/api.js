@@ -28,7 +28,7 @@ export async function saveCabinDraft(step) {
 }
 
 export async function submitCabinBooking(payload) {
-    const res = await fetch(`${backendUrl}/api/cabinReservations`, {
+    const res = await fetch(`${backendUrl}/api/cabin_reservations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -41,7 +41,7 @@ export async function submitCabinBooking(payload) {
 }
 
 export async function submitMealBooking(payload) {
-    const res = await fetch(`${backendUrl}/api/mealReservations`, {
+    const res = await fetch(`${backendUrl}/api/meal_reservations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -53,14 +53,14 @@ export async function submitMealBooking(payload) {
     return await res.json();
 }
 
-export async function incarcatDateOcupare() {
+export async function loadOccupiedDates() {
     try {
-        const response = await fetch(`${backendUrl}/api/zile_ocupate`);
+        const response = await fetch(`${backendUrl}/api/occupied_days`);
         if (response.ok) {
-            const rezervariConfirmate = await response.json();
-            rezervariConfirmate.forEach(rez => {
-                let startParts = rez.data_inceput.split('-');
-                let endParts = rez.data_sfarsit.split('-');
+            const confirmedReservations = await response.json();
+            confirmedReservations.forEach(rez => {
+                let startParts = rez.start_date.split('-');
+                let endParts = rez.end_date.split('-');
                 let startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 12, 0, 0);
                 let endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 12, 0, 0);
 
@@ -68,7 +68,7 @@ export async function incarcatDateOcupare() {
                     let dateStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
 
                     if (!APP_GLOBALS.dailyOccupancy[dateStr]) APP_GLOBALS.dailyOccupancy[dateStr] = 0;
-                    APP_GLOBALS.dailyOccupancy[dateStr] += rez.numar_persoane;
+                    APP_GLOBALS.dailyOccupancy[dateStr] += rez.number_of_persons;
 
                     if (APP_GLOBALS.dailyOccupancy[dateStr] >= 8) {
                         APP_GLOBALS.fullyBookedDates.push(dateStr);

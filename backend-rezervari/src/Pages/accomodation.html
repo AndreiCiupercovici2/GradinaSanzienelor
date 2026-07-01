@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="titlu_cazare"></title>
+    <title data-i18n="accommodation_title"></title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" 
           href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" 
@@ -22,7 +22,7 @@
         <nav class="main-nav">
             <ul>
                 <li><a href="/" data-i18n="nav_home"></a></li>
-                <li><a href="punctGastronomic" data-i18n="nav_punct_gastronomic"></a></li>
+                <li><a href="punctGastronomic" data-i18n="nav_gastronomic_point"></a></li>
                 <li><a href="meal" data-i18n="nav_meal"></a></li>
                 <li><a href="accomodation" data-i18n="nav_cabin"></a></li>
                 <li><a href="contact" data-i18n="nav_contact"></a></li>
@@ -35,7 +35,7 @@
         </div>
     </header>
 
-    <h1 data-i18n="titlu_cazare" style="text-align: center;"></h1>
+    <h1 data-i18n="accommodation_title" style="text-align: center;"></h1>
 
     <!-- Hero Slideshow Section -->
     <section class="hero-slideshow" id="heroSlideshow">
@@ -90,14 +90,14 @@
     </section>
 
     <!-- Resume Draft Banner for Cabin -->
-    <div id="resumeBannerCabana" class="resume-banner" style="display: none;">
+    <div id="resumeBannerCabin" class="resume-banner" style="display: none;">
         <p data-i18n="draft_exists_message">Ai o rezervare de cazare în curs de finalizare.</p>
         <button type="button" id="resumeButtonCabana" class="btn-resume" data-i18n="btn_resume">Continuă
             Rezervarea</button>
     </div>
 
-    <div id="sectiuneCabana" class="form-container cabin-container" style="display: flex;">
-        <p class="section-description" data-i18n="subSectiuneCabana">Selectează perioada în care dorești să te cazezi în
+    <div id="cabinSection" class="form-container cabin-container" style="display: flex;">
+        <p class="section-description" data-i18n="cabin_section_subtitle">Selectează perioada în care dorești să te cazezi în
             cabană.</p>
         <div id="notificationTodayCabana" class="notification notification-warning" style="display: flex;"
             data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
@@ -190,7 +190,7 @@
             </div>
 
             <!-- Section C: Warning banners -->
-            <div id="warningCabana" style="display:none;"></div>
+            <div id="warningCabin" style="display:none;"></div>
             <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;" data-i18n="warning_pending_cabin_step1"></div>
 
             <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras
