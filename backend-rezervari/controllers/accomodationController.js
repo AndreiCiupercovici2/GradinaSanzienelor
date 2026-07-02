@@ -31,11 +31,12 @@ const AccomodationController = {
         const start_date = bodyData.start_date;
         const end_date = bodyData.end_date;
         const adults = bodyData.adults;
-        const pets = bodyData.pets || 0;
+        const pets = bodyData.pets;
         const rooms_needed = bodyData.rooms_needed;
         const wants_meal = bodyData.wants_meal;
         const wants_hottub = bodyData.wants_hottub;
         const newsletter = bodyData.newsletter;
+        const arrival_time = bodyData.arrival_time;
 
         if (typeof first_name !== 'string' || typeof last_name !== 'string') {
             return res.status(400).json({ errors: t('invalid_name', lang) });
@@ -49,11 +50,11 @@ const AccomodationController = {
             return res.status(400).json({ errors: t('invalid_start_date', lang) });
         }
 
-        if (!isValidInteger(adults)) {
-            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        if (typeof arrival_time !== 'string') {
+            return res.status(400).json({ errors: t('invalid_arrival_time', lang) });
         }
 
-        if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
+        if (!isValidInteger(adults)) {
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
@@ -80,8 +81,9 @@ const AccomodationController = {
             phone: phone,
             start_date: start_date,
             end_date: end_date,
+            arrival_time: arrival_time,
             adults: parseInt(adults, 10),
-            pets: parseInt(pets, 10) || 0,
+            pets: pets,
             rooms_needed: parseInt(rooms_needed, 10),
             wants_meal: wants_meal ? true : false,
             wants_hottub: wants_hottub ? true : false,
@@ -116,6 +118,7 @@ const AccomodationController = {
                 phone: sanitizeText(phone),
                 start_date: start_date,
                 end_date: end_date,
+                arrival_time: arrival_time,
                 adults: mappedData.adults,
                 pets: mappedData.pets,
                 rooms_needed: mappedData.rooms_needed,

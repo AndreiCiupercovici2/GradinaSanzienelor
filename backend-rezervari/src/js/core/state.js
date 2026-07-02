@@ -14,6 +14,7 @@ export const WIZARD_STATE = {
         phone: '',
         arrivalDate: '',
         departureDate: '',
+        arrivalTime: '',
         adults: 1,
         rooms_needed: 1,
         children: 0,
@@ -35,7 +36,8 @@ export const WIZARD_STATE = {
         children: 0,
         wantsCabin: false,
         newsletter: false,
-        reservationDate: ''
+        reservationDate: '',
+        reservationTime: ''
     },
     mealExtras: {
         cabin: false

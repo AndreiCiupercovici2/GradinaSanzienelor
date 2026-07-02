@@ -23,8 +23,8 @@ const mealModel = {
         return new Promise((resolve, reject) => {
             const sqlInsert = `
             INSERT INTO meal_reservations
-            (first_name, last_name, email, phone, reservation_date, adults, pets, wants_cabin, newsletter, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            (first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 reservationData.first_name,
@@ -32,8 +32,9 @@ const mealModel = {
                 reservationData.email,
                 reservationData.phone,
                 reservationData.reservation_date,
+                reservationData.reservation_time,
                 reservationData.adults,
-                reservationData.pets || 0,
+                reservationData.pets,
                 reservationData.wants_cabin ? true : false,
                 reservationData.newsletter ? true : false,
                 reservationData.created_at || new Date().toISOString(),

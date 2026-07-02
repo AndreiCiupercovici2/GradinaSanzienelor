@@ -28,9 +28,10 @@ const MealController = {
         const phone = bodyData.phone;
         const reservation_date = bodyData.reservation_date;
         const adults = bodyData.adults;
-        const pets = bodyData.pets || 0;
+        const pets = bodyData.pets;
         const newsletter = bodyData.newsletter;
         const wants_cabin = bodyData.wants_cabin;
+        const reservation_time = bodyData.reservation_time;
 
         if (typeof first_name !== 'string' || typeof last_name !== 'string') {
             console.log('Invalid first_name or last_name:', { first_name, last_name });
@@ -52,14 +53,19 @@ const MealController = {
             return res.status(400).json({ errors: t('invalid_reservation_date', lang) });
         }
 
+        if (typeof reservation_time !== 'string') {
+            console.log('Invalid reservation_time value:', reservation_time);
+            return res.status(400).json({ errors: t('invalid_reservation_time', lang) });
+        }
+
         if (!isValidInteger(adults)) {
             console.log('Invalid adults value:', adults);
             return res.status(400).json({ errors: t('invalid_integer', lang) });
         }
 
-        if (!isValidInteger(pets) && pets !== undefined && pets !== null && pets !== '') {
-            console.log('Invalid pets value:', pets);
-            return res.status(400).json({ errors: t('invalid_integer', lang) });
+        if (wants_cabin !== undefined && wants_cabin !== null && typeof wants_cabin !== 'boolean') {
+            console.log('Invalid wants_cabin value:', wants_cabin);
+            return res.status(400).json({ errors: t('invalid_input_size', lang) });
         }
 
         if (newsletter !== undefined && newsletter !== null && !isValidBoolean(newsletter)) {
@@ -74,11 +80,12 @@ const MealController = {
             phone: phone,
             reservation_date: reservation_date,
             adults: parseInt(adults, 10),
-            pets: parseInt(pets, 10) || 0,
+            pets: pets,
             wants_cabin: wants_cabin ? true : false,
             newsletter: newsletter ? true : false,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            reservation_time: reservation_time
         };
 
         const validationErrors = validateReservationInput(mappedData, lang, true);
@@ -112,7 +119,8 @@ const MealController = {
                 wants_cabin: mappedData.wants_cabin ? true : false,
                 newsletter: mappedData.newsletter ? true : false,
                 created_at: mappedData.created_at,
-                updated_at: mappedData.updated_at
+                updated_at: mappedData.updated_at,
+                reservation_time: reservation_time
             };
 
             const insertedId = await MealModel.createReservation(dbData);

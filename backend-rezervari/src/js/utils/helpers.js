@@ -25,6 +25,9 @@ export function syncCabinOrMealFormToState() {
     state.pets = parseInt(document.getElementById('pets')?.value) || 0;
     state.arrivalDate = document.getElementById('arrivalDate')?.value || new Date().toISOString().split('T')[0];
     state.departureDate = document.getElementById('departureDate')?.value || '';
+    state.arrivalTime = document.getElementById('arrivalTime')?.value || '';
+    state.reservationDate = document.getElementById('reservationDate')?.value || new Date().toISOString().split('T')[0];
+    state.reservationTime = document.getElementById('reservationTime')?.value || '';
     state.newsletter = document.getElementById('newsletter')?.checked;
     state.wantsMeal = document.getElementById('wantsMeal')?.checked;
     state.wantsHotTub = document.getElementById('wantsHotTub')?.checked;

@@ -20,9 +20,9 @@ const accomodationModel = {
         return new Promise((resolve, reject) => {
             const sql = `
                 INSERT INTO cabin_reservations (
-                    first_name, last_name, email, phone, start_date, end_date,
+                    first_name, last_name, email, phone, start_date, end_date, arrival_time,
                     adults, pets, rooms_needed, wants_meal, wants_hottub, newsletter, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 data.first_name,
@@ -31,8 +31,9 @@ const accomodationModel = {
                 data.phone,
                 data.start_date,
                 data.end_date,
+                data.arrival_time,
                 data.adults,
-                data.pets || 0,
+                data.pets,
                 data.rooms_needed,
                 data.wants_meal ? true : false,
                 data.wants_hottub ? true : false,
