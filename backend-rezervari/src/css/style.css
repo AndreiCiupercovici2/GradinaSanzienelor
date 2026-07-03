@@ -926,12 +926,18 @@ input#calendarCabin {
     gap: 16px;
 }
 
-.date-field-wrapper {
+.date-field-wrapper,
+.time-field-wrapper {
     flex: 1;
     min-width: 0;
 }
 
-.date-field-label {
+
+
+.date-field-label,
+.time-field-label,
+.label-adults,
+.label-pets {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -940,7 +946,8 @@ input#calendarCabin {
 }
 
 /* Clickable card look for date inputs */
-.date-input-card {
+.date-input-card,
+.time-input-card {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -954,12 +961,15 @@ input#calendarCabin {
 }
 
 .date-input-card:hover,
-.date-input-card:focus-within {
+.date-input-card:focus-within,
+.time-input-card:hover,
+.time-input-card:focus-within {
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.12);
 }
 
-.date-icon {
+.date-icon,
+.time-icon {
     font-size: 15px;
     flex-shrink: 0;
     color: #666;
@@ -969,7 +979,9 @@ input#calendarCabin {
 /* Override the global input[readonly] gray rule for cabin date inputs */
 #cabinArrivalInput,
 #cabinDepartureInput,
-#mealArrivalInput {
+#mealArrivalInput,
+#cabinArrivalTimeInput,
+#mealArrivalTimeInput {
     background-color: #fff !important;
     cursor: pointer !important;
     border: none;
@@ -983,7 +995,9 @@ input#calendarCabin {
 
 #cabinArrivalInput::placeholder,
 #cabinDepartureInput::placeholder,
-#mealArrivalInput::placeholder {
+#mealArrivalInput::placeholder,
+#cabinArrivalTimeInput::placeholder,
+#mealArrivalTimeInput::placeholder {
     color: #aaa;
     font-size: 13px;
 }

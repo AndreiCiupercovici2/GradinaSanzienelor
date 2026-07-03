@@ -1,31 +1,6 @@
 import { WIZARD_STATE, APP_GLOBALS, backendUrl } from '../core/state.js';
 
-export async function saveMealDraft(step) {
-    const res = await fetch(`${backendUrl}/api/reservations/draft`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservation_type: 'meal', current_step: step, step_data: WIZARD_STATE.mealFormData })
-    });
-    if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to save meal draft');
-    }
-    return await res.json();
-}
 
-export async function saveCabinDraft(step) {
-    const res = await fetch(`${backendUrl}/api/reservations/draft`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservation_type: 'cabin', current_step: step, step_data: WIZARD_STATE.cabinFormData })
-    });
-    if (!res.ok) {
-        console.log('Error response:', res);
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to save cabin draft');
-    }
-    return await res.json();
-}
 
 export async function submitCabinBooking(payload) {
     const res = await fetch(`${backendUrl}/api/cabin_reservations`, {

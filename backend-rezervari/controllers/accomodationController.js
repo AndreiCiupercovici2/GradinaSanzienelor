@@ -85,9 +85,9 @@ const AccomodationController = {
             adults: parseInt(adults, 10),
             pets: pets,
             rooms_needed: parseInt(rooms_needed, 10),
-            wants_meal: wants_meal ? true : false,
-            wants_hottub: wants_hottub ? true : false,
-            newsletter: newsletter ? true : false,
+            wants_meal: wants_meal,
+            wants_hottub: wants_hottub,
+            newsletter: newsletter,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };

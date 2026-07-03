@@ -4,13 +4,11 @@ const cors = require('cors');
 require('dotenv').config();
 
 require('./db');
-require('./jobs/cronJobs');
 
 //Import modular routes
 const portalInternRoutes = require('./routes/portalInternRoutes');
 const accomodationRoutes = require('./routes/accomodationRoutes');
 const mealRoutes = require('./routes/mealRoutes');
-const draftRoutes = require('./routes/draftRoutes');
 const pageRoutes = require('./routes/pageRoutes');
 
 const app = express();
@@ -26,7 +24,6 @@ app.use('/flatpickr', express.static('node_modules/flatpickr'));
 app.use('/api', portalInternRoutes);
 app.use('/api', accomodationRoutes);
 app.use('/api', mealRoutes);
-app.use('/api/reservations', draftRoutes);
 app.use('/', pageRoutes);
 
 

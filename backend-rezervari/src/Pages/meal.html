@@ -117,13 +117,6 @@
         </div>
     </section>
 
-    <!-- Resume Draft Banner for Meal - placed above the section -->
-    <div id="resumeBannerMeal" class="resume-banner" style="display: none;">
-        <p data-i18n="draft_exists_message">Ai o rezervare de masă în curs de finalizare.</p>
-        <button type="button" id="resumeButtonMeal" class="btn-resume" data-i18n="btn_resume">Continuă
-            Rezervarea</button>
-    </div>
-
     <div id="mealSection" class="form-container meal-container" style="display: flex;">
         <p class="section-description" data-i18n="meal_section_subtitle"></p>
         <div id="notificationTodayMancare" class="notification notification-warning" style="display: flex;"
@@ -185,11 +178,11 @@
                 <h4 class="meal-card-title" data-i18n="meal_guests_title">Guests</h4>
                 <div class="guests-grid">
                     <div class="form-group">
-                        <label data-i18n="label_adults">Guests</label>
+                        <label class="label-adults" data-i18n="label_adults">Guests</label>
                         <input type="text" id="mealAdultsInput" min="1" max="15" value="1" required>
                     </div>
                     <div class="form-group">
-                        <label data-i18n="label_pets">Pets</label>
+                        <label class="label-pets" data-i18n="label_pets">Pets</label>
                         <input type="text" id="mealPetsInput" placeholder="e.g. 1 dog">
                     </div>
                 </div>

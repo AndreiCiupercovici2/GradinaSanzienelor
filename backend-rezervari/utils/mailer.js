@@ -47,36 +47,4 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
     }
 };
 
-const sendDraftReminderEmail = async (draft, clientName, reservationType, resumeLink) => {
-    try {
-        const createdDate = new Date(draft.created_at).toLocaleDateString('ro-RO');
-        
-        const emailContent = `
-Salut ${clientName},
-
-Observă că ai o rezervare nefinalizată pentru ${reservationType}, înregistrată pe ${createdDate}.
-
-Poți continua să completezi formularul accesând următorul link:
-${resumeLink}
-
-Datele tale vor fi șterse în 24 de ore din momentul înregistrării.
-
-Dacă ai întrebări, ne poți contacta.
-
-Cu plăcere,
-Echipa Grădina Sânzienelor
-        `.trim();
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: draft.email,
-            subject: `Reluare rezervare - ${reservationType}`,
-            text: emailContent
-        });
-    } catch (error) {
-        console.error('Reminder email sending failed:', error);
-        throw error; // Throw to the controller so it can send a 500 status
-    }
-};
-
-module.exports = { sendConfirmationEmail, sendDraftReminderEmail };
+module.exports = { sendConfirmationEmail};

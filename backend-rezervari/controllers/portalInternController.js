@@ -25,17 +25,6 @@ const PortalInternController = {
         }
     },
 
-    getActiveDrafts: async (req, res) => {
-        const lang = getLanguage(req);
-        try {
-            const rows = await portalInternModel.getActiveDrafts();
-            res.json(rows);
-        } catch (error) {
-            console.error('Error fetching active drafts:', error);
-            res.status(500).json({ errors: t('server_error', lang) });
-        }
-    },
-
     getAdminReservations: async (req, res) => {
         const lang = getLanguage(req);
         try {

@@ -16,10 +16,9 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.db'), (err) => {
 db.run('PRAGMA foreign_keys = ON');
 
 function runMigrations() {
-    const { initializeTables, migrateReservationDraftsSchema } = require('./utils/dbMigration');
+    const { initializeTables } = require('./utils/dbMigration');
 
     initializeTables()
-        .then(() => migrateReservationDraftsSchema())
         .catch((err) => {
             console.error('Migration error:', err);
         });

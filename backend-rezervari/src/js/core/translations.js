@@ -31,8 +31,6 @@ const translations = {
         step_personal_info: "Informații Personale",
         step_progress_1of2: "Pasul 1 din 2",
         step_progress_2of2: "Pasul 2 din 2",
-        draft_exists_message: "Ai o rezervare în curs de finalizare.",
-        draft_warning_exit: "Aveți o rezervare necompletată. Puteți reveni și o continua mai târziu.",
         step_extras: "Extra Servicii",
         step_your_details: "Date Personale",
         step_confirmation: "Confirmare",
@@ -136,8 +134,6 @@ const translations = {
         step_personal_info: "Personal Information",
         step_progress_1of2: "Step 1 of 2",
         step_progress_2of2: "Step 2 of 2",
-        draft_exists_message: "You have an unfinished reservation.",
-        draft_warning_exit: "You have an unfinished reservation. You can return and continue it later.",
         step_extras: "Extras",
         step_your_details: "Your Details",
         step_confirmation: "Confirmation",
@@ -231,9 +227,9 @@ export function changeLanguage(newLanguage) {
     const mealContainer = document.getElementById('mealSection');
     const cabinContainer = document.getElementById('cabinSection');
 
-    if (mealContainer && mealContainer.style.display !== 'none' && mealCalendarInstance) {
-        mealCalendarInstance.destroy();
-        mealCalendarInstance = null;
+    if (mealContainer && mealContainer.style.display !== 'none' && calendarMealInstance) {
+        calendarMealInstance.destroy();
+        calendarMealInstance = null;
         showSection('mealSection');
     }
     if (cabinContainer && cabinContainer.style.display !== 'none' && cabinArrivalFP) {

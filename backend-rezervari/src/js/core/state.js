@@ -45,8 +45,6 @@ export const WIZARD_STATE = {
     mealStep: 1, // current step 1-4
     mealFormDirty: false,
     cabinFormDirty: false,
-    mealDraftId: null,
-    cabinDraftId: null
 };
 
 export const APP_GLOBALS = {
