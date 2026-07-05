@@ -801,15 +801,15 @@ export function updateCabinSummary() {
 
     panel.innerHTML = `
         <div class="summary-section">
-            <div class="summary-row"><span class="summary-label" data-i18n="check_in">${t.summary_check_in}</span><strong>${arrival}</strong></div>
-            <div class="summary-row"><span class="summary-label" data-i18n="check_in_time">${t.summary_check_in_time}</span><strong>${time}</strong></div>
-            <div class="summary-row"><span class="summary-label" data-i18n="check_out">${t.summary_check_out}</span><strong>${departure}</strong></div>
-            <div class="summary-row"><span class="summary-label" data-i18n="duration">${t.summary_duration}</span><strong>${APP_GLOBALS.cabinNights} ${APP_GLOBALS.cabinNights === 1 ? t.night : t.nights}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_in">${t.summary_arrival}</span><strong>${arrival}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_in_time">${t.summary_time}</span><strong>${time}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_out">${t.label_departure}</span><strong>${departure}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="duration">${t.summary_nights}</span><strong>${APP_GLOBALS.cabinNights} ${APP_GLOBALS.cabinNights === 1 ? t.label_night : t.label_nights}</strong></div>
             <div class="summary-row"><span class="summary-label" data-i18n="rooms">${t.summary_rooms}</span><strong>${rooms}</strong></div>
             <div class="summary-row"><span class="summary-label" data-i18n="adults">${t.summary_adults}</span><strong>${adults}</strong></div>
-            ${pets ? `<div class="summary-row"><span class="summary-label" data-i18n="pets">${t.summary_pets}</span><strong>${pets}</strong></div>` : ''}
-            <div class="summary-row"><span class="summary-label" data-i18n="hot_tub">${t.summary_hot_tub}</span><strong>${hotTub}</strong></div>
-            <div class="summary-row"><span class="summary-label" data-i18n="meal">${t.summary_meal}</span><strong>${meal}</strong></div>
+            ${pets ? `<div class="summary-row"><span class="summary-label" data-i18n="pets">${t.label_pets}</span><strong>${pets}</strong></div>` : ''}
+            <div class="summary-row"><span class="summary-label" data-i18n="hot_tub">${t.extras_hottub}</span><strong>${hotTub}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="meal">${t.extras_meal_plan}</span><strong>${meal}</strong></div>
         </div>
     `;
 }

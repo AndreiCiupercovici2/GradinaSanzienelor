@@ -937,7 +937,8 @@ input#calendarCabin {
 .date-field-label,
 .time-field-label,
 .label-adults,
-.label-pets {
+.label-pets,
+.label-rooms {
     display: block;
     font-size: 13px;
     font-weight: 600;

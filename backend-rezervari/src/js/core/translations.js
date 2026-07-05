@@ -36,7 +36,8 @@ export const translations = {
         step_confirmation: "Confirmare",
         label_arrival: "Sosire",
         label_departure: "Plecare",
-        label_nights: "noapte / nopți",
+        label_night: "Noapte",
+        label_nights: "Nopți",
         label_rooms: "Nr. de Camere",
         label_hottub: "Ciubăr",
         label_meal_plan: "Plan Gastronomic",
@@ -49,8 +50,6 @@ export const translations = {
         terms_link: "Termenii și Condițiile",
         privacy_link: "Politica de Confidențialitate",
         btn_send_booking: "Trimite Rezervarea pentru Confirmare",
-        btn_back_to_travel: "Înapoi",
-        btn_back_to_extras: "Înapoi",
         btn_new_booking: "Fă o Altă Rezervare",
         confirmation_title: "Cererea de Rezervare Primită!",
         confirmation_message: "Mulțumim că ați ales Grădina Sânzienelor. Gazda va examina cererea și vă va contacta în 24 de ore pentru a confirma detaliile rezervării.",
@@ -120,7 +119,16 @@ export const translations = {
         meal_extras_title: "Extra Servicii pentru Masă",
         summary_time: "Ora Sosirii",
         yes: "Da",
-        no: "Nu"
+        no: "Nu",
+        cabin_extras_title: "Extra Servicii pentru Cazare",
+        extra_hot_tub: "Ciubăr Privat",
+        extra_meal_plan: "Plan Gastronomic",
+        cabin_dates_title: "Date Cazare",
+        extra_hot_tub_description: "Relaxați-vă sub stele în ciubărul nostru privat cu apă fierbinte. Disponibil tot anul, ciubărul poate găzdui până la 6 oaspeți și este inclus pentru întreaga sejur.",
+        extra_meal_plan_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
+        extra_optional: "Extra Opțional",
+        cabin_guests_title: "Număr de Oaspeți în Cabană",
+        personal_information_title: "Informații Personale"
     },
     en: {
         main_title: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -160,7 +168,8 @@ export const translations = {
         step_confirmation: "Confirmation",
         label_arrival: "Arrival",
         label_departure: "Departure",
-        label_nights: "night / nights",
+        label_nights: "Nights",
+        label_night: "Night",
         label_rooms: "No. of Rooms",
         label_hottub: "Hot Tub",
         label_meal_plan: "Gastronomic Meal Plan",
@@ -173,8 +182,6 @@ export const translations = {
         terms_link: "Terms and Conditions",
         privacy_link: "Privacy Policy",
         btn_send_booking: "Send Booking for Confirmation",
-        btn_back_to_travel: "Back",
-        btn_back_to_extras: "Back",
         btn_new_booking: "Make Another Booking",
         confirmation_title: "Booking Request Received!",
         confirmation_message: "Thank you for choosing Grădina Sânzienelor. Our host will review your request and contact you as soon as possible to confirm your reservation details.",
@@ -244,7 +251,16 @@ export const translations = {
         meal_extras_title: "Meal Extra Services",
         summary_time: "Arrival Time",
         yes: "Yes",
-        no: "No"
+        no: "No",
+        cabin_extras_title: "Cabin Extra Services",
+        extra_hot_tub: "Private Hot Tub",
+        extra_meal_plan: "Gastronomic Meal Plan",
+        extra_hot_tub_description: "Relax under the stars in our private outdoor hot tub. Available year-round, the hot tub accommodates up to 6 guests and is included for your entire stay.",
+        extra_optional: "Optional Extra",
+        cabin_dates_title: "Cabin Dates",
+        cabin_guests_title: "Number of Guests in Cabin",
+        personal_information_title: "Personal Information",
+        extra_meal_plan_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night."
     }
 }
 

@@ -117,31 +117,30 @@
     </section>
 
     <div id="cabinSection" class="form-container cabin-container" style="display: flex;">
-        <p class="section-description" data-i18n="cabin_section_subtitle">Selectează perioada în care dorești să te cazezi în
-            cabană.</p>
+        <p class="section-description" data-i18n="cabin_section_subtitle"></p>
         <div id="notificationTodayCabana" class="notification notification-warning" style="display: flex;"
-            data-i18n="notification_today_disabled">Dacă doriți să rezervați pentru azi, vă rog sunați.</div>
+            data-i18n="notification_today_disabled"></div>
 
         <!-- Progress Indicator for Cabin — 4 steps -->
         <div id="progressCabin" class="progress-indicator">
             <div class="progress-step active" id="step1Cabin">
                 <span class="step-number">1</span>
-                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
+                <span class="step-label" data-i18n="step_travel_info"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step2Cabin">
                 <span class="step-number">2</span>
-                <span class="step-label" data-i18n="step_extras">Extras</span>
+                <span class="step-label" data-i18n="step_extras"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step3Cabin">
                 <span class="step-number">3</span>
-                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
+                <span class="step-label" data-i18n="step_personal_info"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step4Cabin">
                 <span class="step-number">4</span>
-                <span class="step-label" data-i18n="step_confirmation">Confirmare</span>
+                <span class="step-label" data-i18n="step_confirmation"></span>
             </div>
         </div>
 
@@ -150,13 +149,13 @@
 
             <!-- Section A: Dates card -->
             <div class="cabin-dates-card">
-                <h4 class="cabin-card-title" data-i18n="cabin_dates_title">Arrival and Departure</h4>
+                <h4 class="cabin-card-title" data-i18n="cabin_dates_title"></h4>
                 <div class="dates-row">
                     <div class="date-field-wrapper">
-                        <span class="date-field-label" data-i18n="label_arrival">Arrival</span>
+                        <span class="date-field-label" data-i18n="label_arrival"></span>
                         <div class="date-input-card">
                             <span class="date-icon">&#128197;</span>
-                            <input type="text" id="cabinArrivalInput" readonly placeholder="Select arrival date" data-i18n-placeholder="placeholder_select_date">
+                            <input type="text" id="cabinArrivalInput" readonly placeholder="" data-i18n-placeholder="placeholder_select_date">
                         </div>
                         <!-- Calendar popup wrapper for arrival -->
                         <div id="cabinArrivalCalendarWrapper" class="calendar-popup-wrapper"
@@ -173,7 +172,7 @@
                         <span class="date-field-label" data-i18n="label_departure">Departure</span>
                         <div class="date-input-card">
                             <span class="date-icon">&#128197;</span>
-                            <input type="text" id="cabinDepartureInput" readonly placeholder="Select departure date">
+                            <input type="text" id="cabinDepartureInput" readonly placeholder="" data-i18n-placeholder="placeholder_select_date">
                         </div>
                         <!-- Calendar popup wrapper for departure -->
                         <div id="cabinDepartureCalendarWrapper" class="calendar-popup-wrapper"
@@ -183,8 +182,8 @@
                         <span class="date-field-label" data-i18n="label_arrival_time"></span>
                         <div class="time-input-card">
                             <span class="time-icon">&#128337;</span>
-                            <select id="cabinArrivalTimeInput" readonly placeholder="Select arrival time" data-i18n-placeholder="placeholder_select_time">
-                                <option value="" disabled selected data-i18n="placeholder_select_time">Select arrival time</option>
+                            <select id="cabinArrivalTimeInput" readonly placeholder="" data-i18n-placeholder="placeholder_select_time">
+                                <option value="" disabled selected data-i18n="placeholder_select_time"></option>
                                 <option value="15:00">15:00</option>
                                 <option value="15:15">15:15</option>
                                 <option value="15:30">15:30</option>
@@ -210,10 +209,10 @@
 
             <!-- Section B: Guests card -->
             <div class="cabin-guests-card">
-                <h4 class="cabin-card-title" data-i18n="cabin_guests_title">Guests</h4>
+                <h4 class="cabin-card-title" data-i18n="cabin_guests_title"></h4>
                 <div class="guests-grid">
                     <div class="form-group">
-                        <label data-i18n="label_no_rooms">No. of Rooms</label>
+                        <label class="label-rooms" data-i18n="label_rooms"></label>
                         <select id="cabinRoomsSelect" class="cabin-select">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -221,7 +220,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="label-adults" data-i18n="label_adults">Adults</label>
+                        <label class="label-adults" data-i18n="label_adults"></label>
                         <select id="cabinAdultsSelect" class="cabin-select">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -229,8 +228,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="label-pets" data-i18n="label_pets">Pets</label>
-                        <input type="text" id="cabinPetsInput" placeholder="e.g. 1 dog">
+                        <label class="label-pets" data-i18n="label_pets"></label>
+                        <input type="text" id="cabinPetsInput" placeholder="" data-i18n-placeholder="placeholder_pets">
                     </div>
                 </div>
             </div>
@@ -239,13 +238,13 @@
             <div id="warningCabin" style="display:none;"></div>
             <div id="warningPendingCStep1" class="notification notification-warning" style="display:none;" data-i18n="warning_pending_cabin_step1"></div>
 
-            <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn">Continue to Extras
+            <button type="button" id="continueToExtrasBtn" class="btn-primary cabin-continue-btn" data-i18n="continue_to_extras">
                 &#8594;</button>
         </div>
 
         <!-- STEP 2: Extras -->
         <div id="step2ContainerCabin" class="step-container" style="display:none;">
-            <h3 class="cabin-card-title" data-i18n="cabin_extras_title">Choose Your Extras</h3>
+            <h3 class="cabin-card-title" data-i18n="cabin_extras_title"></h3>
 
             <!-- Hot Tub Extra -->
             <div class="extra-item-card" id="hotTubCard">
@@ -263,12 +262,10 @@
                     <button class="extras-next-btn" aria-label="Next">&#8250;</button>
                 </div>
                 <div class="extra-info-panel">
-                    <div class="extra-badge" data-i18n="extra_optional">Optional Extra</div>
-                    <h4 data-i18n="extra_hot_tub">Hot Tub</h4>
-                    <p class="extra-description" data-i18n="extra_hot_tub_description">Unwind in our private outdoor hot tub overlooking the forest. Perfect
-                        for romantic evenings or after a day of exploring the mountains. Available throughout your
-                        entire stay.</p>
-                    <button id="hotTubToggle" class="extra-toggle-btn" data-i18n="extra_add_hot_tub">+ Add Hot Tub</button>
+                    <div class="extra-badge" data-i18n="extra_optional"></div>
+                    <h4 data-i18n="extra_hot_tub"></h4>
+                    <p class="extra-description" data-i18n="extra_hot_tub_description"></p>
+                    <button id="hotTubToggle" class="extra-toggle-btn" data-i18n="extra_add_hot_tub"></button>
                 </div>
             </div>
 
@@ -288,18 +285,16 @@
                     <button class="extras-next-btn" aria-label="Next">&#8250;</button>
                 </div>
                 <div class="extra-info-panel">
-                    <div class="extra-badge" data-i18n="extra_optional">Optional Extra</div>
-                    <h4 data-i18n="extra_gastronomy_meal_plan">Gastronomy Meal Plan</h4>
-                    <p class="extra-description" data-i18n="extra_gastronomy_meal_plan_description">Savor authentic local cuisine prepared by our in-house chef. Enjoy a
-                        full breakfast and a three-course dinner using seasonal ingredients from our garden. A true
-                        farm-to-table experience.</p>
-                    <button id="mealToggle" class="extra-toggle-btn" data-i18n="extra_add_meal_plan">+ Add Meal Plan</button>
+                    <div class="extra-badge" data-i18n="extra_optional"></div>
+                    <h4 data-i18n="extra_meal_plan"></h4>
+                    <p class="extra-description" data-i18n="extra_meal_plan_description"></p>
+                    <button id="mealToggle" class="extra-toggle-btn" data-i18n="extra_add_meal_plan"></button>
                 </div>
             </div>
 
             <div class="form-actions cabin-step-actions">
-                <button type="button" id="backToTravelBtn" class="btn-secondary">&#8592; Back</button>
-                <button type="button" id="continueToPersonalBtn" class="btn-primary cabin-continue-btn">Continue
+                <button type="button" id="backToTravelBtn" class="btn-secondary" data-i18n="back_to_travel_info">&#8592; Back</button>
+                <button type="button" id="continueToPersonalBtn" class="btn-primary cabin-continue-btn" data-i18n="continue_to_personal_info">Continue
                     &#8594;</button>
             </div>
         </div>
@@ -308,26 +303,26 @@
         <div id="step3ContainerCabin" class="step-container" style="display:none;">
             <div class="step3-layout">
                 <div class="step3-form-col">
-                    <h3 data-i18n="personal_information_title">Personal Information</h3>
+                    <h3 data-i18n="personal_information_title"></h3>
 
                     <div class="name-row">
                         <div class="form-group">
-                            <label data-i18n="label_first_name">First Name <span class="required"></span></label>
-                            <input type="text" id="cabinFirstName" placeholder="First name" required>
+                            <label data-i18n="label_first_name"></label>
+                            <input type="text" id="cabinFirstName" placeholder="First name" required data-i18n-placeholder="placeholder_first_name">
                         </div>
                         <div class="form-group">
-                            <label data-i18n="label_last_name">Last Name <span class="required"></span></label>
-                            <input type="text" id="cabinLastName" placeholder="Last name" required>
+                            <label data-i18n="label_last_name"></label>
+                            <input type="text" id="cabinLastName" placeholder="Last name" required data-i18n-placeholder="placeholder_last_name">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label data-i18n="label_email">Email Address <span class="required"></span></label>
-                        <input type="email" id="cabinEmail" placeholder="your@email.com" required>
+                        <label data-i18n="label_email"></label>
+                        <input type="email" id="cabinEmail" placeholder="your@email.com" required data-i18n-placeholder="placeholder_email">
                     </div>
 
                     <div class="form-group">
-                        <label data-i18n="label_telephone">Telephone <span class="required"></span></label>
+                        <label data-i18n="telephone_label"></label>
                         <div class="phone-input-row">
                             <select id="cabinPhonePrefix" class="phone-prefix-select">
                                 <option value="+40">🇷🇴 +40</option>
@@ -570,19 +565,17 @@
                                 <option value="+260">🇿🇲 +260</option>
                                 <option value="+263">🇿🇼 +263</option>
                             </select>
-                            <input type="tel" id="cabinPhone" placeholder="Phone number" required>
+                            <input type="tel" id="cabinPhone" placeholder="Phone number" required data-i18n-placeholder="placeholder_phone">
                         </div>
                     </div>
 
                     <div class="newsletter-group">
                         <label class="newsletter-label">
                             <input type="checkbox" id="newsletterCheck">
-                            <span data-i18n="newsletter_agree">I agree to receive information</span>
+                            <span data-i18n="newsletter_agree"></span>
                             <span class="info-tooltip" tabindex="0">
                                 &#9432;
-                                <span class="tooltip-text" data-i18n="newsletter_tooltip">In the future, I would like to receive newsletters with
-                                    current information and travel offers by email. This consent can be withdrawn at any
-                                    time.</span>
+                                <span class="tooltip-text" data-i18n="newsletter_tooltip"></span>
                             </span>
                         </label>
                     </div>
@@ -590,14 +583,13 @@
                     <p class="legal-note" data-i18n="legal_note"></p>
 
                     <div class="form-actions cabin-step-actions">
-                        <button type="button" id="backToExtrasBtn" class="btn-secondary" data-i18n="back_button">&#8592; Back</button>
-                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking" data-i18n="send_booking_button">Send Booking for
-                            Confirmation</button>
+                        <button type="button" id="backToExtrasBtn" class="btn-secondary" data-i18n="back_to_extras"></button>
+                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking" data-i18n="send_booking_button"></button>
                     </div>
                 </div>
 
                 <aside class="booking-summary-panel">
-                    <h4 data-i18n="booking_summary">Booking Summary</h4>
+                    <h4 data-i18n="booking_summary"></h4>
                     <div id="summaryContent" class="summary-content">
                         <!-- populated by JS -->
                     </div>
@@ -612,12 +604,10 @@
             </div>
             <div class="confirmation-container">
                 <div class="confirmation-icon">&#10003;</div>
-                <h3 data-i18n="booking_request_submitted">Booking Request Submitted</h3>
-                <p class="confirmation-message" data-i18n="confirmation_message_details">Thank you for your booking request. Our host will personally review your
-                    details and contact you within 24 hours to confirm your reservation. We look forward to welcoming
-                    you to Gr&#259;dina S&#226;nzienelor!</p>
-                <p class="confirmation-sub" data-i18n="confirmation_sub_message">Please check your email for a summary of your request.</p>
-                <button id="newBookingBtn" class="btn-secondary" data-i18n="make_another_booking">Make Another Booking</button>
+                <h3 data-i18n="booking_request_submitted"></h3>
+                <p class="confirmation-message" data-i18n="confirmation_message_details"></p>
+                <p class="confirmation-sub" data-i18n="confirmation_sub_message"></p>
+                <button id="newBookingBtn" class="btn-secondary" data-i18n="make_another_booking"></button>
             </div>
         </div>
     </div>
