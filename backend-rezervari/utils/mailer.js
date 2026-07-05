@@ -24,6 +24,7 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
         if (reservationType === 'cabin') {
             emailContent += `\nData început: ${reservationDetails.start_date}\n`;
             emailContent += `Data sfârșit: ${reservationDetails.end_date}\n`;
+            emailContent += `Ora sosirii: ${reservationDetails.arrival_time || 'Nu a lăsat ora'}\n`;
             emailContent += `Camere necesare: ${reservationDetails.rooms_needed || 1}\n`;
             emailContent += `Vrea meniu: ${reservationDetails.wants_meal ? 'Da' : 'Nu'}\n`;
             emailContent += `Vrea ciubăr: ${reservationDetails.wants_hottub ? 'Da' : 'Nu'}\n`;

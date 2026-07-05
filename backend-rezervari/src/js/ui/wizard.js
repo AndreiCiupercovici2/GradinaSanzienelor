@@ -206,9 +206,9 @@ export function initWizardEventListeners() {
 
     document.addEventListener('change', function (e) {
         const id = e.target?.id;
-        
+
         if (id === 'newsletterCheck') {
-            const isChecked = e.target.checked; 
+            const isChecked = e.target.checked;
 
             if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
             WIZARD_STATE.cabinFormData.newsletter = isChecked;
@@ -218,6 +218,22 @@ export function initWizardEventListeners() {
 
             saveToLocalStorage();
         }
+    });
+
+    document.querySelectorAll('.date-input-card, .time-input-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const input = card.querySelector('input, select');
+            if (input && e.target !== input) {
+                input.focus();
+                if (input._flatpickr) {
+                    input._flatpickr.open();
+                } else if (typeof input.showPicker === 'function') {
+                    input.showPicker();
+                } else {
+                    input.click();
+                }
+            }
+        });
     });
 }
 
