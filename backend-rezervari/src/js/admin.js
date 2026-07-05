@@ -17,7 +17,7 @@ function generateButtons(id, reservationType, currentStatus) {
     if (currentStatus === 'pending') {
         return `
             <button class="btn-approve" onclick="window.changeStatus(${id}, '${reservationType}', 'confirm')">✔️ Aprobă</button>
-            <button class="btn-reject" onclick="window.changeStatus(${id}, '${reservationType}', 'rejected')">❌ Respinge</button>
+            <button class="btn-reject" onclick="window.changeStatus(${id}, '${reservationType}', 'reject')">❌ Respinge</button>
         `;
     }
     return `<strong class="status-text status-${currentStatus}">${currentStatus.toUpperCase()}</strong>`;

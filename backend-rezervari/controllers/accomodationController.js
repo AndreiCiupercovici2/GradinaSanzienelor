@@ -1,5 +1,7 @@
 const AccomodationModel = require('../models/accomodationModel');
 
+const { sendConfirmationEmail } = require('../utils/mailer');
+
 const {
     getLanguage,
     t,
@@ -130,6 +132,7 @@ const AccomodationController = {
             };
 
             const insertedId = await AccomodationModel.createReservation(dbData);
+            sendConfirmationEmail(dbData, 'accommodation');
             return res.status(201).json({ message: t('cabin_success', lang), reservationId: insertedId });
         } catch (error) {
             console.error('Error creating accommodation reservation:', error);

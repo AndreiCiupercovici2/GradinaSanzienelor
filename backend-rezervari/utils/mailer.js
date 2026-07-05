@@ -20,7 +20,6 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
         emailContent += `\nCompunerea grupului:\n`;
         emailContent += `- Adulți: ${adults}\n`;
         emailContent += `- Animale de companie: ${pets}\n`;
-        emailContent += `Persoane total: ${adults}\n`;
 
         if (reservationType === 'cabin') {
             emailContent += `\nData început: ${reservationDetails.start_date}\n`;
@@ -31,7 +30,7 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
             emailContent += `Consimțământ newsletter: ${reservationDetails.newsletter ? 'Da' : 'Nu'}\n`;
         } else {
             emailContent += `\nData: ${reservationDetails.reservation_date}\n`;
-            emailContent += `Ora: ${reservationDetails.time}\n`;
+            emailContent += `Ora: ${reservationDetails.reservation_time}\n`;
         }
 
         emailContent += `\nPentru a vedea detaliile și a aproba sau anula rezervarea, accesează: ${BASE_URL}/portalIntern.html`;

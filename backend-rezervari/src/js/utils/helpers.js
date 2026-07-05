@@ -32,3 +32,13 @@ export function calculateNights(arrivalDate, departureDate) {
     const diffTime = Math.abs(departure - arrival);
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
+
+export function setVal(selector, value) {
+    const element = document.querySelector(selector);
+    if ( element && value !== undefined && value !== null) element.value = value;
+}
+
+export function setChecked(selector, isChecked) {
+    const element = document.querySelector(selector);
+    if (element) element.checked = isChecked;
+}

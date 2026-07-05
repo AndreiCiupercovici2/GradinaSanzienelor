@@ -18,8 +18,6 @@ export const WIZARD_STATE = {
         adults: 1,
         rooms_needed: 1,
         children: 0,
-        wantsHotTub: false,
-        wantsMeal: false,
         newsletter: false
     },
     cabinExtras: {
@@ -34,10 +32,10 @@ export const WIZARD_STATE = {
         phone: '',
         adults: 1,
         children: 0,
-        wantsCabin: false,
         newsletter: false,
         reservationDate: '',
-        reservationTime: ''
+        reservationTime: '',
+        pets: ''
     },
     mealExtras: {
         cabin: false

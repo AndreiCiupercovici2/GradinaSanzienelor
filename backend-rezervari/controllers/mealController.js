@@ -1,5 +1,7 @@
 const MealModel = require('../models/mealModel');
 
+const { sendConfirmationEmail } = require('../utils/mailer');
+
 const {
     getLanguage,
     t,
@@ -124,6 +126,7 @@ const MealController = {
             };
 
             const insertedId = await MealModel.createReservation(dbData);
+            sendConfirmationEmail(dbData, 'meal');
             return res.status(201).json({ message: t('meal_success', lang), reservationId: insertedId });
         } catch (error) {
             console.error('Error creating meal reservation:', error);

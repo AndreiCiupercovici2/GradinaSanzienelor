@@ -114,12 +114,12 @@ const isValidPhoneNumber = (phone) => {
 };
 
 const isValidInteger = (value) => {
-    const num = parseInt(value, 10);
-    return !isNaN(num) && String(num) === String(value) && num >= 0;
+    const num = Number(value);
+    return Number.isInteger(num) && num >= 0;
 };
 
 const isValidBoolean = (value) => {
-    return typeof value === 'boolean' || value === 'true' || value === 'false' || value === 1 || value === 0;
+    return typeof value === 'boolean';
 };
 
 const containsMaliciousPatterns = (text) => {
@@ -204,13 +204,6 @@ const validateReservationInput = (data, lang, isFood = false) => {
     } else {
         const adults = parseInt(data.adults, 10);
         if (adults < 1) errors.push(t('invalid_adults', lang));
-    }
-
-    const pets = parseInt(data.pets, 10) || 0;
-    if (!isValidInteger(data.pets) && data.pets !== undefined && data.pets !== null && data.pets !== '') {
-        errors.push(t('invalid_integer', lang));
-    } else if (pets < 0) {
-        errors.push(t('invalid_pets', lang));
     }
 
     if (isFood) {

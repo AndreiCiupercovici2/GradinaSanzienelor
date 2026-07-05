@@ -1,10 +1,362 @@
 import { WIZARD_STATE, APP_GLOBALS, backendUrl } from '../core/state.js';
-import { isToday, isAfter10Am } from '../utils/helpers.js';
+import { isToday, isAfter10Am, setVal, setChecked } from '../utils/helpers.js';
 import { submitCabinBooking, submitMealBooking } from '../api/api.js';
 
 import flatpickr from 'flatpickr';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 
+export function initWizardEventListeners() {
+    window.addEventListener('beforeunload', (e) => {
+        if (WIZARD_STATE.mealFormDirty || WIZARD_STATE.cabinFormDirty) {
+            e.preventDefault(); e.returnValue = '';
+        }
+    });
+
+    document.getElementById('cabinSection')?.addEventListener('input', (e) => {
+        const id = e.target?.id;
+        if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+        const state = WIZARD_STATE.cabinFormData;
+
+        if (id === 'cabinFirstName') state.firstName = e.target.value;
+        if (id === 'cabinLastName') state.lastName = e.target.value;
+        if (id === 'cabinEmail') state.email = e.target.value;
+        if (id === 'cabinPhone') state.phone = e.target.value;
+        if (id === 'cabinArrivalTimeInput') state.arrivalTime = e.target.value;
+        if (id === 'cabinAdultsSelect') state.adults = parseInt(e.target.value) || 1;
+        if (id === 'cabinPetsInput') state.pets = e.target.value;
+        if (id === 'cabinRoomsSelect') state.rooms_needed = parseInt(e.target.value) || 1;
+
+        saveToLocalStorage();
+    });
+
+    document.getElementById('mealSection')?.addEventListener('input', (e) => {
+        const id = e.target?.id;
+        if (!WIZARD_STATE.mealFormData) WIZARD_STATE.mealFormData = {};
+        const state = WIZARD_STATE.mealFormData;
+
+        if (id === 'mealFirstName') state.firstName = e.target.value;
+        if (id === 'mealLastName') state.lastName = e.target.value;
+        if (id === 'mealEmail') state.email = e.target.value;
+        if (id === 'mealPhone') state.phone = e.target.value;
+        if (id === 'mealArrivalTimeInput') state.reservationTime = e.target.value;
+        if (id === 'mealAdultsInput') state.adults = parseInt(e.target.value) || 1;
+        if (id === 'mealPetsInput') state.pets = e.target.value;
+
+        saveToLocalStorage();
+    });
+
+    // ===== CABIN-SPECIFIC EVENT LISTENERS =====
+    document.getElementById('nightsDecBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (APP_GLOBALS.cabinNights > 1) {
+            APP_GLOBALS.cabinNights--;
+            updateNightsDisplay();
+            saveToLocalStorage();
+        }
+    });
+
+    document.getElementById('nightsIncBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        APP_GLOBALS.cabinNights++;
+        updateNightsDisplay();
+        saveToLocalStorage();
+    });
+
+    // Step 1 to Step 2: Cabin workflow
+    const cabinContinueBtn = document.querySelector('#step1ContainerCabin #continueToExtrasBtn');
+    cabinContinueBtn?.addEventListener('click', async function (e) {
+        e.preventDefault();
+        if (await validateCabinStep1()) {
+            WIZARD_STATE.cabinFormDirty = true;
+            showCabinStep(2);
+            saveToLocalStorage();
+        }
+    });
+
+    // Step 2 to Step 3: Cabin workflow
+    const cabinPersonalBtn = document.querySelector('#step2ContainerCabin #continueToPersonalBtn');
+    cabinPersonalBtn?.addEventListener('click', async function (e) {
+        e.preventDefault();
+        updateCabinSummary();
+        showCabinStep(3);
+        saveToLocalStorage();
+    });
+
+    // Back to Step 1: Cabin workflow
+    const cabinBackBtn = document.querySelector('#step2ContainerCabin #backToTravelBtn');
+    cabinBackBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showCabinStep(1);
+        saveToLocalStorage();
+    });
+
+    // Back to Step 2: Cabin workflow
+    const cabinBackExtrasBtn = document.querySelector('#step3ContainerCabin #backToExtrasBtn');
+    cabinBackExtrasBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showCabinStep(2);
+        saveToLocalStorage();
+    });
+
+    // Submit Cabin Booking (Step 3 to Step 4)
+    const cabinSendBtn = document.querySelector('#step3ContainerCabin #sendBookingBtn');
+    cabinSendBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!validateCabinStep3()) return;
+        saveToLocalStorage();
+        await handleCabinSubmission();
+    });
+
+    // Cabin Extras Toggles
+    document.getElementById('hotTubToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isAdded = WIZARD_STATE.cabinExtras?.hotTub || false;
+        WIZARD_STATE.cabinExtras.hotTub = !isAdded;
+        this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Hot Tub' : '+ Adaugă Jacuzzi';
+        saveToLocalStorage();
+    });
+
+    document.getElementById('mealToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isAdded = WIZARD_STATE.cabinExtras?.meal || false;
+        WIZARD_STATE.cabinExtras.meal = !isAdded;
+        this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Meal' : '+ Adaugă Masă';
+        saveToLocalStorage();
+    });
+
+    // Rooms select change listener - update adults options
+    document.getElementById('cabinRoomsSelect')?.addEventListener('change', function (e) {
+        const rooms = parseInt(this.value) || 1;
+        updateAdultsOptions(rooms);
+        updateCabinSummary();
+        saveToLocalStorage();
+    });
+
+    // ===== MEAL-SPECIFIC EVENT LISTENERS =====
+
+    // Step 1 to Step 2: Meal workflow
+    const mealContinueBtn = document.querySelector('#step1ContainerMeal #continueToExtrasBtn');
+    mealContinueBtn?.addEventListener('click', async function (e) {
+        e.preventDefault();
+        if (await validateMealStep1()) {
+            WIZARD_STATE.mealFormDirty = true;
+            saveToLocalStorage();
+            showMealStep(2);
+        }
+    });
+
+    // Step 2 to Step 3: Meal workflow
+    const mealPersonalBtn = document.querySelector('#step2ContainerMeal #continueToPersonalBtn');
+    mealPersonalBtn?.addEventListener('click', async function (e) {
+        e.preventDefault();
+        updateMealSummary();
+        saveToLocalStorage();
+        showMealStep(3);
+    });
+
+    // Back to Step 1: Meal workflow
+    const mealBackBtn = document.querySelector('#step2ContainerMeal #backToTravelBtn');
+    mealBackBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showMealStep(1);
+        saveToLocalStorage();
+    });
+
+    // Back to Step 2: Meal workflow
+    const mealBackExtrasBtn = document.querySelector('#step3ContainerMeal #backToExtrasBtn');
+    mealBackExtrasBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+        showMealStep(2);
+        saveToLocalStorage();
+    });
+
+    // Submit Meal Booking (Step 3 to Step 4)
+    const mealSendBtn = document.querySelector('#step3ContainerMeal #sendBookingBtn');
+    mealSendBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!validateMealStep3()) return;
+        await handleMealSubmission();
+        saveToLocalStorage();
+    });
+
+    // Meal Extras Toggle
+    document.getElementById('cabinToggle')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isMealSection = document.getElementById('mealSection');
+        if (isMealSection) {
+            const isAdded = WIZARD_STATE.mealExtras?.cabin || false;
+            WIZARD_STATE.mealExtras.cabin = !isAdded;
+            this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimina Cabana' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana';
+            saveToLocalStorage();
+        }
+    });
+
+    document.getElementById('newBookingBtn')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const msg = APP_GLOBALS.currentLanguage === 'en'
+            ? 'Are you sure you want to start a new booking?'
+            : 'Sigur doriți să începeți o rezervare nouă?';
+        showConfirmModal(msg, () => {
+            resetCabinForm();
+            showCabinStep(1);
+            showMealStep(1);
+            saveToLocalStorage();
+        });
+    });
+
+    document.addEventListener('change', function (e) {
+        const id = e.target?.id;
+        
+        if (id === 'newsletterCheck') {
+            const isChecked = e.target.checked; 
+
+            if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+            WIZARD_STATE.cabinFormData.newsletter = isChecked;
+
+            if (!WIZARD_STATE.mealFormData) WIZARD_STATE.mealFormData = {};
+            WIZARD_STATE.mealFormData.newsletter = isChecked;
+
+            saveToLocalStorage();
+        }
+    });
+}
+
+export function saveToLocalStorage() {
+    localStorage.setItem('wizardState', JSON.stringify(WIZARD_STATE));
+}
+
+export function loadFromLocalStorage() {
+    const savedState = localStorage.getItem('wizardState');
+    if (savedState) {
+        try {
+
+            const parsedState = JSON.parse(savedState);
+            Object.assign(WIZARD_STATE, parsedState);
+
+            const cabinState = WIZARD_STATE.cabinFormData;
+
+            if (cabinState) {
+                setVal('cabinFirstName', cabinState.firstName);
+                setVal('cabinLastName', cabinState.lastName);
+                setVal('cabinEmail', cabinState.email);
+                setVal('cabinPhone', cabinState.phone);
+                setVal('cabinPhonePrefix', cabinState.phonePrefix);
+                setVal('cabinArrivalTimeInput', cabinState.arrivalTime);
+                setVal('cabinAdultsSelect', cabinState.adults);
+                setVal('cabinPetsInput', cabinState.pets);
+                setVal('cabinRoomsSelect', cabinState.rooms_needed);
+                setChecked('cabinNewsletter', cabinState.newsletter);
+            }
+            const hotTubToggle = document.getElementById('hotTubToggle');
+            const mealToggle = document.getElementById('mealToggle');
+
+            if (hotTubToggle && WIZARD_STATE.cabinExtras?.hotTub) {
+                hotTubToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr';
+            }
+            if (mealToggle && WIZARD_STATE.cabinExtras?.meal) {
+                mealToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă';
+            }
+
+            if (WIZARD_STATE.cabinStep > 1) {
+                showCabinStep(WIZARD_STATE.cabinStep);
+                updateCabinSummary();
+            }
+
+            const mealState = WIZARD_STATE.mealFormData;
+            if (mealState) {
+                setVal('mealFirstName', mealState.firstName);
+                setVal('mealLastName', mealState.lastName);
+                setVal('mealEmail', mealState.email);
+                setVal('mealPhone', mealState.phone);
+                setVal('mealPhonePrefix', mealState.phonePrefix);
+                setVal('mealArrivalTimeInput', mealState.reservationTime);
+                setVal('mealAdultsInput', mealState.adults);
+                setVal('mealPetsInput', mealState.pets);
+                setChecked('mealNewsletter', mealState.newsletter);
+            }
+
+            const cabinToggle = document.getElementById('cabinToggle');
+            if (cabinToggle && WIZARD_STATE.mealExtras?.cabin) {
+                cabinToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimina Cabana';
+            }
+
+            if (WIZARD_STATE.mealStep > 1) {
+                showMealStep(WIZARD_STATE.mealStep);
+                updateMealSummary();
+            }
+        } catch (e) {
+            console.error('Error loading cabin state from localStorage:', e);
+            localStorage.removeItem('wizardState');
+        }
+    }
+}
+
+export async function handleCabinSubmission() {
+    if (!validateCabinStep3()) return;
+
+    const payload = WIZARD_STATE.cabinFormData;
+    const extras = WIZARD_STATE.cabinExtras;
+    const fallbackStartDate = document.getElementById('cabinArrivalInput')?.value || '';
+    const fallbackEndDate = document.getElementById('cabinDepartureInput')?.value || '';
+    const fallbackArrivalTime = document.getElementById('cabinArrivalTimeInput')?.value || '';
+
+    const backendPayload = {
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        phone: payload.phonePrefix + payload.phone,
+        start_date: payload.arrivalDate || fallbackStartDate,
+        end_date: payload.departureDate || fallbackEndDate,
+        arrival_time: payload.arrivalTime || fallbackArrivalTime,
+        adults: parseInt(payload.adults, 10) || 1,
+        pets: payload.pets,
+        wants_meal: extras.meal ? true : false,
+        wants_hottub: extras.hotTub ? true : false,
+        rooms_needed: payload.rooms_needed || 1,
+        newsletter: payload.newsletter ? true : false
+    };
+
+    try {
+        await submitCabinBooking(backendPayload);
+        WIZARD_STATE.cabinFormDirty = false;
+
+        localStorage.removeItem('wizardState');
+        showCabinStep(4);
+    } catch (e) {
+        showToast('Error submitting cabin booking: ' + e.message, 'error');
+    }
+}
+
+export async function handleMealSubmission() {
+    if (!validateMealStep3()) return;
+
+    const payload = WIZARD_STATE.mealFormData;
+    const fallbackDate = document.getElementById('mealArrivalInput')?.value || '';
+    const fallbackTime = document.getElementById('mealArrivalTimeInput')?.value || '';
+
+    const backendPayload = {
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        phone: payload.phonePrefix + payload.phone,
+        reservation_date: payload.reservationDate || fallbackDate,
+        reservation_time: payload.reservationTime || fallbackTime,
+        adults: parseInt(payload.adults, 10) || 1,
+        pets: payload.pets,
+        wants_cabin: WIZARD_STATE.mealExtras.cabin ? true : false,
+        newsletter: payload.newsletter ? true : false
+    };
+
+    try {
+        await submitMealBooking(backendPayload);
+        WIZARD_STATE.mealFormDirty = false;
+
+        localStorage.removeItem('wizardState');
+        showMealStep(4);
+    } catch (e) {
+        showToast('Error submitting meal booking: ' + e.message, 'error');
+    }
+}
 // ─── UI Notification Helpers ──────────────────────────────────────────────────
 
 export function showToast(message, type = 'info') {
@@ -65,95 +417,46 @@ function markError(el) {
 }
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-
-export async function handleCabinSubmission() {
-    if (!validateCabinStep3()) return;
-
-    const payload = WIZARD_STATE.cabinFormData;
-
-    const backendPayload = {
-        first_name: payload.firstName,
-        last_name: payload.lastName,
-        email: payload.email,
-        phone: payload.phonePrefix + payload.phone,
-        start_date: payload.arrivalDate,
-        end_date: payload.departureDate,
-        arrival_time: payload.arrivalTime,
-        adults: payload.adults,
-        pets: payload.pets,
-        rooms_needed: payload.rooms_needed || 1,
-        wants_meal: payload.wantsMeal ? true : false,
-        wants_hottub: payload.wantsHotTub ? true : false,
-        newsletter: payload.newsletter ? true : false
-    };
-
-    console.log('Submitting cabin booking with payload:', backendPayload);
-    console.log('payload from WIZARD_STATE:', payload);
-
-    try {
-        await submitCabinBooking(backendPayload);
-        WIZARD_STATE.cabinFormDirty = false;
-        showCabinStep(4);
-    } catch (err) {
-        showToast('Error submitting cabin booking: ' + err.message, 'error');
-    }
-}
-
-export async function handleMealSubmission() {
-    if (!validateMealStep1()) return;
-
-    const payload = WIZARD_STATE.mealFormData;
-
-    const backendPayload = {
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        email: payload.email,
-        phone: payload.phonePrefix + payload.phone,
-        reservation_date: payload.reservationDate,
-        reservation_time: payload.reservationTime,
-        adults: payload.adults,
-        pets: payload.pets,
-        wants_cabin: payload.wantsCabin ? true : false,
-        newsletter: payload.newsletter ? true : false
-    };
-    try {
-        await submitMealBooking(backendPayload);
-        WIZARD_STATE.mealFormDirty = false;
-        showMealStep(4);
-    } catch (err) {
-        showToast('Error submitting meal booking: ' + err.message, 'error');
-    }
-}
-
 export function handleArrivalChange(dates) {
     if (!dates || dates.length === 0) return;
     const arrivalDate = new Date(dates[0]);
+    const arrDateStr = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}-${String(arrivalDate.getDate()).padStart(2, '0')}`;
     const cabinArrivalInput = document.getElementById('cabinArrivalInput');
     const cabinDepartureInput = document.getElementById('cabinDepartureInput');
     const mealArrivalInput = document.getElementById('mealArrivalInput');
-    
+
     if (cabinArrivalInput && cabinDepartureInput) {
         const depDate = new Date(arrivalDate);
         depDate.setDate(depDate.getDate() + APP_GLOBALS.cabinNights);
         const depDateStr = `${depDate.getFullYear()}-${String(depDate.getMonth() + 1).padStart(2, '0')}-${String(depDate.getDate()).padStart(2, '0')}`;
         cabinDepartureInput.value = depDateStr;
+
+        if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+        WIZARD_STATE.cabinFormData.arrivalDate = arrDateStr;
+        WIZARD_STATE.cabinFormData.departureDate = depDateStr;
+
         if (APP_GLOBALS.cabinDepartureFP) {
-            APP_GLOBALS.cabinDepartureFP.setDate(depDate, true);
-            APP_GLOBALS.cabinDepartureFP.set('minDate', new Date(arrivalDate.getTime() + 24 * 60 * 60 * 1000));
+            const nextDay = new Date(arrivalDate.getTime() + 24 * 60 * 60 * 1000);
+            APP_GLOBALS.cabinDepartureFP.set('minDate', nextDay);
+            APP_GLOBALS.cabinDepartureFP.setDate(depDate, false);
         }
-        updateNightsDisplay();
+        updateNightsDisplay(false);
         updateCabinSummary();
     }
     if (mealArrivalInput) {
         const mealDateStr = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}-${String(arrivalDate.getDate()).padStart(2, '0')}`;
         mealArrivalInput.value = mealDateStr;
 
+        if (!WIZARD_STATE.mealFormData) WIZARD_STATE.mealFormData = {};
+        WIZARD_STATE.mealFormData.reservationDate = mealDateStr;
+
         if (APP_GLOBALS.mealReservationFP) {
-            APP_GLOBALS.mealReservationFP.setDate(arrivalDate, true);
+            APP_GLOBALS.mealReservationFP.setDate(arrivalDate, false);
         }
         updateMealSummary();
     }
+
+    saveToLocalStorage();
 }
 
 export function handleDepartureChange(dates) {
@@ -161,11 +464,18 @@ export function handleDepartureChange(dates) {
         const arrival = APP_GLOBALS.cabinArrivalFP.selectedDates[0];
         const departure = new Date(dates[0]);
         const diff = departure.getTime() - arrival.getTime();
-        const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        const nights = Math.round(diff / (1000 * 60 * 60 * 24));
         if (nights > 0) {
             APP_GLOBALS.cabinNights = nights;
+
+            const depDateStr = `${departure.getFullYear()}-${String(departure.getMonth() + 1).padStart(2, '0')}-${String(departure.getDate()).padStart(2, '0')}`;
+
+            if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+            WIZARD_STATE.cabinFormData.departureDate = depDateStr;
             updateNightsDisplay(false);
             updateCabinSummary();
+
+            saveToLocalStorage();
         }
     }
 }
@@ -256,11 +566,11 @@ export async function validateMealStep1() {
         showToast(lang === 'en' ? 'Please select a date.' : 'Vă rugăm selectați o dată.', 'warning');
         return false;
     }
-    if (!arrivalTimeEl?.value) {
-        markError(arrivalTimeEl);
-        showToast(lang === 'en' ? 'Please select a time.' : 'Vă rugăm selectați o oră.', 'warning');
-        return false;
-    }
+    // if (!arrivalTimeEl?.value) {
+    //     markError(arrivalTimeEl);
+    //     showToast(lang === 'en' ? 'Please select a time.' : 'Vă rugăm selectați o oră.', 'warning');
+    //     return false;
+    // }
     if (isToday(arrivalEl.value) && isAfter10Am()) {
         markError(arrivalEl);
         showToast(lang === 'en' ? 'Same-day requests are no longer accepted. Please call.' : 'Cererea pentru azi nu mai este acceptată. Vă rugăm sunați.', 'warning');
@@ -449,7 +759,7 @@ export function updateNightsDisplay(shouldUpdateDeparture = true) {
             document.getElementById('cabinDepartureInput').value = dateStr;
 
             if (APP_GLOBALS.cabinDepartureFP) {
-                APP_GLOBALS.cabinDepartureFP.setDate(dep, true);
+                APP_GLOBALS.cabinDepartureFP.setDate(dep, false);
             }
         }
         updateCabinSummary();
@@ -641,176 +951,4 @@ function initializeFlatpickr(inputElement, type) {
     }
 }
 
-export function initWizardEventListeners() {
-    window.addEventListener('beforeunload', (e) => {
-        if (WIZARD_STATE.mealFormDirty || WIZARD_STATE.cabinFormDirty) {
-            e.preventDefault(); e.returnValue = '';
-        }
-    });
-
-    // ===== CABIN-SPECIFIC EVENT LISTENERS =====
-    document.getElementById('nightsDecBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (APP_GLOBALS.cabinNights > 1) {
-            APP_GLOBALS.cabinNights--;
-            updateNightsDisplay();
-        }
-    });
-
-    document.getElementById('nightsIncBtn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        APP_GLOBALS.cabinNights++;
-        updateNightsDisplay();
-    });
-
-    // Step 1 to Step 2: Cabin workflow
-    const cabinContinueBtn = document.querySelector('#step1ContainerCabin #continueToExtrasBtn');
-    cabinContinueBtn?.addEventListener('click', async function (e) {
-        e.preventDefault();
-        if (await validateCabinStep1()) {
-            WIZARD_STATE.cabinFormDirty = true;
-            showCabinStep(2);
-        }
-    });
-
-    // Step 2 to Step 3: Cabin workflow
-    const cabinPersonalBtn = document.querySelector('#step2ContainerCabin #continueToPersonalBtn');
-    cabinPersonalBtn?.addEventListener('click', async function (e) {
-        e.preventDefault();
-        updateCabinSummary();
-        showCabinStep(3);
-    });
-
-    // Back to Step 1: Cabin workflow
-    const cabinBackBtn = document.querySelector('#step2ContainerCabin #backToTravelBtn');
-    cabinBackBtn?.addEventListener('click', function (e) {
-        e.preventDefault();
-        showCabinStep(1);
-    });
-
-    // Back to Step 2: Cabin workflow
-    const cabinBackExtrasBtn = document.querySelector('#step3ContainerCabin #backToExtrasBtn');
-    cabinBackExtrasBtn?.addEventListener('click', function (e) {
-        e.preventDefault();
-        showCabinStep(2);
-    });
-
-    // Submit Cabin Booking (Step 3 to Step 4)
-    const cabinSendBtn = document.querySelector('#step3ContainerCabin #sendBookingBtn');
-    cabinSendBtn?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (!validateCabinStep3()) return;
-        await handleCabinSubmission();
-    });
-
-    // Cabin Extras Toggles
-    document.getElementById('hotTubToggle')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        this.textContent = !WIZARD_STATE.cabinExtras.hotTub ? '- Remove Hot Tub' : '+ Add Hot Tub';
-        WIZARD_STATE.cabinExtras.hotTub = !WIZARD_STATE.cabinExtras.hotTub;
-    });
-
-    document.getElementById('mealToggle')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        this.textContent = !WIZARD_STATE.cabinExtras.meal ? '- Remove Meal Plan' : '+ Add Meal Plan';
-        WIZARD_STATE.cabinExtras.meal = !WIZARD_STATE.cabinExtras.meal;
-    });
-
-    // ===== MEAL-SPECIFIC EVENT LISTENERS =====
-
-    // Step 1 to Step 2: Meal workflow
-    const mealContinueBtn = document.querySelector('#step1ContainerMeal #continueToExtrasBtn');
-    mealContinueBtn?.addEventListener('click', async function (e) {
-        e.preventDefault();
-        if (await validateMealStep1()) {
-            WIZARD_STATE.mealFormDirty = true;
-            showMealStep(2);
-        }
-    });
-
-    // Step 2 to Step 3: Meal workflow
-    const mealPersonalBtn = document.querySelector('#step2ContainerMeal #continueToPersonalBtn');
-    mealPersonalBtn?.addEventListener('click', async function (e) {
-        e.preventDefault();
-        updateMealSummary();
-        showMealStep(3);
-    });
-
-    // Back to Step 1: Meal workflow
-    const mealBackBtn = document.querySelector('#step2ContainerMeal #backToTravelBtn');
-    mealBackBtn?.addEventListener('click', function (e) {
-        e.preventDefault();
-        showMealStep(1);
-    });
-
-    // Back to Step 2: Meal workflow
-    const mealBackExtrasBtn = document.querySelector('#step3ContainerMeal #backToExtrasBtn');
-    mealBackExtrasBtn?.addEventListener('click', function (e) {
-        e.preventDefault();
-        showMealStep(2);
-    });
-
-    // Submit Meal Booking (Step 3 to Step 4)
-    const mealSendBtn = document.querySelector('#step3ContainerMeal #sendBookingBtn');
-    mealSendBtn?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (!validateMealStep3()) return;
-        await handleMealSubmission();
-    });
-
-    // Meal Extras Toggle
-    document.getElementById('cabinToggle')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        const isMealSection = document.getElementById('mealSection');
-        if (isMealSection) {
-            const isAdded = WIZARD_STATE.mealExtras?.cabin || false;
-            WIZARD_STATE.mealExtras = { cabin: !isAdded };
-            this.textContent = !isAdded ? '- Remove Cabin' : '+ Add Cabin';
-        }
-    });
-
-    // Rooms select change listener - update adults options
-    document.getElementById('cabinRoomsSelect')?.addEventListener('change', function (e) {
-        const rooms = parseInt(this.value) || 1;
-        updateAdultsOptions(rooms);
-        updateCabinSummary();
-    });
-
-    // ===== MEAL QUICK DATE BUTTONS =====
-    document.getElementById('btnToday')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (!this.disabled) {
-            const today = new Date();
-            const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            document.getElementById('mealArrivalInput').value = dateStr;
-            showMealStep(1);
-        }
-    });
-
-    document.getElementById('btnTomorrow')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateStr = tomorrow.getFullYear() + '-' + String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + String(tomorrow.getDate()).padStart(2, '0');
-        document.getElementById('mealArrivalInput').value = dateStr;
-        showMealStep(1);
-    });
-
-    document.getElementById('newBookingBtn')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        const msg = APP_GLOBALS.currentLanguage === 'en'
-            ? 'Are you sure you want to start a new booking?'
-            : 'Sigur doriți să începeți o rezervare nouă?';
-        showConfirmModal(msg, () => {
-            resetCabinForm();
-            showCabinStep(1);
-            showMealStep(1);
-        });
-    });
-
-    document.getElementById('newsletter')?.addEventListener('change', function (e) {
-        if (WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData.newsletter = this.checked;
-        if (WIZARD_STATE.mealFormData) WIZARD_STATE.mealFormData.newsletter = this.checked;
-    });
-}
 

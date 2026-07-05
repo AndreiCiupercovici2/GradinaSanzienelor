@@ -16,9 +16,9 @@ function initializeTables() {
                     adults INTEGER NOT NULL,
                     pets TEXT,
                     rooms_needed INTEGER,
-                    wants_meal INTEGER DEFAULT 0,
-                    wants_hottub INTEGER DEFAULT 0,
-                    newsletter INTEGER DEFAULT 0,
+                    wants_meal BOOLEAN DEFAULT 0,
+                    wants_hottub BOOLEAN DEFAULT 0,
+                    newsletter BOOLEAN DEFAULT 0,
                     status TEXT DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -38,8 +38,8 @@ function initializeTables() {
                     reservation_time TEXT NOT NULL,
                     adults INTEGER NOT NULL,
                     pets TEXT,
-                    wants_cabin INTEGER DEFAULT 0,
-                    newsletter INTEGER DEFAULT 0,
+                    wants_cabin BOOLEAN DEFAULT 0,
+                    newsletter BOOLEAN DEFAULT 0,
                     status TEXT DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
