@@ -1,7 +1,7 @@
 const backendUrl = '/api';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { calculateNights, formatDate } from './utils/helpers.js';
+import { calculateNights, formatDate, formatDateDMY } from './utils/helpers.js';
 
 let cabinReservationsData = [];
 let mealReservationsData = [];
@@ -9,8 +9,6 @@ let cabinCalendar;
 let mealCalendar;
 
 const TOTAL_CABIN_ROOMS = 3;
-
-// Format a UTC registration date for display
 
 // Build approve / reject buttons when status is 'pending'
 function generateButtons(id, reservationType, currentStatus) {
@@ -53,7 +51,6 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
     dateFormat: "Y-m-d",
     minDate: "today",
 
-    // Se execută pentru fiecare zi randată în calendar
     onDayCreate: function (dObj, dStr, fp, dayElem) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -75,18 +72,16 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
         });
 
         if (activeRez.length > 0) {
-            dayElem.classList.add("cal-meal-booked"); // Maro
+            dayElem.classList.add("cal-meal-booked");
         } else {
-            dayElem.classList.add("cal-meal-free"); // Verde
+            dayElem.classList.add("cal-meal-free"); 
         }
     },
 
-    // Se execută când dai click pe o dată
     onChange: function (selectedDates, dateStr, instance) {
         const detailsContainer = document.getElementById('mealDetails');
         if (!detailsContainer) return;
 
-        // Afișăm containerul (în caz că l-am ascuns inițial)
         detailsContainer.style.display = 'block';
 
         const activeRez = mealReservationsData.filter(rez => {
@@ -112,7 +107,6 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
 
     minDate: "today",
 
-    // Se execută pentru fiecare zi randată în calendar
     onDayCreate: function (dObj, dStr, fp, dayElem) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -130,7 +124,6 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         const currentCellDate = `${y}-${m}-${d}`;
 
         const activeRez = cabinReservationsData.filter(rez => {
-            // Decupăm strict partea de YYYY-MM-DD din baza de date
             const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
             const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
 
@@ -142,20 +135,18 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         const roomsBooked = activeRez.reduce((sum, r) => sum + parseInt(r.rooms_needed || 1), 0);
 
         if (roomsBooked >= TOTAL_CABIN_ROOMS) {
-            dayElem.classList.add("cal-fully-booked"); // Maro
+            dayElem.classList.add("cal-fully-booked"); 
         } else if (roomsBooked > 0) {
-            dayElem.classList.add("cal-partially-booked"); // Galben
+            dayElem.classList.add("cal-partially-booked"); 
         } else {
-            dayElem.classList.add("cal-free"); // Verde
+            dayElem.classList.add("cal-free");
         }
     },
 
-    // Se execută când dai click pe o dată
     onChange: function (selectedDates, dateStr, instance) {
         const detailsContainer = document.getElementById('cabinDetails');
         if (!detailsContainer) return;
 
-        // Afișăm containerul (în caz că l-am ascuns inițial)
         detailsContainer.style.display = 'block';
 
         const activeRez = cabinReservationsData.filter(rez => {
@@ -168,9 +159,9 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         });
 
         if (activeRez.length === 0) {
-            detailsContainer.innerHTML = `<p style="color: #28a745;"><strong>${dateStr}</strong>: Cabana este complet liberă.</p>`;
+            detailsContainer.innerHTML = `<p style="color: #28a745;"><strong>${formatDateDMY(dateStr)}</strong>: Cabana este complet liberă.</p>`;
         } else {
-            let html = `<p><strong>Cazări active în data de ${dateStr} - până la ${activeRez[0].end_date}</strong></p><ul>`;
+            let html = `<p><strong>Cazări active în data de ${formatDateDMY(dateStr)} - până la ${formatDateDMY(activeRez[0].end_date)}</strong></p><ul>`;
             activeRez.forEach(rez => {
                 html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - ${calculateNights(rez.start_date, rez.end_date)} nopți</li>`;
             });
@@ -184,7 +175,6 @@ async function loadMealReservations() {
     try {
         const res = await fetch(`${backendUrl}/portalIntern/meal`);
 
-        // Check if response was successful
         if (!res.ok) {
             console.error('Error fetching meal reservations:', res.status);
             alert('Nu s-au putut încărca rezervările de mâncare.');
@@ -193,7 +183,6 @@ async function loadMealReservations() {
 
         const reservations = await res.json();
 
-        // Validate that reservations is an array
         if (!Array.isArray(reservations)) {
             console.error('API returned non-array data for meal reservations:', reservations);
             alert('Format de date invalid de la server.');
@@ -208,12 +197,19 @@ async function loadMealReservations() {
         const table = document.getElementById('mealTable');
         table.innerHTML = '';
 
-        reservations.forEach(rez => {
+        mealReservationsData.sort((a, b) => {
+            const dateCompare = (a.reservation_date || '').localeCompare(b.reservation_date || '');
+            if (dateCompare !== 0) return dateCompare;
+            return (a.reservation_time || '').localeCompare(b.reservation_time || '');
+
+        });
+
+        mealReservationsData.forEach(rez => {
             table.innerHTML += `
                 <tr>
                     <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
                     <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone}</small><br> <small>${rez.email}</small></td>
-                    <td><strong>${rez.reservation_date}</strong></td>
+                    <td><strong>${formatDateDMY(rez.reservation_date)}</strong></td>
                     <td>${rez.adults}</td>
                     <td>${rez.pets}</td>
                     <td>${rez.wants_cabin ? 'Da' : 'Nu'}</td>
@@ -231,7 +227,6 @@ async function loadCabinReservations() {
     try {
         const res = await fetch(`${backendUrl}/portalIntern/cabin`);
 
-        // Check if response was successful
         if (!res.ok) {
             console.error('Error fetching cabin reservations:', res.status);
             alert('Nu s-au putut încărca rezervările de cabană.');
@@ -240,7 +235,6 @@ async function loadCabinReservations() {
 
         const reservations = await res.json();
 
-        // Validate that reservations is an array
         if (!Array.isArray(reservations)) {
             console.error('API returned non-array data for cabin reservations:', reservations);
             alert('Format de date invalid de la server.');
@@ -256,12 +250,14 @@ async function loadCabinReservations() {
         const table = document.getElementById('cabinTable');
         table.innerHTML = '';
 
-        reservations.forEach(rez => {
+        cabinReservationsData.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+
+        cabinReservationsData.forEach(rez => {
             table.innerHTML += `
                 <tr>
                     <td style="color:#888; font-size:12px;">${formatDate(rez.created_at)}</td>
                     <td>${rez.first_name} ${rez.last_name} <br> <small>${rez.phone}</small><br> <small>${rez.email}</small></td>
-                    <td>${rez.start_date} - ${rez.end_date}<br>${calculateNights(rez.start_date, rez.end_date)} nopți</td>
+                    <td><strong>${formatDateDMY(rez.start_date)} - ${formatDateDMY(rez.end_date)}<br>${calculateNights(rez.start_date, rez.end_date)} nopți</strong></td>
                     <td>${rez.adults} <br> Meniu: ${rez.wants_meal ? 'Da' : 'Nu'}</td>
                     <td>${rez.rooms_needed}</td>
                     <td>${rez.wants_hottub ? 'Da' : 'Nu'}</td>
@@ -276,17 +272,14 @@ async function loadCabinReservations() {
     }
 }
 
-// Export to global scope so inline onclick handlers can access them
 window.changeStatus = changeStatus;
 window.loadMealReservations = loadMealReservations;
 window.loadCabinReservations = loadCabinReservations;
 
-// Auto-refresh every 30 seconds
 setInterval(() => {
     loadMealReservations();
     loadCabinReservations();
 }, 30000);
 
-// Initial load
 loadMealReservations();
 loadCabinReservations();

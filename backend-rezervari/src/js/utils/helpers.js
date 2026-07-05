@@ -42,3 +42,11 @@ export function setChecked(selector, isChecked) {
     const element = document.querySelector(selector);
     if (element) element.checked = isChecked;
 }
+
+export function formatDateDMY(dateStr) {
+    if (!dateStr) return dateStr;
+    const datePart = dateStr.substring(0, 10);
+    const [year, month, day] = datePart.split('-');
+    if (!year || !month || !day) return dateStr;
+    return `${day}-${month}-${year}`;
+}

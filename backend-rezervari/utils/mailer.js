@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const { BASE_URL } = require('./helpers');
+const { BASE_URL, formatDateDMY } = require('./helpers');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -22,15 +22,15 @@ const sendConfirmationEmail = async (reservationDetails, reservationType) => {
         emailContent += `- Animale de companie: ${pets}\n`;
 
         if (reservationType === 'cabin') {
-            emailContent += `\nData început: ${reservationDetails.start_date}\n`;
-            emailContent += `Data sfârșit: ${reservationDetails.end_date}\n`;
+            emailContent += `\nData început: ${formatDateDMY(reservationDetails.start_date)}\n`;
+            emailContent += `Data sfârșit: ${formatDateDMY(reservationDetails.end_date)}\n`;
             emailContent += `Ora sosirii: ${reservationDetails.arrival_time || 'Nu a lăsat ora'}\n`;
             emailContent += `Camere necesare: ${reservationDetails.rooms_needed || 1}\n`;
             emailContent += `Vrea meniu: ${reservationDetails.wants_meal ? 'Da' : 'Nu'}\n`;
             emailContent += `Vrea ciubăr: ${reservationDetails.wants_hottub ? 'Da' : 'Nu'}\n`;
             emailContent += `Consimțământ newsletter: ${reservationDetails.newsletter ? 'Da' : 'Nu'}\n`;
         } else {
-            emailContent += `\nData: ${reservationDetails.reservation_date}\n`;
+            emailContent += `\nData: ${formatDateDMY(reservationDetails.reservation_date)}\n`;
             emailContent += `Ora: ${reservationDetails.reservation_time}\n`;
         }
 

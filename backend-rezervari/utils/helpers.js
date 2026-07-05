@@ -166,6 +166,14 @@ const validateInputSize = (text) => {
     return !text || (typeof text === 'string' && text.length <= MAX_INPUT_SIZE);
 };
 
+function formatDateDMY(dateStr) {
+    if (!dateStr) return dateStr;
+    const datePart = dateStr.substring(0, 10);
+    const [year, month, day] = datePart.split('-');
+    if (!year || !month || !day) return dateStr;
+    return `${day}-${month}-${year}`;
+}
+
 const validateReservationInput = (data, lang, isFood = false) => {
     const errors = [];
 
@@ -277,5 +285,6 @@ module.exports = {
     validateInputSize,
     isToday,
     isAfter10Am,
+    formatDateDMY,
     BASE_URL
 };
