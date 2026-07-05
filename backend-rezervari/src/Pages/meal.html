@@ -126,22 +126,22 @@
         <div id="progressMeal" class="progress-indicator">
             <div class="progress-step active" id="step1Meal">
                 <span class="step-number">1</span>
-                <span class="step-label" data-i18n="step_travel_info">Informații Călătorie</span>
+                <span class="step-label" data-i18n="step_travel_info"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step2Meal">
                 <span class="step-number">2</span>
-                <span class="step-label" data-i18n="step_extras">Extras</span>
+                <span class="step-label" data-i18n="step_extras"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step3Meal">
                 <span class="step-number">3</span>
-                <span class="step-label" data-i18n="step_personal_info">Informații Personale</span>
+                <span class="step-label" data-i18n="step_personal_info"></span>
             </div>
             <div class="progress-line"></div>
             <div class="progress-step" id="step4Meal">
                 <span class="step-number">4</span>
-                <span class="step-label" data-i18n="step_confirmation">Confirmare</span>
+                <span class="step-label" data-i18n="step_confirmation"></span>
             </div>
         </div>
 
@@ -150,10 +150,10 @@
 
             <!-- Section A: Dates card -->
             <div class="meal-dates-card">
-                <h4 class="meal-card-title" data-i18n="meal_arrival_title">Arrival</h4>
+                <h4 class="meal-card-title" data-i18n="meal_arrival_title"></h4>
                 <div class="dates-row">
                     <div class="date-field-wrapper">
-                        <span class="date-field-label" data-i18n="meal_arrival_label">Arrival</span>
+                        <span class="date-field-label" data-i18n="meal_arrival_label"></span>
                         <div class="date-input-card">
                             <span class="date-icon">&#128197;</span>
                             <input type="text" id="mealArrivalInput" readonly placeholder="Select arrival date" data-i18n-placeholder="placeholder_select_date">
@@ -168,7 +168,7 @@
                         <div class="time-input-card">
                             <span class="time-icon">&#128337;</span>
                             <select id="mealArrivalTimeInput" readonly placeholder="Select arrival time" data-i18n-placeholder="placeholder_select_time">
-                                <option value="" disabled selected data-i18n="placeholder_select_time">Select arrival time</option>
+                                <option value="" disabled selected data-i18n="placeholder_select_time"></option>
                                 <option value="15:00">15:00</option>
                                 <option value="15:15">15:15</option>
                                 <option value="15:30">15:30</option>
@@ -194,15 +194,15 @@
 
             <!-- Section B: Guests card -->
             <div class="meal-guests-card">
-                <h4 class="meal-card-title" data-i18n="meal_guests_title">Guests</h4>
+                <h4 class="meal-card-title" data-i18n="meal_guests_title"></h4>
                 <div class="guests-grid">
                     <div class="form-group">
-                        <label class="label-adults" data-i18n="label_adults">Guests</label>
+                        <label class="label-adults" data-i18n="label_adults"></label>
                         <input type="text" id="mealAdultsInput" min="1" max="15" value="1" required>
                     </div>
                     <div class="form-group">
-                        <label class="label-pets" data-i18n="label_pets">Pets</label>
-                        <input type="text" id="mealPetsInput" placeholder="e.g. 1 dog">
+                        <label class="label-pets" data-i18n="label_pets"></label>
+                        <input type="text" id="mealPetsInput" data-i18n-placeholder="placeholder_pets" placeholder="ex: 1 câine">
                     </div>
                 </div>
             </div>
@@ -235,18 +235,16 @@
                     <button class="extras-next-btn" aria-label="Next">&#8250;</button>
                 </div>
                 <div class="extra-info-panel">
-                    <div class="extra-badge" data-i18n="optional_extra">Optional Extra</div>
-                    <h4 data-i18n="cabin_title">Cabin</h4>
-                    <p class="extra-description" data-i18n="cabin_description">Unwind in our private cabin overlooking the forest. Perfect
-                        for romantic evenings or after a day of exploring the mountains. Available throughout your
-                        entire stay.</p>
-                    <button id="cabinToggle" class="extra-toggle-btn" data-i18n="add_cabin">+ Add Cabin</button>
+                    <div class="extra-badge" data-i18n="optional_extra"></div>
+                    <h4 data-i18n="cabin_title"></h4>
+                    <p class="extra-description" data-i18n="cabin_description"></p>
+                    <button id="cabinToggle" class="extra-toggle-btn"></button>
                 </div>
             </div>
 
             <div class="form-actions meal-step-actions">
-                <button type="button" id="backToTravelBtn" class="btn-secondary" data-i18n="back_button">&#8592; Back</button>
-                <button type="button" id="continueToPersonalBtn" class="btn-primary meal-continue-btn" data-i18n="continue_button">Continue
+                <button type="button" id="backToTravelBtn" class="btn-secondary" data-i18n="back_to_travel_info">&#8592; Back</button>
+                <button type="button" id="continueToPersonalBtn" class="btn-primary meal-continue-btn" data-i18n="continue_to_personal_info">Continue
                     &#8594;</button>
             </div>
         </div>
@@ -255,26 +253,26 @@
         <div id="step3ContainerMeal" class="step-container" style="display:none;">
             <div class="step3-layout">
                 <div class="step3-form-col">
-                    <h3 data-i18n="personal_information_title">Personal Information</h3>
+                    <h3 data-i18n="personal_information_title"></h3>
 
                     <div class="name-row">
                         <div class="form-group">
-                            <label data-i18n="first_name_label">First Name <span class="required">*</span></label>
-                            <input type="text" id="mealFirstName" placeholder="First name" required>
+                            <label data-i18n="first_name_label"><span class="required"></span></label>
+                            <input type="text" id="mealFirstName" placeholder="First name" required data-i18n-placeholder="first_name_placeholder">
                         </div>
                         <div class="form-group">
-                            <label data-i18n="last_name_label">Last Name <span class="required">*</span></label>
-                            <input type="text" id="mealLastName" placeholder="Last name" required>
+                            <label data-i18n="last_name_label"><span class="required"></span></label>
+                            <input type="text" id="mealLastName" placeholder="Last name" required data-i18n-placeholder="last_name_placeholder">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label data-i18n="email_address_label">Email Address <span class="required">*</span></label>
-                        <input type="email" id="mealEmail" placeholder="your@email.com" required>
+                        <label data-i18n="email_address_label"></label>
+                        <input type="email" id="mealEmail" placeholder="your@email.com" required data-i18n-placeholder="email_placeholder">
                     </div>
 
                     <div class="form-group">
-                        <label data-i18n="telephone_label">Telephone <span class="required">*</span></label>
+                        <label data-i18n="telephone_label"><span class="required"></span></label>
                         <div class="phone-input-row">
                             <select id="mealPhonePrefix" class="phone-prefix-select">
                                 <option value="+40">🇷🇴 +40</option>
@@ -517,36 +515,31 @@
                                 <option value="+260">🇿🇲 +260</option>
                                 <option value="+263">🇿🇼 +263</option>
                             </select>
-                            <input type="tel" id="mealPhone" placeholder="Phone number" required>
+                            <input type="tel" id="mealPhone" placeholder="Phone number" required data-i18n-placeholder="phone_placeholder">
                         </div>
                     </div>
 
                     <div class="newsletter-group">
                         <label class="newsletter-label">
                             <input type="checkbox" id="newsletterCheck">
-                            <span data-i18n="newsletter_agree">I agree to receive information</span>
+                            <span data-i18n="newsletter_agree"></span>
                             <span class="info-tooltip" tabindex="0">
                                 &#9432;
-                                <span class="tooltip-text" data-i18n="newsletter_tooltip">In the future, I would like to receive newsletters with
-                                    current information and travel offers by email. This consent can be withdrawn at any
-                                    time.</span>
+                                <span class="tooltip-text" data-i18n="newsletter_tooltip"></span>
                             </span>
                         </label>
                     </div>
 
-                    <p class="legal-note" data-i18n="legal_note">By confirming the booking you agree to the <a href="#" class="legal-link"
-                            id="termsLink" data-i18n="terms_and_conditions">Terms and Conditions</a> and <a href="#" class="legal-link"
-                            id="privacyLink" data-i18n="privacy_policy">Privacy Policy</a>.</p>
+                    <p class="legal-note" data-i18n="legal_note"></p>
 
                     <div class="form-actions meal-step-actions">
-                        <button type="button" id="backToExtrasBtn" class="btn-secondary" data-i18n="back_button">&#8592; Back</button>
-                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking" data-i18n="send_booking_button">Send Booking for
-                            Confirmation</button>
+                        <button type="button" id="backToExtrasBtn" class="btn-secondary" data-i18n="back_to_extras"></button>
+                        <button type="button" id="sendBookingBtn" class="btn-primary btn-send-booking" data-i18n="send_booking_button"></button>
                     </div>
                 </div>
 
                 <aside class="booking-summary-panel">
-                    <h4 data-i18n="booking_summary">Booking Summary</h4>
+                    <h4 data-i18n="booking_summary"></h4>
                     <div id="summaryContent" class="summary-content">
                         <!-- populated by JS -->
                     </div>
@@ -561,12 +554,9 @@
             </div>
             <div class="confirmation-container">
                 <div class="confirmation-icon">&#10003;</div>
-                <h3 data-i18n="booking_request_submitted">Booking Request Submitted</h3>
-                <p class="confirmation-message" data-i18n="confirmation_message_details">Thank you for your booking request. Our host will personally review your
-                    details and contact you within 24 hours to confirm your reservation. We look forward to welcoming
-                    you to Gr&#259;dina S&#226;nzienelor!</p>
-                <p class="confirmation-sub" data-i18n="confirmation_sub_message">Please check your email for a summary of your request.</p>
-                <button id="newBookingBtn" class="btn-secondary" data-i18n="make_another_booking">Make Another Booking</button>
+                <h3 data-i18n="booking_request_submitted"></h3>
+                <p class="confirmation-message" data-i18n="confirmation_message_details"></p>
+                <button id="newBookingBtn" class="btn-secondary" data-i18n="make_another_booking"></button>
             </div>
         </div>
     </div>

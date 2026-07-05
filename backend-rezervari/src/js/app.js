@@ -1,5 +1,5 @@
 import { initExtrasSlideshow, initHeroSlideshow } from './ui/slideshow.js';
-import { changeLanguage, applyTranslations, formatLegalLinks } from './core/translations.js';
+import { changeLanguage, applyTranslations, formatLegalLinks, updateExtrasToggleTexts } from './core/translations.js';
 import { APP_GLOBALS } from './core/state.js';
 import { initWizardEventListeners, showCabinStep, showMealStep, initializeCalendars, loadFromLocalStorage } from './ui/wizard.js';
 import { loadOccupiedDates } from './api/api.js';
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     applyTranslations();
     formatLegalLinks();
+    updateExtrasToggleTexts();
 
     document.getElementById('ro-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('ro'); });
     document.getElementById('en-btn')?.addEventListener('click', (e) => { e.preventDefault(); changeLanguage('en'); });

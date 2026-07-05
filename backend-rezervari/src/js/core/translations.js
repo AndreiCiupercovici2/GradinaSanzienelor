@@ -1,4 +1,5 @@
-const translations = {
+import { WIZARD_STATE, APP_GLOBALS } from '../core/state.js';
+export const translations = {
     ro: {
         main_title: "Grădina Sânzienelor - Punct Gastronomic Local",
         label_name: "Nume Complet",
@@ -14,8 +15,7 @@ const translations = {
         label_pets: "Animale de companie",
         label_rooms_needed: "Camere necesare",
         btn_send: "Trimite Rezervarea",
-        btn_continue: "Continuă",
-        btn_back: "Înapoi",
+        continue_button: "Continuă la Informații Personale",
         btn_submit: "Trimite",
         btn_resume: "Continuă Rezervarea",
         btn_today: "Azi",
@@ -76,13 +76,13 @@ const translations = {
         legal_note: "Confirmând rezervarea, sunteți de acord cu {/terms} și {/privacy}.",
         terms_and_conditions: "Termeni și Condiții",
         privacy_policy: "Politica de Confidențialitate",
-        back_button: "Înapoi",
+        back_to_travel_info: "Înapoi la Informații de Călătorie",
         send_booking_button: "Trimite Rezervarea pentru Confirmare",
         booking_summary: "Rezumat Rezervare",
         confirmation_label: "Confirmare",
         confirmation_message: "Rezervarea dvs. a fost trimisă.",
         booking_request_submitted: "Cererea de Rezervare a fost Trimisa",
-        confirmation_message_details: "Vă mulțumim pentru cererea de rezervare. Gazda noastră va examina personal detaliile și vă va contacta în 24 de ore pentru a confirma rezervarea. Așteptăm cu nerăbdare să vă primim la Grădina Sânzienelor!",
+        confirmation_message_details: "Vă mulțumim pentru cererea de rezervare. Gazda noastră va examina personal detaliile și vă va contacta în cel mai scurt timp pentru a confirma rezervarea. Așteptăm cu nerăbdare să vă primim la Grădina Sânzienelor!",
         confirmation_sub_message: "Vă rugăm să verificați email-ul pentru un rezumat al cererii dvs.",
         make_another_booking: "Fă o Altă Rezervare",
         extras_title: "Extra Servicii",
@@ -98,7 +98,29 @@ const translations = {
         extras_cabin: "Cabana",
         extras_cabin_description: "Bucurați-vă de un sejur confortabil în cabana noastră, înconjurată de natură. Cabana este dotată cu facilități moderne și oferă un refugiu confortabil pentru escapada dvs.",
         terms_title: "Termeni și Condiții",
-        privacy_title: "Politica de Confidențialitate"
+        privacy_title: "Politica de Confidențialitate",
+        meal_arrival_label: "Sosire",
+        placeholder_select_date: "Selectează data sosirii",
+        placeholder_select_time: "Selectează ora sosirii",
+        placeholder_pets: "ex: 1 câine",
+        continue_to_extras: "Continuă la Extra Servicii",
+        continue_to_personal_info: "Continuă la Informații Personale",
+        back_to_extras: "Înapoi la Extra Servicii",
+        optional_extra: "Extra Opțional",
+        cabin_title: "Cazare în Cabană",
+        cabin_description: "Relaxați-vă în cabana noastră privată cu vedere la pădure. Perfectă pentru seri romantice sau după o zi de explorare a munților. Disponibilă pe toată durata sejurului.",
+        email_placeholder: "Introduceți adresa dvs. de email",
+        first_name_placeholder: "Introduceți prenumele dvs.",
+        last_name_placeholder: "Introduceți numele dvs.",
+        phone_placeholder: "Introduceți numărul dvs. de telefon",
+        first_name_label: "Prenume",
+        last_name_label: "Nume",
+        email_address_label: "Adresă de Email",
+        telephone_label: "Număr de Telefon",
+        meal_extras_title: "Extra Servicii pentru Masă",
+        summary_time: "Ora Sosirii",
+        yes: "Da",
+        no: "Nu"
     },
     en: {
         main_title: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -115,8 +137,7 @@ const translations = {
         label_pets: "Pets",
         label_rooms_needed: "Rooms needed",
         btn_send: "Submit Reservation",
-        btn_continue: "Continue",
-        btn_back: "Back",
+        continue_button: "Continue to Personal Information",
         btn_submit: "Submit",
         btn_resume: "Resume Booking",
         btn_today: "Today",
@@ -156,7 +177,7 @@ const translations = {
         btn_back_to_extras: "Back",
         btn_new_booking: "Make Another Booking",
         confirmation_title: "Booking Request Received!",
-        confirmation_message: "Thank you for choosing Grădina Sânzienelor. Our host will review your request and contact you within 24 hours to confirm your reservation details.",
+        confirmation_message: "Thank you for choosing Grădina Sânzienelor. Our host will review your request and contact you as soon as possible to confirm your reservation details.",
         summary_title: "Your Booking",
         summary_arrival: "Arrival",
         summary_departure: "Departure",
@@ -179,13 +200,13 @@ const translations = {
         legal_note: "By confirming the booking you agree to the {/terms} and {/privacy}.",
         terms_and_conditions: "Terms and Conditions",
         privacy_policy: "Privacy Policy",
-        back_button: "Back",
+        back_to_travel_info: "Back to Travel Information",
         send_booking_button: "Send Booking for Confirmation",
         booking_summary: "Booking Summary",
         confirmation_label: "Confirmation",
         confirmation_message: "Your booking has been submitted.",
         booking_request_submitted: "Booking Request Submitted",
-        confirmation_message_details: "Thank you for your booking request. Our host will personally review your details and contact you within 24 hours to confirm your reservation. We look forward to welcoming you to Grădina Sânzienelor!",
+        confirmation_message_details: "Thank you for your booking request. Our host will personally review your details and contact you as soon as possible to confirm your reservation. We look forward to welcoming you to Grădina Sânzienelor!",
         confirmation_sub_message: "Please check your email for a summary of your request.",
         make_another_booking: "Make Another Booking",
         extras_title: "Extra Services",
@@ -201,7 +222,29 @@ const translations = {
         extras_cabin: "Cabin",
         extras_cabin_description: "Enjoy a cozy stay in our cabin, surrounded by nature. The cabin is equipped with modern amenities and provides a comfortable retreat for your getaway.",
         terms_title: "Terms and Conditions",
-        privacy_title: "Privacy Policy"     
+        privacy_title: "Privacy Policy",
+        meal_arrival_label: "Arrival",
+        placeholder_select_date: "Select arrival date",
+        placeholder_select_time: "Select arrival time",
+        placeholder_pets: "e.g. 1 dog",
+        continue_to_extras: "Continue to Extra Services",
+        continue_to_personal_info: "Continue to Personal Information",
+        back_to_extras: "Back to Extra Services",
+        optional_extra: "Optional Extra",
+        cabin_title: "Cabin Accommodation",
+        cabin_description: "Unwind in our private cabin overlooking the forest. Perfect for romantic evenings or after a day of exploring the mountains. Available throughout your entire stay.",
+        first_name_placeholder: "Enter your first name",
+        last_name_placeholder: "Enter your last name",
+        email_placeholder: "Enter your email address",
+        phone_placeholder: "Enter your phone number",
+        first_name_label: "First Name",
+        last_name_label: "Last Name",
+        email_address_label: "Email Address",
+        telephone_label: "Phone Number",
+        meal_extras_title: "Meal Extra Services",
+        summary_time: "Arrival Time",
+        yes: "Yes",
+        no: "No"
     }
 }
 
@@ -216,16 +259,29 @@ export function applyTranslations() {
             element.innerText = translations[currentLanguage][key];
         }
     });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
+            element.setAttribute('placeholder', translations[currentLanguage][key]);
+        }
+    });
 }
 
 export function changeLanguage(newLanguage) {
     currentLanguage = newLanguage;
+    APP_GLOBALS.currentLanguage = newLanguage;
     localStorage.setItem('limba_preferata', newLanguage);
     applyTranslations();
+    formatLegalLinks();
+    updateExtrasToggleTexts();
 
     // Recreate visible calendars with new locale
     const mealContainer = document.getElementById('mealSection');
     const cabinContainer = document.getElementById('cabinSection');
+    const calendarMealInstance = WIZARD_STATE.calendarMealInstance;
+    const cabinArrivalFP = WIZARD_STATE.cabinArrivalFP;
+    const cabinDepartureFP = WIZARD_STATE.cabinDepartureFP;
 
     if (mealContainer && mealContainer.style.display !== 'none' && calendarMealInstance) {
         calendarMealInstance.destroy();
@@ -259,5 +315,27 @@ export function formatLegalLinks() {
 
     currentText = currentText.replace('{/terms}', termsHtml).replace('{/privacy}', privacyHtml);
     noteElement.innerHTML = currentText;
+}
+
+export function updateExtrasToggleTexts() {
+    const lang = currentLanguage || 'ro';
+
+    const hotTubToggle = document.getElementById('hotTubToggle');
+    if (hotTubToggle) {
+        const isAdded = WIZARD_STATE.cabinExtras.hotTub || false;
+        hotTubToggle.textContent = isAdded ? (lang === 'ro' ? '- Elimină Ciubăr' : '- Remove Hot Tub') : (lang === 'ro' ? '+ Adaugă Ciubăr' : '+ Add Hot Tub');
+    }
+
+    const mealToggle = document.getElementById('mealToggle');
+    if (mealToggle) {
+        const isAdded = WIZARD_STATE.cabinExtras.meal || false;
+        mealToggle.textContent = isAdded ? (lang === 'ro' ? '- Elimină Meniu' : '- Remove Meal') : (lang === 'ro' ? '+ Adaugă Meniu' : '+ Add Meal');
+    }
+
+    const cabinToggle = document.getElementById('cabinToggle');
+    if (cabinToggle) {
+        const isAdded = WIZARD_STATE.mealExtras.cabin || false;
+        cabinToggle.textContent = isAdded ? (lang === 'ro' ? '- Elimină Cabană' : '- Remove Cabin') : (lang === 'ro' ? '+ Adaugă Cabană' : '+ Add Cabin');
+    }
 }
 

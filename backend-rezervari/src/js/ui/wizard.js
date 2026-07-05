@@ -2,6 +2,8 @@ import { WIZARD_STATE, APP_GLOBALS, backendUrl } from '../core/state.js';
 import { isToday, isAfter10Am, setVal, setChecked } from '../utils/helpers.js';
 import { submitCabinBooking, submitMealBooking } from '../api/api.js';
 
+import { translations } from '../core/translations.js';
+
 import flatpickr from 'flatpickr';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 
@@ -186,7 +188,7 @@ export function initWizardEventListeners() {
         if (isMealSection) {
             const isAdded = WIZARD_STATE.mealExtras?.cabin || false;
             WIZARD_STATE.mealExtras.cabin = !isAdded;
-            this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimina Cabana' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana';
+            this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana';
             saveToLocalStorage();
         }
     });
@@ -293,7 +295,7 @@ export function loadFromLocalStorage() {
 
             const cabinToggle = document.getElementById('cabinToggle');
             if (cabinToggle && WIZARD_STATE.mealExtras?.cabin) {
-                cabinToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimina Cabana';
+                cabinToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana';
             }
 
             if (WIZARD_STATE.mealStep > 1) {
@@ -785,26 +787,29 @@ export function updateNightsDisplay(shouldUpdateDeparture = true) {
 export function updateCabinSummary() {
     const panel = document.getElementById('summaryContent');
     if (!panel) return;
+    const lang = APP_GLOBALS.currentLanguage;
+    const t = translations[lang];
+    
     const arrival = document.getElementById('cabinArrivalInput')?.value || '—';
     const departure = document.getElementById('cabinDepartureInput')?.value || '—';
     const time = document.getElementById('cabinArrivalTimeInput')?.value || '—';
     const rooms = document.getElementById('cabinRoomsSelect')?.value || '1';
     const adults = document.getElementById('cabinAdultsSelect')?.value || '1';
     const pets = document.getElementById('cabinPetsInput')?.value || '';
-    const hotTub = WIZARD_STATE.cabinExtras.hotTub ? 'Yes' : 'No';
-    const meal = WIZARD_STATE.cabinExtras.meal ? 'Yes' : 'No';
+    const hotTub = WIZARD_STATE.cabinExtras.hotTub ? t.yes : t.no;
+    const meal = WIZARD_STATE.cabinExtras.meal ? t.yes : t.no;
 
     panel.innerHTML = `
         <div class="summary-section">
-            <div class="summary-row"><span class="summary-label">Check-in</span><strong>${arrival}</strong></div>
-            <div class="summary-row"><span class="summary-label">Check-in Time</span><strong>${time}</strong></div>
-            <div class="summary-row"><span class="summary-label">Check-out</span><strong>${departure}</strong></div>
-            <div class="summary-row"><span class="summary-label">Duration</span><strong>${APP_GLOBALS.cabinNights} ${APP_GLOBALS.cabinNights === 1 ? 'night' : 'nights'}</strong></div>
-            <div class="summary-row"><span class="summary-label">Rooms</span><strong>${rooms}</strong></div>
-            <div class="summary-row"><span class="summary-label">Adults</span><strong>${adults}</strong></div>
-            ${pets ? `<div class="summary-row"><span class="summary-label">Pets</span><strong>${pets}</strong></div>` : ''}
-            <div class="summary-row"><span class="summary-label">Hot Tub</span><strong>${hotTub}</strong></div>
-            <div class="summary-row"><span class="summary-label">Meal</span><strong>${meal}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_in">${t.summary_check_in}</span><strong>${arrival}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_in_time">${t.summary_check_in_time}</span><strong>${time}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="check_out">${t.summary_check_out}</span><strong>${departure}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="duration">${t.summary_duration}</span><strong>${APP_GLOBALS.cabinNights} ${APP_GLOBALS.cabinNights === 1 ? t.night : t.nights}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="rooms">${t.summary_rooms}</span><strong>${rooms}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="adults">${t.summary_adults}</span><strong>${adults}</strong></div>
+            ${pets ? `<div class="summary-row"><span class="summary-label" data-i18n="pets">${t.summary_pets}</span><strong>${pets}</strong></div>` : ''}
+            <div class="summary-row"><span class="summary-label" data-i18n="hot_tub">${t.summary_hot_tub}</span><strong>${hotTub}</strong></div>
+            <div class="summary-row"><span class="summary-label" data-i18n="meal">${t.summary_meal}</span><strong>${meal}</strong></div>
         </div>
     `;
 }
@@ -812,19 +817,22 @@ export function updateCabinSummary() {
 export function updateMealSummary() {
     const panel = document.getElementById('summaryContent');
     if (!panel) return;
+    const lang = APP_GLOBALS.currentLanguage;
+    const t = translations[lang];
+
     const arrival = document.getElementById('mealArrivalInput')?.value || '—';
     const time = document.getElementById('mealArrivalTimeInput')?.value || '—';
     const adults = document.getElementById('mealAdultsInput')?.value || '1';
     const pets = document.getElementById('mealPetsInput')?.value || '';
-    const wantsCabin = WIZARD_STATE.mealExtras?.cabin ? 'Yes' : 'No';
+    const wantsCabin = WIZARD_STATE.mealExtras?.cabin ? t.yes : t.no;
 
     panel.innerHTML = `
         <div class="summary-section">
-            <div class="summary-row"><span class="summary-label">Check-in</span><strong>${arrival}</strong></div>
-            <div class="summary-row"><span class="summary-label">Check-in Time</span><strong>${time}</strong></div>
-            <div class="summary-row"><span class="summary-label">Adults</span><strong>${adults}</strong></div>
-            ${pets ? `<div class="summary-row"><span class="summary-label">Pets</span><strong>${pets}</strong></div>` : ''}
-            <div class="summary-row"><span class="summary-label">Cabin</span><strong>${wantsCabin}</strong></div>
+            <div class="summary-row"><span class="summary-label">${t.summary_arrival}</span><strong>${arrival}</strong></div>
+            <div class="summary-row"><span class="summary-label">${t.summary_time}</span><strong>${time}</strong></div>
+            <div class="summary-row"><span class="summary-label">${t.summary_adults}</span><strong>${adults}</strong></div>
+            ${pets ? `<div class="summary-row"><span class="summary-label">${t.label_pets}</span><strong>${pets}</strong></div>` : ''}
+            <div class="summary-row"><span class="summary-label">${t.extras_cabin}</span><strong>${wantsCabin}</strong></div>
         </div>
     `;
 }

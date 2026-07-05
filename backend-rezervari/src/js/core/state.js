@@ -52,6 +52,6 @@ export const APP_GLOBALS = {
     calendarMealInstance: null,
     cabinArrivalFP: null,
     cabinDepartureFP: null,
-    currentLanguage: window.currentLanguage || 'ro',
+    currentLanguage: localStorage.getItem('limba_preferata') || 'ro',
     mealReservationFP: null
 };
