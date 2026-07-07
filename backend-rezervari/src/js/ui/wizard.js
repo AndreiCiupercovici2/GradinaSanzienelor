@@ -1013,6 +1013,28 @@ function initializeFlatpickr(inputElement, type) {
         });
         APP_GLOBALS.calendarMealInstance = fpInstance;
         APP_GLOBALS.mealReservationFP = fpInstance;
+
+        fetchMealAvailability().then(({ full, partial }) => {
+            fpInstance.set('disable', [
+                d => {
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    return full.has(key);
+                }
+            ]);
+
+            fpInstance.set('onDayCreate', (dObj, dStr, fp, dayElem) => {
+                const key = `${dayElem.dateObj.getFullYear()}-${String(dayElem.dateObj.getMonth() + 1).padStart(2, '0')}-${String(dayElem.dateObj.getDate()).padStart(2, '0')}`;
+                if (partial.has(key)) {
+                    dayElem.classList.add('fp-partial-occupancy');
+                    dayElem.title = lang === 'ro'
+                        ? 'Capacitate parțial ocupată în această zi'
+                        : 'Partially booked this day';
+                }
+            });
+            fpInstance.redraw();
+        }).catch(err => {
+            console.error('Error fetching meal availability:', err);
+        });
     }
 }
 

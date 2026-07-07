@@ -86,7 +86,7 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
         const currentCellDate = `${y}-${m}-${d}`;
 
         const isBlocked = blockedDatesData.some(b => {
-            b.type === 'meal' && currentCellDate >= b.start_date && currentCellDate <= b.end_date;
+            return b.type === 'meal' && currentCellDate >= b.start_date && currentCellDate <= b.end_date;
         });
 
         const activeRez = mealReservationsData.filter(rez => {
