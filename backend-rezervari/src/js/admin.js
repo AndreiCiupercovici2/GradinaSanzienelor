@@ -7,8 +7,26 @@ let cabinReservationsData = [];
 let mealReservationsData = [];
 let cabinCalendar;
 let mealCalendar;
+let blockedDatesData = [];
 
 const TOTAL_CABIN_ROOMS = 3;
+
+async function fetchBlockedDates() {
+    try {
+        const res = await fetch(`${backendUrl}/portalIntern/blocked-dates`);
+        if (res.ok) {
+            blockedDatesData = await res.json();
+            if (mealCalendar) {
+                mealCalendar.redraw();
+            }
+            if (cabinCalendar) {
+                cabinCalendar.redraw();
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching blocked dates:', error);
+    }
+}
 
 // Build approve / reject buttons when status is 'pending'
 function generateButtons(id, reservationType, currentStatus) {
@@ -67,11 +85,18 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
         const d = String(dayElem.dateObj.getDate()).padStart(2, '0');
         const currentCellDate = `${y}-${m}-${d}`;
 
+        const isBlocked = blockedDatesData.some(b => {
+            b.type === 'meal' && currentCellDate >= b.start_date && currentCellDate <= b.end_date;
+        });
+
         const activeRez = mealReservationsData.filter(rez => {
             return rez.status === 'confirmed' && rez.reservation_date === currentCellDate;
         });
 
-        if (activeRez.length > 0) {
+        if (isBlocked) {
+            dayElem.classList.add("cal-meal-blocked");
+            dayElem.title = "Dată blocată manual";
+        } else if (activeRez.length > 0) {
             dayElem.classList.add("cal-meal-booked");
         } else {
             dayElem.classList.add("cal-meal-free"); 
@@ -83,6 +108,12 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
         if (!detailsContainer) return;
 
         detailsContainer.style.display = 'block';
+
+        const blockedInfo = blockedDatesData.find(b => b.type === 'meal' && dateStr >= b.start_date && dateStr <= b.end_date);
+        if (blockedInfo) {
+            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${dateStr}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}</p>`;
+            return;
+        }
 
         const activeRez = mealReservationsData.filter(rez => {
             return rez.status === 'confirmed' && rez.reservation_date === dateStr;
@@ -123,6 +154,10 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         const d = String(dayElem.dateObj.getDate()).padStart(2, '0');
         const currentCellDate = `${y}-${m}-${d}`;
 
+        const isBlocked = blockedDatesData.some(b => {
+            return b.type === 'cabin' && currentCellDate >= b.start_date && currentCellDate <= b.end_date;
+        });
+
         const activeRez = cabinReservationsData.filter(rez => {
             const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
             const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
@@ -134,13 +169,16 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
 
         const roomsBooked = activeRez.reduce((sum, r) => sum + parseInt(r.rooms_needed || 1), 0);
 
-        if (roomsBooked >= TOTAL_CABIN_ROOMS) {
+        if (isBlocked) {
+            dayElem.classList.add("cal-cabin-blocked");
+            dayElem.title = "Dată blocată manual";
+        } else if (roomsBooked >= TOTAL_CABIN_ROOMS) {
             dayElem.classList.add("cal-fully-booked"); 
         } else if (roomsBooked > 0) {
             dayElem.classList.add("cal-partially-booked"); 
         } else {
             dayElem.classList.add("cal-free");
-        }
+        }    
     },
 
     onChange: function (selectedDates, dateStr, instance) {
@@ -148,6 +186,12 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         if (!detailsContainer) return;
 
         detailsContainer.style.display = 'block';
+
+        const blockedInfo = blockedDatesData.find(b => b.type === 'cabin' && dateStr >= b.start_date && dateStr <= b.end_date);
+        if (blockedInfo) {
+            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${formatDateDMY(dateStr)}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}</p>`;
+            return;
+        }
 
         const activeRez = cabinReservationsData.filter(rez => {
             const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
@@ -272,6 +316,82 @@ async function loadCabinReservations() {
     }
 }
 
+async function blockDate(type, startDate, endDate, reason) {
+    const response = await fetch(`${backendUrl}/portalIntern/block-date`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type, start_date: startDate, end_date: endDate, reason: reason })
+    });
+    if (response.ok) {
+        alert('Datele au fost blocate cu succes!');
+        loadBlockedDates();
+    } else {
+        alert('A apărut o eroare la blocarea datelor.');
+    }
+}
+
+async function loadBlockedDates() {
+    try {
+        const res = await fetch(`${backendUrl}/portalIntern/blocked-dates`);
+        if (!res.ok) {
+            console.error('Error fetching blocked dates:', res.status);
+            return;
+        }
+        const blockedDates = await res.json();
+
+        if (!Array.isArray(blockedDates)) {
+            console.error('API returned non-array data for blocked dates:', blockedDates);
+            return;
+        }
+
+        blockedDatesData = blockedDates;
+
+        if (mealCalendar) {
+            mealCalendar.redraw();
+        }
+        if (cabinCalendar) {
+            cabinCalendar.redraw();
+        }
+    } catch (error) {
+        console.error('Exception in loadBlockedDates:', error);
+    }
+}
+
+const blockStartPicker = flatpickr("#blockStartDate", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    onChange: function (selectedDates, dateStr) {
+        blockEndPicker.set('minDate', dateStr);
+    }
+});
+
+const blockEndPicker = flatpickr("#blockEndDate", {
+    dateFormat: "Y-m-d",
+    minDate: "today"
+});
+
+document.getElementById('blockDatesForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const type = document.getElementById('blockType').value;
+    const startDate = document.getElementById('blockStartDate').value;
+    const endDate = document.getElementById('blockEndDate').value;
+    const reason = document.getElementById('blockReason').value;
+
+    if (startDate > endDate) {
+        alert('Data de început nu poate fi după data de sfârșit.');
+        return;
+    }
+
+    if (!confirm(`Ești sigur că vrei să blochezi disponibilitatea pentru ${type === 'cabin' ? 'Cabană' : 'Masă'} între ${formatDateDMY(startDate)} și ${formatDateDMY(endDate)}?`)) {
+        return;
+    }
+
+    await blockDate(type, startDate, endDate, reason);
+
+    e.target.reset();
+    blockEndPicker.set('minDate', 'today');
+});
+
 window.changeStatus = changeStatus;
 window.loadMealReservations = loadMealReservations;
 window.loadCabinReservations = loadCabinReservations;
@@ -279,7 +399,9 @@ window.loadCabinReservations = loadCabinReservations;
 setInterval(() => {
     loadMealReservations();
     loadCabinReservations();
+    loadBlockedDates();
 }, 30000);
 
 loadMealReservations();
 loadCabinReservations();
+loadBlockedDates();

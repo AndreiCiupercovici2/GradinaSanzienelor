@@ -18,8 +18,8 @@
             color: #333;
         }
 
-        .table-container {
-            overflow-x: auto;
+        .table-container,
+        .form-container {
             margin-bottom: 40px;
             background: white;
             padding: 15px;
@@ -27,11 +27,21 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
+        .form-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
-            /* Puțin mai lat pentru a acomoda coloanele noi */
         }
 
         th,
@@ -57,7 +67,6 @@
             font-size: 12px;
         }
 
-        /* Status styling - targetează <strong> generat de JS */
         td strong {
             display: inline-block;
             padding: 4px 8px;
@@ -67,7 +76,6 @@
             color: #495057;
         }
 
-        /* Clase CSS pentru butoane */
         button {
             margin: 2px;
             padding: 6px 10px;
@@ -87,19 +95,24 @@
             background-color: #218838;
         }
 
-        .btn-reject {
+        .btn-reject,
+        .btn-block {
             background-color: #dc3545;
             color: white;
         }
 
-        .btn-reject:hover {
+        .btn-reject:hover,
+        .btn-block:hover {
             background-color: #c82333;
         }
 
-        /* Stiluri pentru culorile din calendarul Flatpickr */
+        .btn-block {
+            padding: 9px 15px;
+            font-size: 14px;
+        }
+
         .flatpickr-day.cal-fully-booked {
             background: #8B4513 !important;
-            /* Brown (Maro) */
             color: white !important;
             border-color: #8B4513 !important;
         }
@@ -110,7 +123,6 @@
 
         .flatpickr-day.cal-partially-booked {
             background: #FFD700 !important;
-            /* Yellow (Galben) */
             color: #333 !important;
             border-color: #FFD700 !important;
         }
@@ -121,7 +133,6 @@
 
         .flatpickr-day.cal-free {
             background: #28a745 !important;
-            /* Green (Verde) */
             color: white !important;
             border-color: #28a745 !important;
         }
@@ -159,7 +170,6 @@
             opacity: 0.6;
         }
 
-        /* Containerul unde se vor afișa detaliile sub/lângă calendar */
         #mealDetails,
         #cabinDetails {
             background: white;
@@ -205,6 +215,37 @@
 
     <h1>Panou Administrare Rezervări</h1>
     <p>Aici poți aproba sau respinge cererile de rezervare primite de la clienți.</p>
+
+    <div class="form-container">
+        <h2 style="margin-top: 0;">Blochează date manual</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Folosește acest formular pentru a bloca perioade (ex: curățenie generală, renovări, evenimente private).</p>
+
+        <form id="blockDatesForm" class="form-row">
+            <div class="form-group">
+                <label for="blockType">Tip resursă</label>
+                <select id="blockType" required>
+                    <option value="meal">Mâncare</option>
+                    <option value="cabin">Cabană</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="blockStartDate">Data de început</label>
+                <input type="text" id="blockStartDate" required placeholder="Selectează data de început">
+            </div>
+            <div class="form-group">
+                <label for="blockEndDate">Data de sfârșit</label>
+                <input type="text" id="blockEndDate" required placeholder="Selectează data de sfârșit">
+            </div>
+            <div class="form-group">
+                <label for="blockReason">Motiv</label>
+                <input type="text" id="blockReason" required placeholder="Ex: Curățenie generală / Eveniment">
+            </div>
+            <div class="form-group">
+                <button type="submit" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 4px;">Blochează</button>
+            </div>
+        </form>
+    </div>
 
     <h2>1. Rezervări Mâncare</h2>
     <div style="margin-bottom: 20px;">

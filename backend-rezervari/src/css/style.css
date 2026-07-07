@@ -521,17 +521,23 @@ input#calendarCabin {
     object-fit: cover;
 }
 .logo-container {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: auto;
     border-radius: 50%;
     overflow: hidden;
     border: 2.5px solid #c8a96e;
     box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.25), 0 4px 16px rgba(0, 0, 0, 0.4);
     background: #fff;
+    z-index: 30;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
 }
 
 /* --- Responsive Design --- */

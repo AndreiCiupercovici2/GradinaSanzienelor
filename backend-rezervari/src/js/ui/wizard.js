@@ -500,24 +500,44 @@ export function handleDepartureChange(dates) {
 
 async function fetchCabinOccupancy() {
     try {
-        const resp = await fetch(`${backendUrl}/api/occupied_days`);
-        if (!resp.ok) return { full: new Set(), partial: new Set() };
-        const reservations = await resp.json();
-        const adultsPerDay = {};
-        for (const r of reservations) {
-            const cur = new Date(r.start_date + 'T00:00:00');
-            const end = new Date(r.end_date + 'T00:00:00');
-            while (cur < end) {
-                const key = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
-                adultsPerDay[key] = (adultsPerDay[key] || 0) + (r.adults || 0);
-                cur.setDate(cur.getDate() + 1);
-            }
-        }
+        const [resp, blockedResp] = await Promise.all([
+            fetch(`${backendUrl}/api/occupied_days`),
+            fetch(`${backendUrl}/api/portalIntern/blocked-dates`)
+        ]);
         const full = new Set();
         const partial = new Set();
-        for (const [date, adults] of Object.entries(adultsPerDay)) {
-            if (adults >= 8) full.add(date);
-            else if (adults > 0) partial.add(date);
+
+        if (!resp.ok) {
+            const reservations = await resp.json();
+            const adultsPerDay = {};
+            for (const res of reservations) {
+                const cur = new Date(res.start_date + 'T00:00:00');
+                const end = new Date(res.end_date + 'T00:00:00');
+                while (cur < end) {
+                    const key = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+                    adultsPerDay[key] = (adultsPerDay[key] || 0) + (res.adults || 0);
+                    cur.setDate(cur.getDate() + 1);
+                }
+            }
+            for (const [date, adults] of Object.entries(adultsPerDay)) {
+                if (adults >= 8) full.add(date);
+                else if (adults > 0) partial.add(date);
+            }
+        }
+        if (blockedResp.ok) {
+            const blockedDates = await blockedResp.json();
+            for (const blocked of blockedDates) {
+                if (blocked.type === 'cabin') {
+                    const cur = new Date(blocked.start_date + 'T00:00:00');
+                    const end = new Date(blocked.end_date + 'T00:00:00');
+                    while (cur <= end) {
+                        const key = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+                        full.add(key);
+                        partial.delete(key);
+                        cur.setDate(cur.getDate() + 1);
+                    }
+                }
+            }
         }
         return { full, partial };
     } catch {
@@ -527,14 +547,35 @@ async function fetchCabinOccupancy() {
 
 async function fetchMealAvailability() {
     try {
-        const resp = await fetch(`${backendUrl}/api/meal_availability`);
-        if (!resp.ok) return { full: new Set(), partial: new Set() };
-        const availability = await resp.json();
+        const [resp, blockedResp] = await Promise.all([
+            fetch(`${backendUrl}/api/meal_availability`),
+            fetch(`${backendUrl}/api/portalIntern/blocked-dates`)
+        ]);
+
         const full = new Set();
         const partial = new Set();
-        for (const [date, seats] of Object.entries(availability)) {
-            if (seats >= 15) full.add(date);
-            else if (seats > 0) partial.add(date);
+
+        if (resp.ok) {
+            const availability = await resp.json();
+            for (const [date, seats] of Object.entries(availability)) {
+                if (seats >= 15) full.add(date);
+                else if (seats > 0) partial.add(date);
+            }
+        }
+        if (blockedResp.ok) {
+            const blockedDates = await blockedResp.json();
+            for (const blocked of blockedDates) {
+                if (blocked.type === 'meal') {
+                    const cur = new Date(blocked.start_date + 'T00:00:00');
+                    const end = new Date(blocked.end_date + 'T00:00:00');
+                    while (cur <= end) {
+                        const key = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+                        full.add(key);
+                        partial.delete(key);
+                        cur.setDate(cur.getDate() + 1);
+                    }
+                }
+            }
         }
         return { full, partial };
     } catch {

@@ -47,6 +47,19 @@ function initializeTables() {
             `, (err) => {
                 if (err) return reject(err);
             });
+            db.run(`
+                CREATE TABLE IF NOT EXISTS blocked_dates (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    type TEXT NOT NULL,
+                    start_date TEXT NOT NULL,
+                    end_date TEXT NOT NULL,
+                    reason TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `, (err) => {
+                if (err) return reject(err);
+            });
         });
     });
 }
