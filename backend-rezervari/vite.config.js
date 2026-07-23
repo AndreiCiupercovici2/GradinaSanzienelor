@@ -16,7 +16,8 @@ export default defineConfig({
         meal: resolve(__dirname, 'src/Pages/meal.html'),
         portalIntern: resolve(__dirname, 'src/Pages/portalIntern.html'),
         terms: resolve(__dirname, 'src/Pages/terms.html'),
-        privacy: resolve(__dirname, 'src/Pages/privacy.html')
+        privacy: resolve(__dirname, 'src/Pages/privacy.html'),
+        login: resolve(__dirname, 'src/Pages/login.html'),
       }
     }
   },
@@ -41,6 +42,8 @@ export default defineConfig({
             req.url = '/Pages/terms.html';
           } else if (req.url === '/privacy') {
             req.url = '/Pages/privacy.html';
+          } else if (req.url === '/login') {
+            req.url = '/Pages/login.html';
           }
           next();
         });

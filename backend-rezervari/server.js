@@ -10,6 +10,7 @@ const portalInternRoutes = require('./routes/portalInternRoutes');
 const accomodationRoutes = require('./routes/accomodationRoutes');
 const mealRoutes = require('./routes/mealRoutes');
 const pageRoutes = require('./routes/pageRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ app.use('/flatpickr', express.static('node_modules/flatpickr'));
 app.use('/api', portalInternRoutes);
 app.use('/api', accomodationRoutes);
 app.use('/api', mealRoutes);
+app.use('/api', authRoutes);
 app.use('/', pageRoutes);
 
 

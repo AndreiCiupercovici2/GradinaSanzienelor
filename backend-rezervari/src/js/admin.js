@@ -1,7 +1,30 @@
-const backendUrl = '/api';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { calculateNights, formatDate, formatDateDMY } from './utils/helpers.js';
+
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = 'login';
+}
+
+const backendUrl = '/api';
+
+async function fetchWithAuth(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        ...options.headers,
+    };
+
+    const response = await fetch(url, { ...options, headers });
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        alert('Sesiunea a expirat. Te rugăm să te autentifici din nou.');
+        window.location.href = 'login';
+        throw new Error('Unauthorized');
+    }
+    return response;
+}
 
 let cabinReservationsData = [];
 let mealReservationsData = [];
@@ -10,10 +33,16 @@ let mealCalendar;
 let blockedDatesData = [];
 
 const TOTAL_CABIN_ROOMS = 3;
+const logoutBtn = document.getElementById('logout-btn');
+
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = 'login';
+});
 
 async function fetchBlockedDates() {
     try {
-        const res = await fetch(`${backendUrl}/portalIntern/blocked-dates`);
+        const res = await fetchWithAuth(`${backendUrl}/portalIntern/blocked-dates`);
         if (res.ok) {
             blockedDatesData = await res.json();
             if (mealCalendar) {
@@ -45,7 +74,7 @@ async function changeStatus(id, reservationType, decision) {
     if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decision}?`)) return;
 
     try {
-        const response = await fetch(`${backendUrl}/portalIntern/decision`, {
+        const response = await fetchWithAuth(`${backendUrl}/portalIntern/decision`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, reservationType: reservationType, decision: decision })
@@ -217,7 +246,7 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
 
 async function loadMealReservations() {
     try {
-        const res = await fetch(`${backendUrl}/portalIntern/meal`);
+        const res = await fetchWithAuth(`${backendUrl}/portalIntern/meal`);
 
         if (!res.ok) {
             console.error('Error fetching meal reservations:', res.status);
@@ -269,7 +298,7 @@ async function loadMealReservations() {
 
 async function loadCabinReservations() {
     try {
-        const res = await fetch(`${backendUrl}/portalIntern/cabin`);
+        const res = await fetchWithAuth(`${backendUrl}/portalIntern/cabin`);
 
         if (!res.ok) {
             console.error('Error fetching cabin reservations:', res.status);
@@ -317,7 +346,7 @@ async function loadCabinReservations() {
 }
 
 async function blockDate(type, startDate, endDate, reason) {
-    const response = await fetch(`${backendUrl}/portalIntern/block-date`, {
+    const response = await fetchWithAuth(`${backendUrl}/portalIntern/block-date`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: type, start_date: startDate, end_date: endDate, reason: reason })
@@ -332,7 +361,7 @@ async function blockDate(type, startDate, endDate, reason) {
 
 async function loadBlockedDates() {
     try {
-        const res = await fetch(`${backendUrl}/portalIntern/blocked-dates`);
+        const res = await fetchWithAuth(`${backendUrl}/portalIntern/blocked-dates`);
         if (!res.ok) {
             console.error('Error fetching blocked dates:', res.status);
             return;

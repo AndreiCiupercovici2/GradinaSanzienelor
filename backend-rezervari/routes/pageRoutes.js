@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 
 // Define valid pages
-const validPages = ['meal', 'accomodation', 'contact', 'punct-gastronomic', 'portalIntern', 'terms', 'privacy'];
+const validPages = ['meal', 'accomodation', 'contact', 'punct-gastronomic', 'portalIntern', 'terms', 'privacy', 'login'];
 
 const getFilePath = (page) => {
     if (page == 'index') {

@@ -17,6 +17,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "flatpickr": "^4.6.13",
+    "jsonwebtoken": "^9.0.3",
     "nodemailer": "^9.0.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^6.0.1"
