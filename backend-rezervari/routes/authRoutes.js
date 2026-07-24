@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { loginLimiter } = require('../middlewares/rateLimiter');
+const { escalatingLoginLimiter } = require('../middlewares/escalatingLimiter');
 
 const { authMiddleware } = require('../middlewares/auth.middleware');
 const portalInternController = require('../controllers/portalInternController');
@@ -9,7 +9,7 @@ const blockedDateController = require('../controllers/blockedDateController');
 const mealController = require('../controllers/mealController');
 const authController = require('../controllers/authController');
 
-router.post('/portalIntern/login', loginLimiter, authController.login);
+router.post('/portalIntern/login', escalatingLoginLimiter, authController.login);
 
 router.post('/cabin_reservations', accomodationController.createReservation);
 router.get('/occupied_days', accomodationController.getAvailability);

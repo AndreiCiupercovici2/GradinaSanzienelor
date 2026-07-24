@@ -6,6 +6,8 @@ const login = (req, res) => {
     if (username === process.env.ADMIN_USERNAME &&
         password === process.env.ADMIN_PASSWORD) {
 
+        req.handleSuccessfulLogin();
+
         const payload = {
             username: username,
             role: 'admin'
@@ -19,6 +21,8 @@ const login = (req, res) => {
             token: token
         });
     }
+
+    req.handleFailedLogin();
 
     return res.status(401).json({ message: 'Invalid username or password' });
 }
