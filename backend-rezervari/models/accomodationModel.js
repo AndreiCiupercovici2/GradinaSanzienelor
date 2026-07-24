@@ -49,6 +49,22 @@ const accomodationModel = {
         });
     },
 
+    cancelReservation: (id) => {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                UPDATE cabin_reservations
+                SET status = 'cancelled', updated_at = ?
+                WHERE id = ?`;
+                
+            const params = [new Date().toISOString(), id];
+
+            db.run(sql, params, function (err) {
+                if (err) reject(err);
+                else resolve(this.changes);
+            });
+        });
+    },
+
     getAvailability: () => {
         return new Promise((resolve, reject) => {
             const sql = `

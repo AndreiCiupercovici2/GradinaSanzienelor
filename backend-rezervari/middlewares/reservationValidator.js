@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const {
     t,
     getLanguage,
@@ -122,7 +122,13 @@ const validateMealReservation = [
         .isBoolean().toBoolean()
 ];
 
+const validateReservationId = [
+    param('id')
+        .isInt().withMessage((value, { req }) => t('invalid_id', getLanguage(req)))
+];
+
 module.exports = {
     validateCabinReservation,
-    validateMealReservation
+    validateMealReservation,
+    validateReservationId
 };

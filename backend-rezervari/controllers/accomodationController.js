@@ -1,4 +1,5 @@
 const AccomodationModel = require('../models/accomodationModel');
+const { matchedData } = require('express-validator');
 
 const { sendConfirmationEmail } = require('../utils/mailer');
 
@@ -66,6 +67,23 @@ const AccomodationController = {
         } catch (error) {
             console.error('Error creating accommodation reservation:', error);
             return res.status(500).json({ errors: t('save_error', lang) });
+        }
+    },
+
+    cancelReservation: async (req, res) => {
+        const lang = getLanguage(req);
+        const { id } = matchedData(req);
+
+        try {
+            const rowsChanged = await AccomodationModel.cancelReservation(id);
+
+            if (rowsChanged === 0) {
+                return res.status(404).json({ errors: t('not_found', lang) });
+            }
+            return res.status(200).json({ message: t('update_success', lang), rowsChanged });
+        } catch (error) {
+            console.error('Error cancelling accommodation reservation:', error);
+            return res.status(500).json({ errors: t('update_error', lang) });
         }
     },
 

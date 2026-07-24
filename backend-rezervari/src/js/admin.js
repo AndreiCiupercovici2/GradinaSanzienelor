@@ -153,7 +153,8 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
         } else {
             let html = `<p><strong>Rezervări de masă confirmate în data de ${dateStr}:</strong></p><ul>`;
             activeRez.forEach(rez => {
-                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> - Adulți: ${rez.adults}, Animale: ${rez.pets}</li>`;
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> - Adulți: ${rez.adults}, Animale: ${rez.pets}
+                <button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelMealReservation(${rez.id})">❌ Anulează</button></li>`;
             });
             html += `</ul>`;
             detailsContainer.innerHTML = html;
@@ -236,7 +237,8 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
         } else {
             let html = `<p><strong>Cazări active în data de ${formatDateDMY(dateStr)} - până la ${formatDateDMY(activeRez[0].end_date)}</strong></p><ul>`;
             activeRez.forEach(rez => {
-                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - ${calculateNights(rez.start_date, rez.end_date)} nopți</li>`;
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - ${calculateNights(rez.start_date, rez.end_date)} nopți
+                <button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelCabinReservation(${rez.id})">❌ Anulează</button></li>`;
             });
             html += `</ul>`;
             detailsContainer.innerHTML = html;
@@ -421,9 +423,73 @@ document.getElementById('blockDatesForm').addEventListener('submit', async funct
     blockEndPicker.set('minDate', 'today');
 });
 
+async function cancelCabinReservation(reservationId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login';
+        return;
+    }
+
+    if (!confirm('Ești sigur că vrei să anulezi această rezervare de cabană?')) return;
+
+    try {
+        const response = await fetchWithAuth(`${backendUrl}/cabin_reservations/${reservationId}/cancel`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Rezervarea de cabană a fost anulată cu succes!');
+            await loadCabinReservations();
+        } else {
+            alert(data.errors || 'A apărut o eroare la anularea rezervării.');
+        }
+    } catch (error) {
+        console.error('Error canceling cabin reservation:', error);
+    }
+}
+
+async function cancelMealReservation(reservationId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login';
+        return;
+    }
+
+    if (!confirm('Ești sigur că vrei să anulezi această rezervare de masă?')) return;
+
+    try {
+        // NOTE: Ensure your backend has this matching PATCH route!
+        const response = await fetchWithAuth(`${backendUrl}/meal_reservations/${reservationId}/cancel`, {
+            method: 'PATCH',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Rezervarea de masă a fost anulată cu succes!');
+            await loadMealReservations(); 
+            document.getElementById('mealDetails').style.display = 'none'; 
+        } else {
+            alert(data.errors || 'A apărut o eroare la anularea rezervării.');
+        }
+    } catch (error) {
+        console.error('Error canceling meal reservation:', error);
+    }
+}
+
 window.changeStatus = changeStatus;
 window.loadMealReservations = loadMealReservations;
 window.loadCabinReservations = loadCabinReservations;
+window.cancelCabinReservation = cancelCabinReservation;
+window.cancelMealReservation = cancelMealReservation;
 
 setInterval(() => {
     loadMealReservations();

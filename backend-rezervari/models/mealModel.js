@@ -51,6 +51,23 @@ const mealModel = {
         });
     },
 
+    cancelReservation: async (id) => {
+        return new Promise((resolve, reject) => {
+            const sqlUpdate = `
+            UPDATE meal_reservations
+            SET status = 'cancelled', updated_at = ?
+            WHERE id = ?`;
+
+            const params = [new Date().toISOString(), id];
+            
+            db.run(sqlUpdate, params, function(err) {
+                if (err) reject(err);
+                else resolve(this.changes);
+                
+            });
+        });
+    },
+
     getReservedDates: async () => {
         return new Promise((resolve, reject) => {
             const sql = `

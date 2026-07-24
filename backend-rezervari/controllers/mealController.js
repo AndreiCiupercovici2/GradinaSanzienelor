@@ -1,5 +1,7 @@
 const MealModel = require('../models/mealModel');
 
+const { matchedData } = require('express-validator');
+
 const { sendConfirmationEmail } = require('../utils/mailer');
 
 const {
@@ -62,6 +64,22 @@ const MealController = {
         }
     },
 
+    cancelReservation: async (req, res) => {
+        const lang = getLanguage(req);
+        const { id } = matchedData(req);
+
+        try {
+            const rowsChanged = await MealModel.cancelReservation(id);
+            if (rowsChanged === 0) {
+                return res.status(404).json({ errors: t('not_found', lang) });
+            }
+            return res.status(200).json({ message: t('update_success', lang), rowsChanged });
+        } catch (error) {
+            console.error('Error cancelling meal reservation:', error);
+            return res.status(500).json({ errors: t('cancel_error', lang) });
+        }
+    },
+
     getAvailability: async (req, res) => {
         const lang = getLanguage(req);
         try {
@@ -69,7 +87,7 @@ const MealController = {
             return res.status(200).json({ reservedDates });
         } catch (error) {
             console.error('Error fetching meal availability:', error);
-            return res.status(500).json({ errors: t('availability_error', lang) });
+            return res.status(500).json({ errors: t('update_error', lang) });
         }
     }
 };
