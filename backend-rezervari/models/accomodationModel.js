@@ -16,7 +16,7 @@ const accomodationModel = {
         });
     },
 
-    createReservation: (data) => {
+    createReservation: ({first_name, last_name, email, phone, start_date, end_date, arrival_time, adults, pets, rooms_needed, wants_meal, wants_hottub, newsletter, created_at, updated_at}) => {
         return new Promise((resolve, reject) => {
             const sql = `
                 INSERT INTO cabin_reservations (
@@ -25,21 +25,21 @@ const accomodationModel = {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
-                data.first_name,
-                data.last_name,
-                data.email,
-                data.phone,
-                data.start_date,
-                data.end_date,
-                data.arrival_time,
-                data.adults,
-                data.pets,
-                data.rooms_needed,
-                data.wants_meal ? true : false,
-                data.wants_hottub ? true : false,
-                data.newsletter ? true : false,
-                data.created_at || new Date().toISOString(),
-                data.updated_at || new Date().toISOString()
+                first_name,
+                last_name,
+                email,
+                phone,
+                start_date,
+                end_date,
+                arrival_time,
+                adults,
+                pets,
+                rooms_needed,
+                wants_meal ? true : false,
+                wants_hottub ? true : false,
+                newsletter ? true : false,
+                created_at || new Date().toISOString(),
+                updated_at || new Date().toISOString()
             ];
 
             db.run(sql, params, function (err) {

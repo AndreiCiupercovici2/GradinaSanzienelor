@@ -6,7 +6,7 @@ const MIN_ROOMS = 1;
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 255;
 const MAX_PHONE_LENGTH = 20;
-const MAX_INPUT_SIZE = 1000;
+
 const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 const messages = {
@@ -86,12 +86,6 @@ const t = (key, lang, ...args) => {
     return typeof msg === 'function' ? msg(...args) : msg;
 };
 
-const isValidEmail = (email) => {
-    if (!email || typeof email !== 'string' || email.length > MAX_EMAIL_LENGTH) return false;
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-};
-
 const isValidDate = (date) => {
     if (!date || typeof date !== 'string') return false;
     const parsed = Date.parse(date);
@@ -107,48 +101,6 @@ const isDateNotInPast = (dateStr) => {
     return date >= today;
 };
 
-const isValidPhoneNumber = (phone) => {
-    if (!phone || typeof phone !== 'string') return false;
-    if (phone.length > MAX_PHONE_LENGTH || phone.length < 6) return false;
-    return /^[0-9\s\-\+()]+$/.test(phone);
-};
-
-const isValidInteger = (value) => {
-    const num = Number(value);
-    return Number.isInteger(num) && num >= 0;
-};
-
-const isValidBoolean = (value) => {
-    return typeof value === 'boolean';
-};
-
-const containsMaliciousPatterns = (text) => {
-    if (!text || typeof text !== 'string') return false;
-    const patterns = [
-        /<script[^>]*>.*?<\/script>/gi,
-        /javascript:/gi,
-        /on\w+\s*=/gi,
-        /<iframe/gi,
-        /eval\(/gi,
-        /alert\(/gi
-    ];
-    return patterns.some(pattern => pattern.test(text));
-};
-
-const sanitizeText = (text) => {
-    if (!text || typeof text !== 'string') return '';
-    let sanitized = text.trim().slice(0, 255);
-    sanitized = sanitized.replace(/[<>]/g, '');
-    return sanitized;
-};
-
-const sanitizeName = (name) => {
-    if (!name || typeof name !== 'string') return '';
-    let sanitized = name.trim().slice(0, MAX_NAME_LENGTH);
-    sanitized = sanitized.replace(/[<>"{};]/g, '');
-    return sanitized;
-};
-
 const isToday = (dateStr) => {
     const today = new Date();
     const date = new Date(dateStr);
@@ -162,10 +114,6 @@ const isAfter10Am = () => {
     return now.getHours() >= 10;
 };
 
-const validateInputSize = (text) => {
-    return !text || (typeof text === 'string' && text.length <= MAX_INPUT_SIZE);
-};
-
 function formatDateDMY(dateStr) {
     if (!dateStr) return dateStr;
     const datePart = dateStr.substring(0, 10);
@@ -174,98 +122,9 @@ function formatDateDMY(dateStr) {
     return `${day}-${month}-${year}`;
 }
 
-const validateReservationInput = (data, lang, isFood = false) => {
-    const errors = [];
-
-    if (!data || typeof data !== 'object') {
-        errors.push(t('invalid_input_size', lang));
-        return errors;
-    }
-
-    const firstName = data.first_name;
-    const lastName = data.last_name;
-
-    if (!firstName || !lastName || typeof firstName !== 'string' || typeof lastName !== 'string') {
-        errors.push(t('invalid_name', lang));
-    } else if (!validateInputSize(firstName) || !validateInputSize(lastName)) {
-        errors.push(t('invalid_input_size', lang));
-    } else if (firstName.length === 0 || lastName.length === 0) {
-        errors.push(t('invalid_name', lang));
-    } else if (containsMaliciousPatterns(firstName) || containsMaliciousPatterns(lastName)) {
-        errors.push(t('invalid_name', lang));
-    }
-
-    if (!isValidEmail(data.email)) {
-        errors.push(t('invalid_email', lang));
-    } else if (containsMaliciousPatterns(data.email)) {
-        errors.push(t('invalid_email', lang));
-    }
-
-    if (!isValidPhoneNumber(data.phone)) {
-        errors.push(t('invalid_phone', lang));
-    } else if (containsMaliciousPatterns(data.phone)) {
-        errors.push(t('invalid_phone', lang));
-    }
-
-    if (!isValidInteger(data.adults)) {
-        errors.push(t('invalid_integer', lang));
-    } else {
-        const adults = parseInt(data.adults, 10);
-        if (adults < 1) errors.push(t('invalid_adults', lang));
-    }
-
-    if (isFood) {
-        if (!isValidDate(data.reservation_date)) {
-            errors.push(t('invalid_reservation_date', lang));
-        } else if (!isDateNotInPast(data.reservation_date)) {
-            errors.push(t('invalid_date_past', lang));
-        }
-
-        if (isToday(data.reservation_date) && isAfter10Am()) {
-            errors.push(t('invalid_same_day_after_10am', lang));
-        }
-    } else {
-        if (!isValidDate(data.start_date)) {
-            errors.push(t('invalid_start_date', lang));
-        } else if (!isDateNotInPast(data.start_date)) {
-            errors.push(t('invalid_date_past', lang));
-        }
-
-        if (!isValidDate(data.end_date)) {
-            errors.push(t('invalid_end_date', lang));
-        } else if (!isDateNotInPast(data.end_date)) {
-            errors.push(t('invalid_date_past', lang));
-        }
-
-        if (isValidDate(data.start_date) && isValidDate(data.end_date)) {
-            if (new Date(data.start_date) >= new Date(data.end_date)) {
-                errors.push(t('invalid_end_before_start', lang));
-            }
-        }
-
-        if (!isValidInteger(data.rooms_needed)) {
-            errors.push(t('invalid_integer', lang));
-        } else {
-            const rooms = parseInt(data.rooms_needed, 10);
-            if (rooms < MIN_ROOMS || rooms > MAX_ROOMS) {
-                errors.push(t('invalid_rooms', lang));
-            }
-        }
-
-        if (isToday(data.start_date) && isAfter10Am()) {
-            errors.push(t('invalid_same_day_after_10am', lang));
-        }
-    }
-
-    return errors.length > 0 ? errors : null;
-};
-
 module.exports = {
     getLanguage,
     t,
-    validateReservationInput,
-    sanitizeText,
-    sanitizeName,
     MAX_CABIN_CAPACITY,
     MIN_CABIN_CAPACITY,
     MAX_MEAL_CAPACITY,
@@ -274,15 +133,7 @@ module.exports = {
     MAX_NAME_LENGTH,
     MAX_EMAIL_LENGTH,
     MAX_PHONE_LENGTH,
-    MAX_INPUT_SIZE,
-    isValidEmail,
-    isValidDate,
-    isValidPhoneNumber,
-    isValidInteger,
-    isValidBoolean,
     isDateNotInPast,
-    containsMaliciousPatterns,
-    validateInputSize,
     isToday,
     isAfter10Am,
     formatDateDMY,

@@ -19,7 +19,7 @@ const mealModel = {
         });
     },
 
-    createReservation: async (reservationData) => {
+    createReservation: async ({first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, created_at, updated_at}) => {
         return new Promise((resolve, reject) => {
             const sqlInsert = `
             INSERT INTO meal_reservations
@@ -27,18 +27,18 @@ const mealModel = {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
-                reservationData.first_name,
-                reservationData.last_name,
-                reservationData.email,
-                reservationData.phone,
-                reservationData.reservation_date,
-                reservationData.reservation_time,
-                reservationData.adults,
-                reservationData.pets,
-                reservationData.wants_cabin ? true : false,
-                reservationData.newsletter ? true : false,
-                reservationData.created_at || new Date().toISOString(),
-                reservationData.updated_at || new Date().toISOString()
+                first_name,
+                last_name,
+                email,
+                phone,
+                reservation_date,
+                reservation_time,
+                adults,
+                pets,
+                wants_cabin ? true : false,
+                newsletter ? true : false,
+                new Date().toISOString(),
+                new Date().toISOString()
             ];
 
             db.run(sqlInsert, params, function(err) {
