@@ -8,5 +8,6 @@ router.get('/portalIntern/meal', portalInternController.getAllMealReservations);
 router.post('/portalIntern/decision', portalInternController.handleDecision);
 router.post('/portalIntern/block-date', blockedDateController.blockDate);
 router.get('/portalIntern/blocked-dates', blockedDateController.getBlockedDates);
+router.delete('/portalIntern/blocked-dates/:id', blockedDateController.deleteBlockedDates);
 
 module.exports = router;

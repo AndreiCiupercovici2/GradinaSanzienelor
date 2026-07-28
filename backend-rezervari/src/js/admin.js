@@ -69,7 +69,6 @@ function generateButtons(id, reservationType, currentStatus) {
 }
 
 
-// Called by the Approve / Reject buttons
 async function changeStatus(id, reservationType, decision) {
     if (!confirm(`Ești sigură că vrei să marchezi această rezervare ca ${decision}?`)) return;
 
@@ -82,9 +81,8 @@ async function changeStatus(id, reservationType, decision) {
 
         if (response.ok) {
             alert('Status actualizat cu succes!');
-            // Reload tables to reflect the new status
-            loadMealReservations();
-            loadCabinReservations();
+            await loadMealReservations();
+            await loadCabinReservations();
         } else {
             alert('A apărut o eroare la actualizare.');
         }
@@ -140,7 +138,7 @@ mealCalendar = flatpickr("#mealAdminCalendarBtn", {
 
         const blockedInfo = blockedDatesData.find(b => b.type === 'meal' && dateStr >= b.start_date && dateStr <= b.end_date);
         if (blockedInfo) {
-            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${dateStr}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}</p>`;
+            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${dateStr}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}<button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelBlockedDate(${blockedInfo.id})">❌ Elimină</button></p>`;
             return;
         }
 
@@ -219,7 +217,7 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
 
         const blockedInfo = blockedDatesData.find(b => b.type === 'cabin' && dateStr >= b.start_date && dateStr <= b.end_date);
         if (blockedInfo) {
-            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${formatDateDMY(dateStr)}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}</p>`;
+            detailsContainer.innerHTML = `<p style="color: #dc3545;"><strong>${formatDateDMY(dateStr)}</strong>: Dată blocată manual. Motiv: ${blockedInfo.reason || 'N/A'}<button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelBlockedDate(${blockedInfo.id})">❌ Elimină</button></p>`;
             return;
         }
 
@@ -418,6 +416,8 @@ document.getElementById('blockDatesForm').addEventListener('submit', async funct
     }
 
     await blockDate(type, startDate, endDate, reason);
+    await loadCabinReservations();
+    await loadMealReservations();
 
     e.target.reset();
     blockEndPicker.set('minDate', 'today');
@@ -444,6 +444,7 @@ async function cancelCabinReservation(reservationId) {
         if (response.ok) {
             alert('Rezervarea de cabană a fost anulată cu succes!');
             await loadCabinReservations();
+            document.getElementById('cabinDetails').style.display = 'none';
         } else {
             alert(data.errors || 'A apărut o eroare la anularea rezervării.');
         }
@@ -462,7 +463,6 @@ async function cancelMealReservation(reservationId) {
     if (!confirm('Ești sigur că vrei să anulezi această rezervare de masă?')) return;
 
     try {
-        // NOTE: Ensure your backend has this matching PATCH route!
         const response = await fetchWithAuth(`${backendUrl}/meal_reservations/${reservationId}/cancel`, {
             method: 'PATCH',
             headers: { 
@@ -485,11 +485,46 @@ async function cancelMealReservation(reservationId) {
     }
 }
 
+async function cancelBlockedDate(blockedDateId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login';
+        return;
+    }
+
+    if (!confirm('Ești sigur că vrei să elimini această dată blocată?')) return;
+
+    try {
+        const response = await fetchWithAuth(`${backendUrl}/portalIntern/blocked-dates/${blockedDateId}`, {
+            method: 'DELETE',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+        });
+        if (response.ok) {
+            alert('Data blocată a fost eliminată cu succes!');
+            await loadBlockedDates();
+
+            const mealDetails = document.getElementById('mealDetails');
+            if (mealDetails) mealDetails.style.display = 'none';
+            
+            const cabinDetails = document.getElementById('cabinDetails');
+            if (cabinDetails) cabinDetails.style.display = 'none';
+        } else {
+            alert('A apărut o eroare la eliminarea datei blocate.');
+        }
+    } catch (error) {
+        console.error('Error canceling blocked date:', error);
+    }
+}
+
 window.changeStatus = changeStatus;
 window.loadMealReservations = loadMealReservations;
 window.loadCabinReservations = loadCabinReservations;
 window.cancelCabinReservation = cancelCabinReservation;
 window.cancelMealReservation = cancelMealReservation;
+window.cancelBlockedDate = cancelBlockedDate;
 
 setInterval(() => {
     loadMealReservations();

@@ -18,6 +18,20 @@ const blockedDateController = {
             }
             return res.status(200).json(rows);
         });
+    },
+
+    deleteBlockedDates: (req, res) => {
+        const id = req.params.id;
+        BlockedDate.delete(id, function(err) {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to delete blocked date' });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({ error: 'Blocked date not found' });
+            }
+            return res.status(200).json({ message: 'Blocked date deleted successfully' });
+        });
     }
 }
 
