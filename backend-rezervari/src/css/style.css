@@ -972,6 +972,7 @@ input#calendarCabin {
     font-weight: 600;
     color: #555;
     margin-bottom: 6px;
+    text-transform: uppercase;
 }
 
 /* Clickable card look for date inputs */
@@ -1197,20 +1198,6 @@ input#calendarCabin {
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-
-.extra-badge {
-    display: inline-block;
-    background: #e8f4fd;
-    color: #0077cc;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    width: fit-content;
 }
 
 .extra-info-panel h4 {
