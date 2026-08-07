@@ -1,4 +1,5 @@
 const MealModel = require('../models/mealModel');
+const BlockedDateModel = require('../models/blockedDateModel');
 
 const { matchedData } = require('express-validator');
 
@@ -34,6 +35,15 @@ const MealController = {
         }
 
         try {
+            const blockedDates = await BlockedDateModel.getBlockedDates();
+            const isBlocked = blockedDates.some(b =>
+                b.type === 'meal' &&
+                reservation_date >= b.start_date &&
+                reservation_date <= b.end_date
+            );
+            if (isBlocked) {
+                return res.status(400).json({ errors: t('date_blocked', lang) });
+            }
             const existingGuests = await MealModel.checkAvailability(reservation_date);
             console.log(`Total capacity= ${MAX_MEAL_CAPACITY}, Existing guests for ${reservation_date}:`, existingGuests);
             if (existingGuests + totalGuests > MAX_MEAL_CAPACITY) {

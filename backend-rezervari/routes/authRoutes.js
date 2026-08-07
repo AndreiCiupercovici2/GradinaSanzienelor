@@ -17,6 +17,7 @@ router.get('/occupied_days', accomodationController.getAvailability);
 router.post('/meal_reservations', mealController.createReservation);
 router.get('/meal_availability', mealController.getAvailability);
 //router.post('/meal-reservations/lookup', mealController.lookupReservation);
+router.get('/public/blocked-dates', blockedDateController.getBlockedDates);
 
 const adminRouter = express.Router();
 

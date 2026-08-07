@@ -1,4 +1,5 @@
 const AccomodationModel = require('../models/accomodationModel');
+const BlockedDateModel = require('../models/blockedDateModel');
 const { matchedData } = require('express-validator');
 
 const { sendConfirmationEmail } = require('../utils/mailer');
@@ -38,6 +39,15 @@ const AccomodationController = {
         }
 
         try {
+            const blockedDates = await BlockedDateModel.getBlockedDates();
+            const isBlocked = blockedDates.some(b =>
+                b.type === 'cabin' &&
+                start_date <= b.end_date &&
+                end_date >= b.start_date
+            );
+            if (isBlocked) {
+                return res.status(400).json({ errors: t('date_blocked', lang) });
+            }
             const existingGuests = await AccomodationModel.checkAvailability(start_date, end_date);
             if (existingGuests + totalGuests > MAX_CABIN_CAPACITY) {
                 return res.status(400).json({ errors: t('fully_booked', lang) });

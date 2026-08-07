@@ -8,11 +8,14 @@ import flatpickr from 'flatpickr';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 
 export function initWizardEventListeners() {
-    window.addEventListener('beforeunload', (e) => {
-        if (WIZARD_STATE.mealFormDirty || WIZARD_STATE.cabinFormDirty) {
-            e.preventDefault(); e.returnValue = '';
-        }
-    });
+    const hasWizard = document.getElementById('cabinSection') || document.getElementById('mealSection');
+    if (hasWizard) {
+        window.addEventListener('beforeunload', (e) => {
+            if (WIZARD_STATE.mealFormDirty || WIZARD_STATE.cabinFormDirty) {
+                e.preventDefault(); e.returnValue = '';
+            }
+        });
+    }
 
     document.getElementById('cabinSection')?.addEventListener('input', (e) => {
         const id = e.target?.id;
@@ -517,7 +520,7 @@ async function fetchCabinOccupancy() {
     try {
         const [resp, blockedResp] = await Promise.all([
             fetch(`${backendUrl}/api/occupied_days`),
-            fetch(`${backendUrl}/api/portalIntern/blocked-dates`)
+            fetch(`${backendUrl}/api/public/blocked-dates`)
         ]);
         const full = new Set();
         const partial = new Set();
@@ -564,7 +567,7 @@ async function fetchMealAvailability() {
     try {
         const [resp, blockedResp] = await Promise.all([
             fetch(`${backendUrl}/api/meal_availability`),
-            fetch(`${backendUrl}/api/portalIntern/blocked-dates`)
+            fetch(`${backendUrl}/api/public/blocked-dates`)
         ]);
 
         const full = new Set();
@@ -845,7 +848,7 @@ export function updateCabinSummary() {
     if (!panel) return;
     const lang = APP_GLOBALS.currentLanguage;
     const t = translations[lang];
-    
+
     const arrival = document.getElementById('cabinArrivalInput')?.value || '—';
     const departure = document.getElementById('cabinDepartureInput')?.value || '—';
     const time = document.getElementById('cabinArrivalTimeInput')?.value || '—';
