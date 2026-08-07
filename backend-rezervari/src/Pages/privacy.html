@@ -15,21 +15,23 @@
 <body>
 
     <header class="main-header">
-        <div class="logo-container">
-            <a href="/" class="logo-link" title="Grădina Sânzienelor - Acasă">
-                <img src="/images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
-            </a>
-        </div>
-
         <nav class="main-nav">
-            <ul>
-                <li><a href="/" data-i18n="nav_home"></a></li>
-                <li><a href="/punctGastronomic" data-i18n="nav_gastronomic_point"></a></li>
-                <li><a href="/meal" data-i18n="nav_meal"></a></li>
-                <li><a href="/accomodation" data-i18n="nav_cabin"></a></li>
-                <li><a href="/contact" data-i18n="nav_contact"></a></li>
-            </ul>
+            <div class="nav-container-left">
+                <a href="/" data-i18n="nav_home"></a>
+                <a href="/punctGastronomic" data-i18n="nav_gastronomic_point"></a>
+                <a href="/meal" data-i18n="nav_meal"></a>
+            </div>
+            <div class="logo-container">
+                <a href="/" class="logo-link" title="Grădina Sânzienelor - Acasă">
+                    <img src="/images/logo.webp" alt="Logo Grădina Sânzienelor" class="logo">
+                </a>
+            </div>
+            <div class="nav-container-right">
+                <a href="/accomodation" data-i18n="nav_cabin"></a>
+                <a href="/contact" data-i18n="nav_contact"></a>
+            </div>
         </nav>
+
 
         <div class="lang-selector">
             <button id="ro-btn">🇷🇴 RO</button>

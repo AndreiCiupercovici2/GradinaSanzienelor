@@ -24,7 +24,7 @@ export const translations = {
         meal_section_subtitle: "Selecteaza o zi din calendar pentru a face rezervarea la masă.",
         cabin_section_subtitle: "Selectează perioada în care dorești să te cazezi în cabană.",
         cabin_warning: "<strong>Atenție:</strong> În această perioadă cabana mai găzduiește <strong>{oaspeți} oaspeți</strong>. Spațiile comune se împart. <br>Mai sunt doar <strong>{locuri} locuri libere</strong>.",
-        notification_today_disabled: "Dacă doriți să rezervați pentru astăzi, vă rugăm sunați la numărul nostru de telefon: \n+40 748 792 686 sau \n+40 740 884 472.",
+        notification_today_disabled: "Dacă doriți să rezervați pentru astăzi, vă rugăm sunați la numărul nostru de telefon: \n+40 748 792 686 sau \n+40 740 884 472.\nDupa finalizarea rezervării, vă vom contacta pentru a confirma detaliile și a vă oferi informații suplimentare.\nPentru evenimente speciale și meniuri mai complexe vă rugăm sa ne sunați",
         confirmation_pending: "Cererea a fost trimisă pentru aprobare. Un administrator vă va contacta pentru a confirma detaliile.",
         warning_pending_reservation: "Atenție: Există o rezervare în așteptare pentru această perioadă.",
         step_travel_info: "Informații Călătorie",
@@ -156,7 +156,7 @@ export const translations = {
         cabin_price_display: "Estimated Price: 0 RON",
         meal_price_display: "Estimated Price: 0 RON",
         cabin_warning: "<strong>Attention:</strong> During this period the cabin hosts <strong>{guests} guests</strong>. Common areas are shared. <br>There are only <strong>{spaces} spaces left</strong>.",
-        notification_today_disabled: "If you want to book for today please call us at: \n+40 748 792 686 or \n+40 740 884 472.",
+        notification_today_disabled: "If you want to book for today please call us at: \n+40 748 792 686 or \n+40 740 884 472.\nAfter completing the booking, we will contact you to confirm the details and provide additional information.\nFor special events and more complex menus, please call us.",
         confirmation_pending: "Your request has been submitted for approval. An administrator will contact you to confirm the details.",
         warning_pending_reservation: "Note: There is a pending reservation for this period.",
         step_travel_info: "Travel Information",
@@ -326,8 +326,8 @@ export function formatLegalLinks() {
     if (!noteElement) return;
 
     let currentText = noteElement.textContent;
-    const termsHtml = `<a href="/terms" class="legal-link" id="termsLink" data-i18n="terms_and_conditions">${translations[currentLanguage].terms_and_conditions}</a>`;
-    const privacyHtml = `<a href="/privacy" class="legal-link" id="privacyLink" data-i18n="privacy_policy">${translations[currentLanguage].privacy_policy}</a>`;
+    const termsHtml = `<a href="/terms" target="_blank" class="legal-link" id="termsLink" data-i18n="terms_and_conditions">${translations[currentLanguage].terms_and_conditions}</a>`;
+    const privacyHtml = `<a href="/privacy" target="_blank" class="legal-link" id="privacyLink" data-i18n="privacy_policy">${translations[currentLanguage].privacy_policy}</a>`;
 
     currentText = currentText.replace('{/terms}', termsHtml).replace('{/privacy}', privacyHtml);
     noteElement.innerHTML = currentText;

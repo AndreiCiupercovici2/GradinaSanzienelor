@@ -113,16 +113,21 @@ export function initWizardEventListeners() {
     document.getElementById('hotTubToggle')?.addEventListener('click', function (e) {
         e.preventDefault();
         const isAdded = WIZARD_STATE.cabinExtras?.hotTub || false;
-        WIZARD_STATE.cabinExtras.hotTub = !isAdded;
-        this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Hot Tub' : '+ Adaugă Jacuzzi';
+        const nextState = !isAdded;
+
+        WIZARD_STATE.cabinExtras.hotTub = nextState;
+        this.classList.toggle('extra-toggle-added', nextState);
+        this.textContent = nextState ? (APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr') : (APP_GLOBALS.currentLanguage === 'en' ? '+ Add Hot Tub' : '+ Adaugă Ciubăr');
         saveToLocalStorage();
     });
 
     document.getElementById('mealToggle')?.addEventListener('click', function (e) {
         e.preventDefault();
         const isAdded = WIZARD_STATE.cabinExtras?.meal || false;
+
         WIZARD_STATE.cabinExtras.meal = !isAdded;
-        this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Meal' : '+ Adaugă Masă';
+        this.classList.toggle('extra-toggle-added', !isAdded);
+        this.textContent = !isAdded ? (APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă') : (APP_GLOBALS.currentLanguage === 'en' ? '+ Add Meal' : '+ Adaugă Masă');
         saveToLocalStorage();
     });
 
@@ -188,6 +193,7 @@ export function initWizardEventListeners() {
         if (isMealSection) {
             const isAdded = WIZARD_STATE.mealExtras?.cabin || false;
             WIZARD_STATE.mealExtras.cabin = !isAdded;
+            this.classList.toggle('extra-toggle-added', !isAdded);
             this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana';
             saveToLocalStorage();
         }
@@ -268,11 +274,17 @@ export function loadFromLocalStorage() {
             const hotTubToggle = document.getElementById('hotTubToggle');
             const mealToggle = document.getElementById('mealToggle');
 
-            if (hotTubToggle && WIZARD_STATE.cabinExtras?.hotTub) {
-                hotTubToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr';
+            if (hotTubToggle) {
+                hotTubToggle.classList.toggle('extra-toggle-added', !!WIZARD_STATE.cabinExtras?.hotTub);
+                hotTubToggle.textContent = WIZARD_STATE.cabinExtras?.hotTub
+                    ? (APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Hot Tub' : '+ Elimina Ciubăr')
+                    : (APP_GLOBALS.currentLanguage === 'en' ? '+ Add Hot Tub' : '+ Adaugă Ciubăr');
             }
-            if (mealToggle && WIZARD_STATE.cabinExtras?.meal) {
-                mealToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă';
+            if (mealToggle) {
+                mealToggle.classList.toggle('extra-toggle-added', !!WIZARD_STATE.cabinExtras?.meal);
+                mealToggle.textContent = WIZARD_STATE.cabinExtras?.meal
+                    ? (APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Meal' : '+ Elimina Masă')
+                    : (APP_GLOBALS.currentLanguage === 'en' ? '+ Add Meal' : '+ Adaugă Masă');
             }
 
             if (WIZARD_STATE.cabinStep > 1) {
@@ -294,8 +306,11 @@ export function loadFromLocalStorage() {
             }
 
             const cabinToggle = document.getElementById('cabinToggle');
-            if (cabinToggle && WIZARD_STATE.mealExtras?.cabin) {
-                cabinToggle.textContent = APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana';
+            if (cabinToggle) {
+                cabinToggle.classList.toggle('extra-toggle-added', !!WIZARD_STATE.mealExtras?.cabin);
+                cabinToggle.textContent = WIZARD_STATE.mealExtras?.cabin
+                    ? (APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana')
+                    : (APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana');
             }
 
             if (WIZARD_STATE.mealStep > 1) {
