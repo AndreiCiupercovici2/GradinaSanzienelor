@@ -38,7 +38,9 @@ export const WIZARD_STATE = {
         pets: ''
     },
     mealExtras: {
-        cabin: false
+        cabin: false,
+        cabinStart: '',
+        cabinEnd: ''
     },
     mealStep: 1, // current step 1-4
     mealFormDirty: false,

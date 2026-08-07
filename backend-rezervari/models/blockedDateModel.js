@@ -10,6 +10,17 @@ const BlockedDate = {
     },
     delete: (id, callback) => {
         db.run(`DELETE FROM blocked_dates WHERE id = ?`, [id], callback);
+    },
+    getAllAsync: () => {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM blocked_dates`, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
     }
 };
 

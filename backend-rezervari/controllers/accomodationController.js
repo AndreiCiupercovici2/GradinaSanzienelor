@@ -39,7 +39,7 @@ const AccomodationController = {
         }
 
         try {
-            const blockedDates = await BlockedDateModel.getBlockedDates();
+            const blockedDates = await BlockedDateModel.getAllAsync();
             const isBlocked = blockedDates.some(b =>
                 b.type === 'cabin' &&
                 start_date <= b.end_date &&

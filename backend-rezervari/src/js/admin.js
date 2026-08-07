@@ -186,16 +186,25 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
             return b.type === 'cabin' && currentCellDate >= b.start_date && currentCellDate <= b.end_date;
         });
 
-        const activeRez = cabinReservationsData.filter(rez => {
+        const activeCabinRez = cabinReservationsData.filter(rez => {
             const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
             const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
-
-            return rez.status === 'confirmed' &&
-                currentCellDate >= safeStart &&
-                currentCellDate <= safeEnd;
+            return rez.status === 'confirmed' && currentCellDate >= safeStart && currentCellDate <= safeEnd;
         });
 
-        const roomsBooked = activeRez.reduce((sum, r) => sum + parseInt(r.rooms_needed || 1), 0);
+        const activeMealCabinRez = mealReservationsData.filter(rez => {
+            const safeStart = rez.cabin_start_date ? rez.cabin_start_date.substring(0, 10) : "";
+            const safeEnd = rez.cabin_end_date ? rez.cabin_end_date.substring(0, 10) : "";
+            return rez.status === 'confirmed' && rez.wants_cabin && safeStart && safeEnd && currentCellDate >= safeStart && currentCellDate <= safeEnd;
+        });
+
+        let roomsBooked = activeCabinRez.reduce((sum, r) => sum + parseInt(r.rooms_needed || 1), 0);
+        activeMealCabinRez.forEach(r => {
+            let adults = parseInt(r.adults || 1);
+            let estimatedRooms = Math.ceil(adults / 3);
+            if (estimatedRooms > 3 ) estimatedRooms = 3;
+            roomsBooked += estimatedRooms;
+        });
 
         if (isBlocked) {
             dayElem.classList.add("cal-cabin-blocked");
@@ -221,23 +230,33 @@ cabinCalendar = flatpickr("#cabinAdminCalendarBtn", {
             return;
         }
 
-        const activeRez = cabinReservationsData.filter(rez => {
+        const activeCabinRez = cabinReservationsData.filter(rez => {
             const safeStart = rez.start_date ? rez.start_date.substring(0, 10) : "";
             const safeEnd = rez.end_date ? rez.end_date.substring(0, 10) : "";
-
-            return rez.status === 'confirmed' &&
-                dateStr >= safeStart &&
-                dateStr <= safeEnd;
+            return rez.status === 'confirmed' && dateStr >= safeStart && dateStr <= safeEnd;
         });
 
-        if (activeRez.length === 0) {
+        const activeMealCabinRez = mealReservationsData.filter(rez => {
+            const safeStart = rez.cabin_start_date ? rez.cabin_start_date.substring(0, 10) : "";
+            const safeEnd = rez.cabin_end_date ? rez.cabin_end_date.substring(0, 10) : "";
+            return rez.status === 'confirmed' && rez.wants_cabin && safeStart && safeEnd && dateStr >= safeStart && dateStr <= safeEnd;
+        });
+
+        if (activeCabinRez.length === 0 && activeMealCabinRez.length === 0) {
             detailsContainer.innerHTML = `<p style="color: #28a745;"><strong>${formatDateDMY(dateStr)}</strong>: Cabana este complet liberă.</p>`;
         } else {
-            let html = `<p><strong>Cazări active în data de ${formatDateDMY(dateStr)} - până la ${formatDateDMY(activeRez[0].end_date)}</strong></p><ul>`;
-            activeRez.forEach(rez => {
-                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - ${calculateNights(rez.start_date, rez.end_date)} nopți
+            let html = `<p><strong>Cazări active în data de ${formatDateDMY(dateStr)}</strong></p><ul>`;
+            
+            activeCabinRez.forEach(rez => {
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (${rez.rooms_needed} camere / Adulți: ${rez.adults}) - până la ${formatDateDMY(rez.end_date)}
                 <button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelCabinReservation(${rez.id})">❌ Anulează</button></li>`;
             });
+
+            activeMealCabinRez.forEach(rez => {
+                html += `<li>👤 <strong>${rez.first_name} ${rez.last_name}</strong> (Pachet Masă + Cabană) - până la ${formatDateDMY(rez.cabin_end_date)}
+                <button class="btn-reject" style="margin-left: 15px;" onclick="window.cancelMealReservation(${rez.id})">❌ Anulează</button></li>`;
+            });
+
             html += `</ul>`;
             detailsContainer.innerHTML = html;
         }
@@ -267,6 +286,10 @@ async function loadMealReservations() {
             mealCalendar.redraw();
         }
 
+        if (cabinCalendar) {
+            cabinCalendar.redraw();
+        }
+
         const table = document.getElementById('mealTable');
         table.innerHTML = '';
 
@@ -286,6 +309,8 @@ async function loadMealReservations() {
                     <td>${rez.adults}</td>
                     <td>${rez.pets}</td>
                     <td>${rez.wants_cabin ? 'Da' : 'Nu'}</td>
+                    <td><strong>${rez.cabin_start_date ? formatDateDMY(rez.cabin_start_date) : '-'}</strong></td>
+                    <td><strong>${rez.cabin_end_date ? formatDateDMY(rez.cabin_end_date) : '-'}</strong></td>
                     <td>${rez.newsletter ? 'Da' : 'Nu'}</td>
                     <td class="status">${generateButtons(rez.id, 'meal', rez.status)}</td>
                 </tr>`;

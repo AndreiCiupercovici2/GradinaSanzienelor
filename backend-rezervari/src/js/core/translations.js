@@ -35,6 +35,9 @@ export const translations = {
         step_your_details: "Date personale",
         step_confirmation: "Confirmare",
         label_arrival: "Sosire",
+        label_cabin_arrival: "Sosire cabană",
+        label_cabin_departure: "Plecare cabană",
+        label_cabin_nights: "Nopți cabană",
         label_departure: "Plecare",
         label_night: "Noapte",
         label_nights: "Nopți",
@@ -124,7 +127,8 @@ export const translations = {
         extra_hot_tub_description: "Relaxați-vă sub stele în ciubărul nostru privat cu sistem de lumini și jacuzzi. Disponibil tot anul, ciubărul poate găzdui până la 6 oaspeți. Puteți alege să îl adăugați la rezervarea dvs. pentru întreg sejurul sau doar pentru o noapte.",
         extra_meal_plan_description: "Începeți fiecare dimineață cu un mic dejun copios, din ingrediente locale sezoniere. Bucurați-vă de cine în trei feluri, gătit de bucătaria noastră. Preț per persoană per noapte.",
         cabin_guests_title: "Număr de oaspeți în cabană",
-        personal_information_title: "Informații personale"
+        personal_information_title: "Informații personale",
+        cabin_dates_required: "Vă rugăm să selectați atât data de check-in cât și data de check-out pentru cabană."
     },
     en: {
         main_title: "Grădina Sânzienelor - Local Gastronomic Point",
@@ -162,6 +166,9 @@ export const translations = {
         step_confirmation: "Confirmation",
         label_arrival: "Arrival",
         label_departure: "Departure",
+        label_cabin_arrival: "Cabin arrival",
+        label_cabin_departure: "Cabin departure",
+        label_cabin_nights: "Cabin nights",
         label_nights: "Nights",
         label_night: "Night",
         label_rooms: "No. of rooms",
@@ -250,7 +257,8 @@ export const translations = {
         cabin_dates_title: "Cabin dates",
         cabin_guests_title: "Number of guests in cabin",
         personal_information_title: "Personal information",
-        extra_meal_plan_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night."
+        extra_meal_plan_description: "Start each morning with a hearty homemade breakfast featuring local seasonal produce. Enjoy three-course dinners crafted by our kitchen. Priced per person per night.",
+        cabin_dates_required: "Please select both check-in and check-out dates for the cabin." 
     }
 }
 

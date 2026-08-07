@@ -9,6 +9,8 @@ const {
     getLanguage,
     t,
     MAX_MEAL_CAPACITY,
+    MAX_CABIN_CAPACITY,
+    MIN_CABIN_CAPACITY,
 } = require('../utils/helpers');
 
 const MealController = {
@@ -26,16 +28,28 @@ const MealController = {
             pets,
             newsletter,
             wants_cabin,
-            reservation_time
+            reservation_time,
+            cabin_start_date,
+            cabin_end_date
         } = req.body;
 
+        if (wants_cabin) {
+            if(!cabin_start_date || !cabin_end_date) {
+                return res.status(400).json({ errors: t('cabin_dates_required', lang) });
+            }
+        }
+
+        if (parseInt(adults, 10) > MAX_CABIN_CAPACITY) {
+            return res.status(400).json({ errors: t('invalid_total_persons_count', lang) });
+        }
+
         const totalGuests = parseInt(adults, 10);
-        if (totalGuests < 1 || totalGuests > MAX_MEAL_CAPACITY) {
+        if (totalGuests < MIN_CABIN_CAPACITY || totalGuests > MAX_MEAL_CAPACITY) {
             return res.status(400).json({ errors: t('invalid_meal_max_persons', lang) });
         }
 
         try {
-            const blockedDates = await BlockedDateModel.getBlockedDates();
+            const blockedDates = await BlockedDateModel.getAllAsync();
             const isBlocked = blockedDates.some(b =>
                 b.type === 'meal' &&
                 reservation_date >= b.start_date &&
@@ -60,6 +74,8 @@ const MealController = {
                 adults: totalGuests,
                 pets,
                 wants_cabin: wants_cabin ? true : false,
+                cabin_start_date: wants_cabin ? cabin_start_date : null,
+                cabin_end_date: wants_cabin ? cabin_end_date : null,
                 newsletter: newsletter ? true : false,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()

@@ -198,6 +198,16 @@ export function initWizardEventListeners() {
             WIZARD_STATE.mealExtras.cabin = !isAdded;
             this.classList.toggle('extra-toggle-added', !isAdded);
             this.textContent = !isAdded ? APP_GLOBALS.currentLanguage === 'en' ? '+ Remove Cabin' : '+ Elimină Cabana' : APP_GLOBALS.currentLanguage === 'en' ? '+ Add Cabin' : '+ Adaugă Cabana';
+            const cabinDatesCard = document.getElementById('cabinDatesCard');
+            if (cabinDatesCard) {
+                cabinDatesCard.style.display = !isAdded ? 'block' : 'none';
+            }
+            if (!isAdded && APP_GLOBALS.cabinArrivalFP) {
+                const mealDate = document.getElementById('mealArrivalInput')?.value;
+                if (mealDate) {
+                    APP_GLOBALS.cabinArrivalFP.setDate(mealDate, false);
+                }
+            }
             saveToLocalStorage();
         }
     });
@@ -367,6 +377,7 @@ export async function handleMealSubmission() {
     if (!validateMealStep3()) return;
 
     const payload = WIZARD_STATE.mealFormData;
+    const extras = WIZARD_STATE.mealExtras;
     const fallbackDate = document.getElementById('mealArrivalInput')?.value || '';
     const fallbackTime = document.getElementById('mealArrivalTimeInput')?.value || '';
 
@@ -379,7 +390,9 @@ export async function handleMealSubmission() {
         reservation_time: payload.reservationTime || fallbackTime,
         adults: parseInt(payload.adults, 10) || 1,
         pets: payload.pets,
-        wants_cabin: WIZARD_STATE.mealExtras.cabin ? true : false,
+        wants_cabin: extras.cabin ? true : false,
+        cabin_start_date: extras.cabinStart,
+        cabin_end_date: extras.cabinEnd,
         newsletter: payload.newsletter ? true : false
     };
 
@@ -453,64 +466,77 @@ function markError(el) {
 }
 
 
-export function handleArrivalChange(dates) {
+export function handleArrivalChange(dates, dateStr, instance) {
     if (!dates || dates.length === 0) return;
     const arrivalDate = new Date(dates[0]);
-    const arrDateStr = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}-${String(arrivalDate.getDate()).padStart(2, '0')}`;
-    const cabinArrivalInput = document.getElementById('cabinArrivalInput');
-    const cabinDepartureInput = document.getElementById('cabinDepartureInput');
-    const mealArrivalInput = document.getElementById('mealArrivalInput');
+    const inputId = instance.element.id;
 
-    if (cabinArrivalInput && cabinDepartureInput) {
-        const depDate = new Date(arrivalDate);
-        depDate.setDate(depDate.getDate() + APP_GLOBALS.cabinNights);
-        const depDateStr = `${depDate.getFullYear()}-${String(depDate.getMonth() + 1).padStart(2, '0')}-${String(depDate.getDate()).padStart(2, '0')}`;
-        cabinDepartureInput.value = depDateStr;
+    if (inputId === 'cabinArrivalInput') {
+        const cabinDepartureInput = document.getElementById('cabinDepartureInput');
+        if (cabinDepartureInput) {
+            const depDate = new Date(arrivalDate);
+            depDate.setDate(depDate.getDate() + APP_GLOBALS.cabinNights);
+            const depDateStr = `${depDate.getFullYear()}-${String(depDate.getMonth() + 1).padStart(2, '0')}-${String(depDate.getDate()).padStart(2, '0')}`;
+            
+            cabinDepartureInput.value = depDateStr;
 
-        if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
-        WIZARD_STATE.cabinFormData.arrivalDate = arrDateStr;
-        WIZARD_STATE.cabinFormData.departureDate = depDateStr;
+            if (document.getElementById('mealSection')) {
+                if (!WIZARD_STATE.mealExtras) WIZARD_STATE.mealExtras = {};
+                WIZARD_STATE.mealExtras.cabinStart = dateStr;
+                WIZARD_STATE.mealExtras.cabinEnd = depDateStr;
+            } else {
+                if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+                WIZARD_STATE.cabinFormData.arrivalDate = dateStr;
+                WIZARD_STATE.cabinFormData.departureDate = depDateStr;
+            }
 
-        if (APP_GLOBALS.cabinDepartureFP) {
-            const nextDay = new Date(arrivalDate.getTime() + 24 * 60 * 60 * 1000);
-            APP_GLOBALS.cabinDepartureFP.set('minDate', nextDay);
-            APP_GLOBALS.cabinDepartureFP.setDate(depDate, false);
+            if (APP_GLOBALS.cabinDepartureFP) {
+                const nextDay = new Date(arrivalDate.getTime() + 24 * 60 * 60 * 1000);
+                APP_GLOBALS.cabinDepartureFP.set('minDate', nextDay);
+                APP_GLOBALS.cabinDepartureFP.setDate(depDate, false);
+            }
+            updateNightsDisplay(false); 
         }
-        updateNightsDisplay(false);
-        updateCabinSummary();
     }
-    if (mealArrivalInput) {
-        const mealDateStr = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}-${String(arrivalDate.getDate()).padStart(2, '0')}`;
-        mealArrivalInput.value = mealDateStr;
 
+    if (inputId === 'mealArrivalInput') {
         if (!WIZARD_STATE.mealFormData) WIZARD_STATE.mealFormData = {};
-        WIZARD_STATE.mealFormData.reservationDate = mealDateStr;
+        WIZARD_STATE.mealFormData.reservationDate = dateStr;
 
         if (APP_GLOBALS.mealReservationFP) {
             APP_GLOBALS.mealReservationFP.setDate(arrivalDate, false);
         }
-        updateMealSummary();
+
+        if (WIZARD_STATE.mealExtras?.cabin && APP_GLOBALS.cabinArrivalFP) {
+            APP_GLOBALS.cabinArrivalFP.setDate(arrivalDate, true); 
+        }
+
+        if (document.getElementById('mealSection')) updateMealSummary();
     }
 
     saveToLocalStorage();
 }
 
-export function handleDepartureChange(dates) {
+export function handleDepartureChange(dates, dateStr, instance) {
     if (dates.length > 0 && APP_GLOBALS.cabinArrivalFP && APP_GLOBALS.cabinArrivalFP.selectedDates[0]) {
         const arrival = APP_GLOBALS.cabinArrivalFP.selectedDates[0];
         const departure = new Date(dates[0]);
         const diff = departure.getTime() - arrival.getTime();
         const nights = Math.round(diff / (1000 * 60 * 60 * 24));
+        
         if (nights > 0) {
             APP_GLOBALS.cabinNights = nights;
 
-            const depDateStr = `${departure.getFullYear()}-${String(departure.getMonth() + 1).padStart(2, '0')}-${String(departure.getDate()).padStart(2, '0')}`;
+            // --- CONSISTENCY FIX: Save to the correct state object ---
+            if (document.getElementById('mealSection')) {
+                if (!WIZARD_STATE.mealExtras) WIZARD_STATE.mealExtras = {};
+                WIZARD_STATE.mealExtras.cabinEnd = dateStr;
+            } else {
+                if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
+                WIZARD_STATE.cabinFormData.departureDate = dateStr;
+            }
 
-            if (!WIZARD_STATE.cabinFormData) WIZARD_STATE.cabinFormData = {};
-            WIZARD_STATE.cabinFormData.departureDate = depDateStr;
             updateNightsDisplay(false);
-            updateCabinSummary();
-
             saveToLocalStorage();
         }
     }
@@ -821,26 +847,29 @@ export function updateNightsDisplay(shouldUpdateDeparture = true) {
         let arrivalDate = null;
         if (APP_GLOBALS.cabinArrivalFP && APP_GLOBALS.cabinArrivalFP.selectedDates && APP_GLOBALS.cabinArrivalFP.selectedDates.length > 0) {
             arrivalDate = new Date(APP_GLOBALS.cabinArrivalFP.selectedDates[0]);
-        }
-
-        else {
+        } else {
             const arrivalInput = document.getElementById('cabinArrivalInput');
             if (arrivalInput && arrivalInput.value) {
                 arrivalDate = new Date(arrivalInput.value);
             }
         }
+        
         if (arrivalDate) {
             const dep = new Date(arrivalDate);
             dep.setDate(dep.getDate() + APP_GLOBALS.cabinNights);
             const dateStr = `${dep.getFullYear()}-${String(dep.getMonth() + 1).padStart(2, '0')}-${String(dep.getDate()).padStart(2, '0')}`;
-            document.getElementById('cabinDepartureInput').value = dateStr;
+            
+            const depInput = document.getElementById('cabinDepartureInput');
+            if (depInput) depInput.value = dateStr;
 
             if (APP_GLOBALS.cabinDepartureFP) {
                 APP_GLOBALS.cabinDepartureFP.setDate(dep, false);
             }
         }
-        updateCabinSummary();
     }
+    
+    if (document.getElementById('cabinSection')) updateCabinSummary();
+    if (document.getElementById('mealSection')) updateMealSummary();
 }
 
 export function updateCabinSummary() {
@@ -884,6 +913,20 @@ export function updateMealSummary() {
     const adults = document.getElementById('mealAdultsInput')?.value || '1';
     const pets = document.getElementById('mealPetsInput')?.value || '';
     const wantsCabin = WIZARD_STATE.mealExtras?.cabin ? t.yes : t.no;
+    
+    let cabinDetailsHTML = '';
+    
+    // Inject the cabin dates into the summary if the extra is selected
+    if (WIZARD_STATE.mealExtras?.cabin) {
+        const cabinArr = document.getElementById('cabinArrivalInput')?.value || '—';
+        const cabinDep = document.getElementById('cabinDepartureInput')?.value || '—';
+        cabinDetailsHTML = `
+            <div class="summary-divider"></div>
+            <div class="summary-row"><span class="summary-label" style="color: #28a745;">${t.label_cabin_arrival}</span><strong>${cabinArr}</strong></div>
+            <div class="summary-row"><span class="summary-label" style="color: #28a745;">${t.label_cabin_departure}</span><strong>${cabinDep}</strong></div>
+            <div class="summary-row"><span class="summary-label" style="color: #28a745;">${t.label_cabin_nights}</span><strong>${APP_GLOBALS.cabinNights}</strong></div>
+        `;
+    }
 
     panel.innerHTML = `
         <div class="summary-section">
@@ -892,6 +935,7 @@ export function updateMealSummary() {
             <div class="summary-row"><span class="summary-label">${t.summary_adults}</span><strong>${adults}</strong></div>
             ${pets ? `<div class="summary-row"><span class="summary-label">${t.label_pets}</span><strong>${pets}</strong></div>` : ''}
             <div class="summary-row"><span class="summary-label">${t.extras_cabin}</span><strong>${wantsCabin}</strong></div>
+            ${cabinDetailsHTML}
         </div>
     `;
 }

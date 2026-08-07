@@ -39,6 +39,8 @@ function initializeTables() {
                     adults INTEGER NOT NULL,
                     pets TEXT,
                     wants_cabin BOOLEAN DEFAULT 0,
+                    cabin_start_date DATE NULL,
+                    cabin_end_date DATE NULL,
                     newsletter BOOLEAN DEFAULT 0,
                     status TEXT DEFAULT 'pending',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

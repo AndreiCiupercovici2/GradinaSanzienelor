@@ -119,7 +119,13 @@ const validateMealReservation = [
         .isInt({ min: MIN_MEAL_CAPACITY, max: MAX_MEAL_CAPACITY }).withMessage((value, { req }) => t('invalid_adults', getLanguage(req))),
     body('wants_cabin')
         .optional()
-        .isBoolean().toBoolean()
+        .isBoolean().toBoolean(),
+    body('cabin_start_date')
+        .optional()
+        .isISO8601().withMessage((value, { req }) => t('invalid_cabin_start_date', getLanguage(req))),
+    body('cabin_end_date')
+        .optional()
+        .isISO8601().withMessage((value, { req }) => t('invalid_cabin_end_date', getLanguage(req)))
 ];
 
 const validateReservationId = [

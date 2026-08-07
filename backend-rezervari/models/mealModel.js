@@ -19,12 +19,12 @@ const mealModel = {
         });
     },
 
-    createReservation: async ({first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, created_at, updated_at}) => {
+    createReservation: async ({first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, cabin_start_date, cabin_end_date, created_at, updated_at}) => {
         return new Promise((resolve, reject) => {
             const sqlInsert = `
             INSERT INTO meal_reservations
-            (first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            (first_name, last_name, email, phone, reservation_date, reservation_time, adults, pets, wants_cabin, newsletter, cabin_start_date, cabin_end_date, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 first_name,
@@ -37,6 +37,8 @@ const mealModel = {
                 pets,
                 wants_cabin ? true : false,
                 newsletter ? true : false,
+                cabin_start_date,
+                cabin_end_date,
                 new Date().toISOString(),
                 new Date().toISOString()
             ];

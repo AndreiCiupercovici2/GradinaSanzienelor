@@ -242,6 +242,38 @@
                     <button id="cabinToggle" class="extra-toggle-btn"></button>
                 </div>
             </div>
+            <div class="cabin-dates-card" style="display: none;" id="cabinDatesCard">
+                <h4 class="cabin-card-title" data-i18n="cabin_dates_title"></h4>
+                <div class="dates-row">
+                    <div class="date-field-wrapper">
+                        <span class="date-field-label" data-i18n="label_arrival"></span>
+                        <div class="date-input-card">
+                            <span class="date-icon">&#128197;</span>
+                            <input type="text" id="cabinArrivalInput" readonly placeholder="" data-i18n-placeholder="placeholder_select_date">
+                        </div>
+                        <!-- Calendar popup wrapper for arrival -->
+                        <div id="cabinArrivalCalendarWrapper" class="calendar-popup-wrapper"
+                            style="position: relative; z-index: 50;"></div>
+                    </div>
+                    <div class="nights-counter-wrapper">
+                        <button type="button" id="nightsDecBtn" class="nights-btn"
+                            aria-label="Decrease nights">&#8722;</button>
+                        <span id="nightsDisplay" class="nights-display">1 night</span>
+                        <button type="button" id="nightsIncBtn" class="nights-btn"
+                            aria-label="Increase nights">&#43;</button>
+                    </div>
+                    <div class="date-field-wrapper">
+                        <span class="date-field-label" data-i18n="label_departure">Departure</span>
+                        <div class="date-input-card">
+                            <span class="date-icon">&#128197;</span>
+                            <input type="text" id="cabinDepartureInput" readonly placeholder="" data-i18n-placeholder="placeholder_select_date">
+                        </div>
+                        <!-- Calendar popup wrapper for departure -->
+                        <div id="cabinDepartureCalendarWrapper" class="calendar-popup-wrapper"
+                            style="position: relative; z-index: 50;"></div>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-actions meal-step-actions">
                 <button type="button" id="backToTravelBtn" class="btn-secondary" data-i18n="back_to_travel_info">&#8592; Back</button>
